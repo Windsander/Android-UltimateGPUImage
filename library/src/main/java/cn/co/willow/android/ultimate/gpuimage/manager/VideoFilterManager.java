@@ -30,18 +30,18 @@ public class VideoFilterManager {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoFilterManager(final Context context) {
-        supportsOpenGLES2(context);
+        supportsOpenGLES3(context);
         mFilter = new GPUImageFilter();
         mRenderer = new VideoRecorderRenderer(mFilter);
     }
 
     /*关键设置======================================================================================*/
     /** 检测是否支持OpenGl */
-    private void supportsOpenGLES2(final Context context) {
+    private void supportsOpenGLES3(final Context context) {
         final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-        if (configurationInfo.reqGlEsVersion < 0x20000) {
-            throw new IllegalStateException("OpenGL ES 2.0 is not supported on this phone.");
+        if (configurationInfo.reqGlEsVersion < 0x30000) {
+            throw new IllegalStateException("OpenGL ES 3.0 is not supported on this phone.");
         }
     }
 

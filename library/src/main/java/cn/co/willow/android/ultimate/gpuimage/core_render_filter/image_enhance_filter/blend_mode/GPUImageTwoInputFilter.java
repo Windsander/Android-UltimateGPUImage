@@ -80,7 +80,13 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
         GLES30.glUniform1i(mFilterInputTextureUniform2, 3);
 
         mTexture2CoordinatesBuffer.position(0);
-        GLES30.glVertexAttribPointer(mFilterSecondTextureCoordinateAttribute, 2, GLES30.GL_FLOAT, false, 0, mTexture2CoordinatesBuffer);
+        GLES30.glVertexAttribPointer(
+                mFilterSecondTextureCoordinateAttribute,
+                2,
+                GLES30.GL_FLOAT,
+                false,
+                0,
+                mTexture2CoordinatesBuffer);
     }
 
 

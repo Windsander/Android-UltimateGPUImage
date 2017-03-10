@@ -14,12 +14,8 @@ public class GPUImageFace02Filter extends GPUImageLookupFilter {
 
     public GPUImageFace02Filter() {
         super();
-    }
-
-    @Override
-    public void onInit() {
-        super.onInit();
         Bitmap bitmap = BitmapFactory.decodeResource(SampleApplication.getApplication().getResources(), R.drawable.filter_face02);
         setBitmap(bitmap);
     }
+
 }

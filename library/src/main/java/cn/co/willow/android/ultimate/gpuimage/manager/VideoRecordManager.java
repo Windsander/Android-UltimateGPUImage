@@ -27,6 +27,7 @@ import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStar
 import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStop;
 import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.CameraUtil;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_ASPECT_RATIO;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_FRAME_RATE;
@@ -79,6 +80,7 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
         }
+        LogUtil.w("Camera::", "size = " + optimalSize.width + "*" + optimalSize.height);
 
         // 2.配置录制参数 init recorder params
         mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
@@ -90,6 +92,7 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mProfile.videoCodec = MediaRecorder.VideoEncoder.MPEG_4_SP;
         mProfile.audioCodec = MediaRecorder.AudioEncoder.AMR_NB;
         mCamera.setParameters(parameters);
+        LogUtil.w("Camera::", "record size = " + mProfile.videoFrameWidth + "*" + mProfile.videoFrameHeight);
 
         // 3.配置预览界面 init preview
         mRecorderView.getHolder().setFixedSize(optimalSize.height, optimalSize.width);

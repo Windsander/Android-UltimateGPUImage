@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2012 CyberAgent
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter;
 
 import android.content.Context;
@@ -40,21 +24,21 @@ public class GPUImageFilter {
     /** 无渲染的顶点着色器 vertex shader without filter */
     protected static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 vPosition;\n" +
-            "attribute vec4 vTextureCoord;\n" +
+            "attribute vec4 inputTextureCoordinate;\n" +
             "varying vec2 textureCoordinate;\n" +
             "void main()\n" +
             "{\n" +
             "    gl_Position = vPosition;\n" +
-            "    textureCoordinate = vTextureCoord.xy;\n" +
+            "    textureCoordinate = inputTextureCoordinate.xy;\n" +
             "}";
 
     /** 无渲染的片段着色器 fragment shader without filter */
     protected static final String NO_FILTER_FRAGMENT_SHADER = "" +
             "varying highp vec2 textureCoordinate;\n" +
-            "uniform sampler2D fSampler2D;\n" +
+            "uniform sampler2D inputImageTexture;\n" +
             "void main()\n" +
             "{\n" +
-            "     gl_FragColor = texture2D(fSampler2D, textureCoordinate);\n" +
+            "     gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n" +
             "}";
 
 
@@ -99,8 +83,8 @@ public class GPUImageFilter {
     public void onInit() {
         mGLProgId = GlUtil.createProgram(mVertexShader, mFragmentShader);
         mVertexPosition = GLES30.glGetAttribLocation(mGLProgId, "vPosition");
-        mVertexTexture = GLES30.glGetAttribLocation(mGLProgId, "vTextureCoord");
-        mFrag2DSampler = GLES30.glGetUniformLocation(mGLProgId, "fSampler2D");
+        mVertexTexture = GLES30.glGetAttribLocation(mGLProgId, "inputTextureCoordinate");
+        mFrag2DSampler = GLES30.glGetUniformLocation(mGLProgId, "inputImageTexture");
         mIsInitialized = true;
     }
 

@@ -10,11 +10,11 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_f
 public class GPUImageLookupFilter extends GPUImageTwoInputFilter {
 
     public static final String LOOKUP_FRAGMENT_SHADER = "" +
-            "varying highp vec2 textureCoordinate;\n" +
-            " varying highp vec2 textureCoordinate2; // TODO: This is not used\n" +
+            " varying highp vec2 textureCoordinate;\n" +
+            " varying highp vec2 textureCoordinate2;\n" +               // TODO: This is not used
             " \n" +
             " uniform sampler2D inputImageTexture;\n" +
-            " uniform sampler2D inputImageTexture2; // lookup texture\n" +
+            " uniform sampler2D inputImageTexture2;\n" +                // lookup texture
             " \n" +
             " uniform lowp float intensity;\n" +
             " \n" +

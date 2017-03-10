@@ -146,6 +146,7 @@ public class GlUtil {
         GLES30.glGenTextures(1, textures, 0);
         GlUtil.checkGlError("glGenTextures");
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+        GlUtil.checkGlError("glBindTexture");
         GLES30.glTexParameteri(
                 /*texture-type*/ GLES30.GL_TEXTURE_2D,
                 /*filter-type*/  GLES30.GL_TEXTURE_MIN_FILTER,
@@ -183,6 +184,7 @@ public class GlUtil {
             GLES30.glGenTextures(1, textures, 0);
             GlUtil.checkGlError("glGenTextures");
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+            GlUtil.checkGlError("glBindTexture");
             GLES30.glTexParameterf(
                     GLES30.GL_TEXTURE_2D,
                     GLES30.GL_TEXTURE_MIN_FILTER,
@@ -231,6 +233,7 @@ public class GlUtil {
             GLES30.glGenTextures(1, textures, 0);
             GlUtil.checkGlError("glGenTextures");
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+            GlUtil.checkGlError("glBindTexture");
             GLES30.glTexParameterf(
                     GLES30.GL_TEXTURE_2D,
                     GLES30.GL_TEXTURE_MAG_FILTER,
