@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -56,11 +56,11 @@ public class GPUImageLevelsFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mMinLocation = GLES20.glGetUniformLocation(getProgram(), "levelMinimum");
-        mMidLocation = GLES20.glGetUniformLocation(getProgram(), "levelMiddle");
-        mMaxLocation = GLES20.glGetUniformLocation(getProgram(), "levelMaximum");
-        mMinOutputLocation = GLES20.glGetUniformLocation(getProgram(), "minOutput");
-        mMaxOutputLocation = GLES20.glGetUniformLocation(getProgram(), "maxOutput");
+        mMinLocation = GLES30.glGetUniformLocation(getProgram(), "levelMinimum");
+        mMidLocation = GLES30.glGetUniformLocation(getProgram(), "levelMiddle");
+        mMaxLocation = GLES30.glGetUniformLocation(getProgram(), "levelMaximum");
+        mMinOutputLocation = GLES30.glGetUniformLocation(getProgram(), "minOutput");
+        mMaxOutputLocation = GLES30.glGetUniformLocation(getProgram(), "maxOutput");
     }
 
     @Override

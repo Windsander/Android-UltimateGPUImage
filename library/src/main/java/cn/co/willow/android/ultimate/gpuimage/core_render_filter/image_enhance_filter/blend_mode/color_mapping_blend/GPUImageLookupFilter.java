@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode.color_mapping_blend;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode.GPUImageTwoInputFilter;
 
@@ -62,7 +62,7 @@ public class GPUImageLookupFilter extends GPUImageTwoInputFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mIntensityLocation = GLES20.glGetUniformLocation(getProgram(), "intensity");
+        mIntensityLocation = GLES30.glGetUniformLocation(getProgram(), "intensity");
     }
 
     @Override

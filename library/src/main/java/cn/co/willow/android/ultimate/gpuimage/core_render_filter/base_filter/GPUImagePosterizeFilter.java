@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -39,7 +39,7 @@ public class GPUImagePosterizeFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mGLUniformColorLevels = GLES20.glGetUniformLocation(getProgram(), "colorLevels");
+        mGLUniformColorLevels = GLES30.glGetUniformLocation(getProgram(), "colorLevels");
         setColorLevels(mColorLevels);
     }
 

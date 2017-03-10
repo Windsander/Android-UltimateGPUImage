@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -43,7 +43,7 @@ public class GPUImageSaturationFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mSaturationLocation = GLES20.glGetUniformLocation(getProgram(), "saturation");
+        mSaturationLocation = GLES30.glGetUniformLocation(getProgram(), "saturation");
     }
 
     @Override

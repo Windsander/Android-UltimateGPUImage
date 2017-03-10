@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -51,8 +51,8 @@ public class GPUImageFalseColorFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mFirstColorLocation = GLES20.glGetUniformLocation(getProgram(), "firstColor");
-        mSecondColorLocation = GLES20.glGetUniformLocation(getProgram(), "secondColor");
+        mFirstColorLocation = GLES30.glGetUniformLocation(getProgram(), "firstColor");
+        mSecondColorLocation = GLES30.glGetUniformLocation(getProgram(), "secondColor");
     }
 
     @Override

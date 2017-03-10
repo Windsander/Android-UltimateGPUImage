@@ -16,7 +16,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 /**
  * 3x3卷积，高亮大色块变黑，加亮边缘、线条等
@@ -89,7 +89,7 @@ public class GPUImage3x3ConvolutionFilter extends GPUImage3x3TextureSamplingFilt
     @Override
     public void onInit() {
         super.onInit();
-        mUniformConvolutionMatrix = GLES20.glGetUniformLocation(getProgram(), "convolutionMatrix");
+        mUniformConvolutionMatrix = GLES30.glGetUniformLocation(getProgram(), "convolutionMatrix");
         setConvolutionKernel(mConvolutionKernel);
     }
 

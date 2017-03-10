@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
 
@@ -76,8 +76,8 @@ public class GPUImageCartoonFilter extends GPUImage3x3TextureSamplingFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mThresholdLocation = GLES20.glGetUniformLocation(getProgram(), "threshold");
-        mQuantizationLevelsLocation = GLES20.glGetUniformLocation(getProgram(), "quantizationLevels");
+        mThresholdLocation = GLES30.glGetUniformLocation(getProgram(), "threshold");
+        mQuantizationLevelsLocation = GLES30.glGetUniformLocation(getProgram(), "quantizationLevels");
     }
 
     @Override

@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -69,7 +69,7 @@ public class GPUImageHueFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mHueLocation = GLES20.glGetUniformLocation(getProgram(), "hueAdjust");
+        mHueLocation = GLES30.glGetUniformLocation(getProgram(), "hueAdjust");
     }
 
     @Override

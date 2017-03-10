@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -49,9 +49,9 @@ public class GPUImageRGBFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mRedLocation = GLES20.glGetUniformLocation(getProgram(), "red");
-        mGreenLocation = GLES20.glGetUniformLocation(getProgram(), "green");
-        mBlueLocation = GLES20.glGetUniformLocation(getProgram(), "blue");
+        mRedLocation = GLES30.glGetUniformLocation(getProgram(), "red");
+        mGreenLocation = GLES30.glGetUniformLocation(getProgram(), "green");
+        mBlueLocation = GLES30.glGetUniformLocation(getProgram(), "blue");
         mIsInitialized = true;
         setRed(mRed);
         setGreen(mGreen);

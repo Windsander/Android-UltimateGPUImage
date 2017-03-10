@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_2_pass_sampling;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilterGroup;
@@ -32,15 +32,15 @@ public class GPUImageTwoPassTextureSamplingFilter extends GPUImageFilterGroup {
     protected void initTexelOffsets() {
         float ratio = getHorizontalTexelOffsetRatio();
         GPUImageFilter filter = mFilters.get(0);
-        int texelWidthOffsetLocation = GLES20.glGetUniformLocation(filter.getProgram(), "texelWidthOffset");
-        int texelHeightOffsetLocation = GLES20.glGetUniformLocation(filter.getProgram(), "texelHeightOffset");
+        int texelWidthOffsetLocation = GLES30.glGetUniformLocation(filter.getProgram(), "texelWidthOffset");
+        int texelHeightOffsetLocation = GLES30.glGetUniformLocation(filter.getProgram(), "texelHeightOffset");
         filter.setFloat(texelWidthOffsetLocation, ratio / mOutputWidth);
         filter.setFloat(texelHeightOffsetLocation, 0);
 
         ratio = getVerticalTexelOffsetRatio();
         filter = mFilters.get(1);
-        texelWidthOffsetLocation = GLES20.glGetUniformLocation(filter.getProgram(), "texelWidthOffset");
-        texelHeightOffsetLocation = GLES20.glGetUniformLocation(filter.getProgram(), "texelHeightOffset");
+        texelWidthOffsetLocation = GLES30.glGetUniformLocation(filter.getProgram(), "texelWidthOffset");
+        texelHeightOffsetLocation = GLES30.glGetUniformLocation(filter.getProgram(), "texelHeightOffset");
         filter.setFloat(texelWidthOffsetLocation, 0);
         filter.setFloat(texelHeightOffsetLocation, ratio / mOutputHeight);
     }

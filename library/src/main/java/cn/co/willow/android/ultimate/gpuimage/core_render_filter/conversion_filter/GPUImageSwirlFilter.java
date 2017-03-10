@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.conversion_filter;
 
 import android.graphics.PointF;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -59,9 +59,9 @@ public class GPUImageSwirlFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mAngleLocation = GLES20.glGetUniformLocation(getProgram(), "angle");
-        mRadiusLocation = GLES20.glGetUniformLocation(getProgram(), "radius");
-        mCenterLocation = GLES20.glGetUniformLocation(getProgram(), "center");
+        mAngleLocation = GLES30.glGetUniformLocation(getProgram(), "angle");
+        mRadiusLocation = GLES30.glGetUniformLocation(getProgram(), "radius");
+        mCenterLocation = GLES30.glGetUniformLocation(getProgram(), "center");
     }
 
     @Override

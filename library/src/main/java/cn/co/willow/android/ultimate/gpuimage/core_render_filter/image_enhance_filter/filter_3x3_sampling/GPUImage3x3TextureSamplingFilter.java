@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -69,8 +69,8 @@ public class GPUImage3x3TextureSamplingFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mUniformTexelWidthLocation = GLES20.glGetUniformLocation(getProgram(), "texelWidth");
-        mUniformTexelHeightLocation = GLES20.glGetUniformLocation(getProgram(), "texelHeight");
+        mUniformTexelWidthLocation = GLES30.glGetUniformLocation(getProgram(), "texelWidth");
+        mUniformTexelHeightLocation = GLES30.glGetUniformLocation(getProgram(), "texelHeight");
         if (mTexelWidth != 0) {
             updateTexelValues();
         }

@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 /**
  * 严格索贝尔算子边缘检测滤镜
@@ -60,7 +60,7 @@ public class GPUImageSobelThresholdFilter extends GPUImage3x3TextureSamplingFilt
     @Override
     public void onInit() {
         super.onInit();
-        mUniformThresholdLocation = GLES20.glGetUniformLocation(getProgram(), "threshold");
+        mUniformThresholdLocation = GLES30.glGetUniformLocation(getProgram(), "threshold");
     }
 
     @Override

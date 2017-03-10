@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -163,10 +163,10 @@ public class GPUImageColorBalanceFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mShadowsLocation = GLES20.glGetUniformLocation(getProgram(), "shadowsShift");
-        mMidtonesLocation = GLES20.glGetUniformLocation(getProgram(), "midtonesShift");
-        mHighlightsLocation = GLES20.glGetUniformLocation(getProgram(), "highlightsShift");
-        mPreserveLuminosityLocation = GLES20.glGetUniformLocation(getProgram(), "preserveLuminosity");
+        mShadowsLocation = GLES30.glGetUniformLocation(getProgram(), "shadowsShift");
+        mMidtonesLocation = GLES30.glGetUniformLocation(getProgram(), "midtonesShift");
+        mHighlightsLocation = GLES30.glGetUniformLocation(getProgram(), "highlightsShift");
+        mPreserveLuminosityLocation = GLES30.glGetUniformLocation(getProgram(), "preserveLuminosity");
     }
 
     @Override

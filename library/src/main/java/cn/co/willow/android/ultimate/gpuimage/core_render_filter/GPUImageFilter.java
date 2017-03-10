@@ -19,7 +19,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_render_filter;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.PointF;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,7 +90,7 @@ public class GPUImageFilter {
 
     public final void destroy() {
         mIsInitialized = false;
-        GLES20.glDeleteProgram(mGLProgId);
+        GLES30.glDeleteProgram(mGLProgId);
         onDestroy();
     }
 
@@ -98,9 +98,9 @@ public class GPUImageFilter {
     /*生命周期======================================================================================*/
     public void onInit() {
         mGLProgId = GlUtil.createProgram(mVertexShader, mFragmentShader);
-        mVertexPosition = GLES20.glGetAttribLocation(mGLProgId, "vPosition");
-        mVertexTexture = GLES20.glGetAttribLocation(mGLProgId, "vTextureCoord");
-        mFrag2DSampler = GLES20.glGetUniformLocation(mGLProgId, "fSampler2D");
+        mVertexPosition = GLES30.glGetAttribLocation(mGLProgId, "vPosition");
+        mVertexTexture = GLES30.glGetAttribLocation(mGLProgId, "vTextureCoord");
+        mFrag2DSampler = GLES30.glGetUniformLocation(mGLProgId, "fSampler2D");
         mIsInitialized = true;
     }
 
@@ -116,7 +116,7 @@ public class GPUImageFilter {
     }
 
     public void onDraw(final int textureId, final FloatBuffer cubeBuffer, final FloatBuffer textureBuffer) {
-        GLES20.glUseProgram(mGLProgId);
+        GLES30.glUseProgram(mGLProgId);
         runPendingOnDrawTasks();
         if (!mIsInitialized) {
             return;
@@ -124,20 +124,20 @@ public class GPUImageFilter {
 
         cubeBuffer.position(0);
         textureBuffer.position(0);
-        GLES20.glVertexAttribPointer(mVertexPosition, 2, GLES20.GL_FLOAT, false, 0, cubeBuffer);
-        GLES20.glVertexAttribPointer(mVertexTexture, 2, GLES20.GL_FLOAT, false, 0, textureBuffer);
-        GLES20.glEnableVertexAttribArray(mVertexPosition);
-        GLES20.glEnableVertexAttribArray(mVertexTexture);
+        GLES30.glVertexAttribPointer(mVertexPosition, 2, GLES30.GL_FLOAT, false, 0, cubeBuffer);
+        GLES30.glVertexAttribPointer(mVertexTexture, 2, GLES30.GL_FLOAT, false, 0, textureBuffer);
+        GLES30.glEnableVertexAttribArray(mVertexPosition);
+        GLES30.glEnableVertexAttribArray(mVertexTexture);
         if (textureId != NO_TEXTURE) {
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
-            GLES20.glUniform1i(mFrag2DSampler, 0);
+            GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureId);
+            GLES30.glUniform1i(mFrag2DSampler, 0);
         }
         onDrawArraysPre();
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-        GLES20.glDisableVertexAttribArray(mVertexPosition);
-        GLES20.glDisableVertexAttribArray(mVertexTexture);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, 4);
+        GLES30.glDisableVertexAttribArray(mVertexPosition);
+        GLES30.glDisableVertexAttribArray(mVertexTexture);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
     }
 
     protected void runPendingOnDrawTasks() {
@@ -185,7 +185,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform1i(location, intValue);
+                GLES30.glUniform1i(location, intValue);
             }
         });
     }
@@ -194,7 +194,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform1f(location, floatValue);
+                GLES30.glUniform1f(location, floatValue);
             }
         });
     }
@@ -203,7 +203,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform2fv(location, 1, FloatBuffer.wrap(arrayValue));
+                GLES30.glUniform2fv(location, 1, FloatBuffer.wrap(arrayValue));
             }
         });
     }
@@ -212,7 +212,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform3fv(location, 1, FloatBuffer.wrap(arrayValue));
+                GLES30.glUniform3fv(location, 1, FloatBuffer.wrap(arrayValue));
             }
         });
     }
@@ -221,7 +221,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform4fv(location, 1, FloatBuffer.wrap(arrayValue));
+                GLES30.glUniform4fv(location, 1, FloatBuffer.wrap(arrayValue));
             }
         });
     }
@@ -230,7 +230,7 @@ public class GPUImageFilter {
         runOnDraw(new Runnable() {
             @Override
             public void run() {
-                GLES20.glUniform1fv(location, arrayValue.length, FloatBuffer.wrap(arrayValue));
+                GLES30.glUniform1fv(location, arrayValue.length, FloatBuffer.wrap(arrayValue));
             }
         });
     }
@@ -243,7 +243,7 @@ public class GPUImageFilter {
                 float[] vec2 = new float[2];
                 vec2[0] = point.x;
                 vec2[1] = point.y;
-                GLES20.glUniform2fv(location, 1, vec2, 0);
+                GLES30.glUniform2fv(location, 1, vec2, 0);
             }
         });
     }
@@ -253,7 +253,7 @@ public class GPUImageFilter {
 
             @Override
             public void run() {
-                GLES20.glUniformMatrix3fv(location, 1, false, matrix, 0);
+                GLES30.glUniformMatrix3fv(location, 1, false, matrix, 0);
             }
         });
     }
@@ -263,7 +263,7 @@ public class GPUImageFilter {
 
             @Override
             public void run() {
-                GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0);
+                GLES30.glUniformMatrix4fv(location, 1, false, matrix, 0);
             }
         });
     }

@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -51,8 +51,8 @@ public class GPUImageHazeFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mDistanceLocation = GLES20.glGetUniformLocation(getProgram(), "distance");
-        mSlopeLocation = GLES20.glGetUniformLocation(getProgram(), "slope");
+        mDistanceLocation = GLES30.glGetUniformLocation(getProgram(), "distance");
+        mSlopeLocation = GLES30.glGetUniformLocation(getProgram(), "slope");
     }
 
     @Override

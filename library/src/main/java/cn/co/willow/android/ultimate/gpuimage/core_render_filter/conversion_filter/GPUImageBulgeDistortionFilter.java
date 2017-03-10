@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.conversion_filter;
 
 import android.graphics.PointF;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -62,10 +62,10 @@ public class GPUImageBulgeDistortionFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mScaleLocation = GLES20.glGetUniformLocation(getProgram(), "scale");
-        mRadiusLocation = GLES20.glGetUniformLocation(getProgram(), "radius");
-        mCenterLocation = GLES20.glGetUniformLocation(getProgram(), "center");
-        mAspectRatioLocation = GLES20.glGetUniformLocation(getProgram(), "aspectRatio");
+        mScaleLocation = GLES30.glGetUniformLocation(getProgram(), "scale");
+        mRadiusLocation = GLES30.glGetUniformLocation(getProgram(), "radius");
+        mCenterLocation = GLES30.glGetUniformLocation(getProgram(), "center");
+        mAspectRatioLocation = GLES30.glGetUniformLocation(getProgram(), "aspectRatio");
     }
 
     @Override

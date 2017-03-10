@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.conversion_filter;
 
 import android.graphics.PointF;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -61,10 +61,10 @@ public class GPUImageVignetteFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mVignetteCenterLocation = GLES20.glGetUniformLocation(getProgram(), "vignetteCenter");
-        mVignetteColorLocation = GLES20.glGetUniformLocation(getProgram(), "vignetteColor");
-        mVignetteStartLocation = GLES20.glGetUniformLocation(getProgram(), "vignetteStart");
-        mVignetteEndLocation = GLES20.glGetUniformLocation(getProgram(), "vignetteEnd");
+        mVignetteCenterLocation = GLES30.glGetUniformLocation(getProgram(), "vignetteCenter");
+        mVignetteColorLocation = GLES30.glGetUniformLocation(getProgram(), "vignetteColor");
+        mVignetteStartLocation = GLES30.glGetUniformLocation(getProgram(), "vignetteStart");
+        mVignetteEndLocation = GLES30.glGetUniformLocation(getProgram(), "vignetteEnd");
 
         setVignetteCenter(mVignetteCenter);
         setVignetteColor(mVignetteColor);

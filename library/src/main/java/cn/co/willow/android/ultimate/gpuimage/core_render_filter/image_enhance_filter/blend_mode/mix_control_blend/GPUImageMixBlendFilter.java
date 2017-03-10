@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode.mix_control_blend;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode.GPUImageTwoInputFilter;
 
@@ -25,7 +25,7 @@ public class GPUImageMixBlendFilter extends GPUImageTwoInputFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mMixLocation = GLES20.glGetUniformLocation(getProgram(), "mixturePercent");
+        mMixLocation = GLES30.glGetUniformLocation(getProgram(), "mixturePercent");
     }
 
     @Override

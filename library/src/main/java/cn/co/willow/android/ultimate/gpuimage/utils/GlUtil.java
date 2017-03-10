@@ -1,6 +1,6 @@
 /*
  * Original work Copyright 2014 Google Inc.
- * Modified work Copyright 2016 Peter Lu
+ * Modified work Copyright 2017 willow Li
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 package cn.co.willow.android.ultimate.gpuimage.utils;
 
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
@@ -60,36 +59,36 @@ public class GlUtil {
      * @return A handle to the program, or 0 on failure.
      */
     public static int createProgram(String vertexSource, String fragmentSource) {
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
+        int vertexShader = loadShader(GLES30.GL_VERTEX_SHADER, vertexSource);
         if (vertexShader == 0) {
             return 0;
         }
-        int pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
+        int pixelShader = loadShader(GLES30.GL_FRAGMENT_SHADER, fragmentSource);
         if (pixelShader == 0) {
             return 0;
         }
 
-        int program = GLES20.glCreateProgram();
+        int program = GLES30.glCreateProgram();
         checkGlError("glCreateProgram");
         if (program == 0) {
             LogUtil.e(TAG, "Could not create program");
         } else {
-            GLES20.glAttachShader(program, vertexShader);
+            GLES30.glAttachShader(program, vertexShader);
             checkGlError("glAttachShader");
-            GLES20.glAttachShader(program, pixelShader);
+            GLES30.glAttachShader(program, pixelShader);
             checkGlError("glAttachShader");
-            GLES20.glLinkProgram(program);
+            GLES30.glLinkProgram(program);
             int[] linkStatus = new int[1];
-            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
-            if (linkStatus[0] != GLES20.GL_TRUE) {
+            GLES30.glGetProgramiv(program, GLES30.GL_LINK_STATUS, linkStatus, 0);
+            if (linkStatus[0] != GLES30.GL_TRUE) {
                 LogUtil.e(TAG, "Could not link program: ");
-                LogUtil.e(TAG, GLES20.glGetProgramInfoLog(program));
-                GLES20.glDeleteProgram(program);
+                LogUtil.e(TAG, GLES30.glGetProgramInfoLog(program));
+                GLES30.glDeleteProgram(program);
                 program = 0;
             }
         }
-        GLES20.glDeleteShader(vertexShader);
-        GLES20.glDeleteShader(pixelShader);
+        GLES30.glDeleteShader(vertexShader);
+        GLES30.glDeleteShader(pixelShader);
         return program;
     }
 
@@ -100,19 +99,19 @@ public class GlUtil {
      * @return A handle to the shader, or 0 on failure.
      */
     public static int loadShader(int shaderType, String source) {
-        int shader = GLES20.glCreateShader(shaderType);
+        int shader = GLES30.glCreateShader(shaderType);
         checkGlError("glCreateShader type=" + shaderType);
         if (shader == 0) {
             LogUtil.e(TAG, "Create shader fail");
         } else {
-            GLES20.glShaderSource(shader, source);
-            GLES20.glCompileShader(shader);
+            GLES30.glShaderSource(shader, source);
+            GLES30.glCompileShader(shader);
             int[] compiled = new int[1];
-            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+            GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, compiled, 0);
             if (compiled[0] == 0) {
                 LogUtil.e(TAG, "Could not compile shader " + shaderType + ":");
-                LogUtil.e(TAG, " " + GLES20.glGetShaderInfoLog(shader));
-                GLES20.glDeleteShader(shader);
+                LogUtil.e(TAG, " " + GLES30.glGetShaderInfoLog(shader));
+                GLES30.glDeleteShader(shader);
                 shader = 0;
             }
         }
@@ -144,27 +143,27 @@ public class GlUtil {
      */
     public static int createTexture(final ByteBuffer data, final int width, final int height, final int format) {
         int textures[] = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
+        GLES30.glGenTextures(1, textures, 0);
         GlUtil.checkGlError("glGenTextures");
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-        GLES20.glTexParameteri(
-                /*texture-type*/ GLES20.GL_TEXTURE_2D,
-                /*filter-type*/  GLES20.GL_TEXTURE_MIN_FILTER,
-                /*algorithm*/    GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(
-                /*texture-type*/ GLES20.GL_TEXTURE_2D,
-                /*filter-type*/  GLES20.GL_TEXTURE_MAG_FILTER,
-                /*algorithm*/    GLES20.GL_LINEAR);
-        GlUtil.checkGlError("loadImageTexture");
-        GLES20.glTexImage2D(
-                /*aim*/          GLES20.GL_TEXTURE_2D,
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+        GLES30.glTexParameteri(
+                /*texture-type*/ GLES30.GL_TEXTURE_2D,
+                /*filter-type*/  GLES30.GL_TEXTURE_MIN_FILTER,
+                /*algorithm*/    GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(
+                /*texture-type*/ GLES30.GL_TEXTURE_2D,
+                /*filter-type*/  GLES30.GL_TEXTURE_MAG_FILTER,
+                /*algorithm*/    GLES30.GL_LINEAR);
+        GlUtil.checkGlError("glTexParameteri");
+        GLES30.glTexImage2D(
+                /*aim*/          GLES30.GL_TEXTURE_2D,
                 /*level*/        0,
                 /*detail*/       format, width, height,
                 /*border*/       0,
                 /*pixel-format*/ format,
-                /*pixel-type*/   GLES20.GL_UNSIGNED_BYTE,
+                /*pixel-type*/   GLES30.GL_UNSIGNED_BYTE,
                 /*pixel-data*/   data);
-        GlUtil.checkGlError("loadImageTexture");
+        GlUtil.checkGlError("glTexImage2D");
 
         return textures[0];
     }
@@ -181,28 +180,33 @@ public class GlUtil {
     public static int createTexture(final Bitmap img, final int usedTexId, final boolean recycle) {
         int textures[] = new int[1];
         if (usedTexId == NO_TEXTURE) {
-            GLES20.glGenTextures(1, textures, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MIN_FILTER,
-                    GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MAG_FILTER,
-                    GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_WRAP_S,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_WRAP_T,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, img, 0);
+            GLES30.glGenTextures(1, textures, 0);
+            GlUtil.checkGlError("glGenTextures");
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MIN_FILTER,
+                    GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MAG_FILTER,
+                    GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_S,
+                    GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_T,
+                    GLES30.GL_CLAMP_TO_EDGE);
+            GlUtil.checkGlError("glTexParameteri");
+            GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, img, 0);
+            GlUtil.checkGlError("glTexImage2D");
         } else {
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, usedTexId);
-            GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, img);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, usedTexId);
+            GlUtil.checkGlError("glBindTexture");
+            GLUtils.texSubImage2D(GLES30.GL_TEXTURE_2D, 0, 0, 0, img);
+            GlUtil.checkGlError("glTexImage2D");
             textures[0] = usedTexId;
         }
         if (recycle) {
@@ -224,46 +228,46 @@ public class GlUtil {
     public static int createTexture(final IntBuffer data, final int width, final int height, final int usedTexId) {
         int textures[] = new int[1];
         if (usedTexId == NO_TEXTURE) {
-            GLES20.glGenTextures(1, textures, 0);
+            GLES30.glGenTextures(1, textures, 0);
             GlUtil.checkGlError("glGenTextures");
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MAG_FILTER,
-                    GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MIN_FILTER,
-                    GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_WRAP_S,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameterf(
-                    GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_WRAP_T,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            GlUtil.checkGlError("loadImageTexture");
-            GLES20.glTexImage2D(
-                    GLES20.GL_TEXTURE_2D,
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MAG_FILTER,
+                    GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MIN_FILTER,
+                    GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_S,
+                    GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(
+                    GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_T,
+                    GLES30.GL_CLAMP_TO_EDGE);
+            GlUtil.checkGlError("glTexParameterf");
+            GLES30.glTexImage2D(
+                    GLES30.GL_TEXTURE_2D,
                     0,
-                    GLES20.GL_RGBA, width, height,
+                    GLES30.GL_RGBA, width, height,
                     0,
-                    GLES20.GL_RGBA,
-                    GLES20.GL_UNSIGNED_BYTE,
+                    GLES30.GL_RGBA,
+                    GLES30.GL_UNSIGNED_BYTE,
                     data);
-            GlUtil.checkGlError("loadImageTexture");
+            GlUtil.checkGlError("glTexImage2D");
         } else {
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, usedTexId);
-            GlUtil.checkGlError("glGenTextures");
-            GLES20.glTexSubImage2D(
-                    GLES20.GL_TEXTURE_2D,
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, usedTexId);
+            GlUtil.checkGlError("glBindTexture");
+            GLES30.glTexSubImage2D(
+                    GLES30.GL_TEXTURE_2D,
                     0,
                     0, 0, width, height,
-                    GLES20.GL_RGBA,
-                    GLES20.GL_UNSIGNED_BYTE,
+                    GLES30.GL_RGBA,
+                    GLES30.GL_UNSIGNED_BYTE,
                     data);
-            GlUtil.checkGlError("loadImageTexture");
+            GlUtil.checkGlError("glTexSubImage2D");
             textures[0] = usedTexId;
         }
         return textures[0];
@@ -290,11 +294,11 @@ public class GlUtil {
      * Checks to see if a GLES error has been raised.
      */
     public static void checkGlError(String op) {
-        int error = GLES20.glGetError();
-        if (error != GLES20.GL_NO_ERROR) {
+        int error = GLES30.glGetError();
+        if (error != GLES30.GL_NO_ERROR) {
             String msg = op + ": glError 0x" + Integer.toHexString(error);
             LogUtil.e(TAG, msg);
-            throw new RuntimeException(msg);
+            // throw new RuntimeException(msg);
         }
     }
 
@@ -303,9 +307,9 @@ public class GlUtil {
      * Writes GL version info to the log.
      */
     public static void logVersionInfo() {
-        LogUtil.i(TAG, "vendor  : " + GLES20.glGetString(GLES20.GL_VENDOR));
-        LogUtil.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
-        LogUtil.i(TAG, "version : " + GLES20.glGetString(GLES20.GL_VERSION));
+        LogUtil.i(TAG, "vendor  : " + GLES30.glGetString(GLES30.GL_VENDOR));
+        LogUtil.i(TAG, "renderer: " + GLES30.glGetString(GLES30.GL_RENDERER));
+        LogUtil.i(TAG, "version : " + GLES30.glGetString(GLES30.GL_VERSION));
 
         if (false) {
             int[] values = new int[1];

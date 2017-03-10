@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -37,7 +37,7 @@ public class GPUImageExposureFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mExposureLocation = GLES20.glGetUniformLocation(getProgram(), "exposure");
+        mExposureLocation = GLES30.glGetUniformLocation(getProgram(), "exposure");
     }
 
     @Override

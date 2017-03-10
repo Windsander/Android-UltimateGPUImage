@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -48,8 +48,8 @@ public class GPUImageColorMatrixFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mColorMatrixLocation = GLES20.glGetUniformLocation(getProgram(), "colorMatrix");
-        mIntensityLocation = GLES20.glGetUniformLocation(getProgram(), "intensity");
+        mColorMatrixLocation = GLES30.glGetUniformLocation(getProgram(), "colorMatrix");
+        mIntensityLocation = GLES30.glGetUniformLocation(getProgram(), "intensity");
     }
 
     @Override

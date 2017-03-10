@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -116,7 +116,7 @@ public class GPUImageKuwaharaFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mRadiusLocation = GLES20.glGetUniformLocation(getProgram(), "radius");
+        mRadiusLocation = GLES30.glGetUniformLocation(getProgram(), "radius");
     }
 
     @Override

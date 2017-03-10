@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -127,8 +127,8 @@ public class GPUImageBilateralFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mDisFactorLocation = GLES20.glGetUniformLocation(getProgram(), "distanceNormalizationFactor");
-        mSingleStepOffsetLocation = GLES20.glGetUniformLocation(getProgram(), "singleStepOffset");
+        mDisFactorLocation = GLES30.glGetUniformLocation(getProgram(), "distanceNormalizationFactor");
+        mSingleStepOffsetLocation = GLES30.glGetUniformLocation(getProgram(), "singleStepOffset");
     }
 
     @Override

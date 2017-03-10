@@ -16,7 +16,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.conversion_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -88,8 +88,8 @@ public class GPUImageCrosshatchFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mCrossHatchSpacingLocation = GLES20.glGetUniformLocation(getProgram(), "crossHatchSpacing");
-        mLineWidthLocation = GLES20.glGetUniformLocation(getProgram(), "lineWidth");
+        mCrossHatchSpacingLocation = GLES30.glGetUniformLocation(getProgram(), "crossHatchSpacing");
+        mLineWidthLocation = GLES30.glGetUniformLocation(getProgram(), "lineWidth");
     }
 
     @Override

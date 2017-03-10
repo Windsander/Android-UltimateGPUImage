@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -50,8 +50,8 @@ public class GPUImageHighlightShadowFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mHighlightsLocation = GLES20.glGetUniformLocation(getProgram(), "highlights");
-        mShadowsLocation = GLES20.glGetUniformLocation(getProgram(), "shadows");
+        mHighlightsLocation = GLES30.glGetUniformLocation(getProgram(), "highlights");
+        mShadowsLocation = GLES30.glGetUniformLocation(getProgram(), "shadows");
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 /**
  * 色度键着色滤镜，用第二张图片的主要颜色来替换第一张图片的指定颜色，可选择替换浮动的范围（敏感度）
@@ -68,9 +68,9 @@ public class GPUImageChromaKeyBlendFilter extends GPUImageTwoInputFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mThresholdSensitivityLocation = GLES20.glGetUniformLocation(getProgram(), "thresholdSensitivity");
-        mSmoothingLocation = GLES20.glGetUniformLocation(getProgram(), "smoothing");
-        mColorToReplaceLocation = GLES20.glGetUniformLocation(getProgram(), "colorToReplace");
+        mThresholdSensitivityLocation = GLES30.glGetUniformLocation(getProgram(), "thresholdSensitivity");
+        mSmoothingLocation = GLES30.glGetUniformLocation(getProgram(), "smoothing");
+        mColorToReplaceLocation = GLES30.glGetUniformLocation(getProgram(), "colorToReplace");
     }
 
     @Override

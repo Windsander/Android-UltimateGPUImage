@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -50,8 +50,8 @@ public class GPUImageHalftoneFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mFractionalWidthOfPixelLocation = GLES20.glGetUniformLocation(getProgram(), "fractionalWidthOfPixel");
-        mAspectRatioLocation = GLES20.glGetUniformLocation(getProgram(), "aspectRatio");
+        mFractionalWidthOfPixelLocation = GLES30.glGetUniformLocation(getProgram(), "fractionalWidthOfPixel");
+        mAspectRatioLocation = GLES30.glGetUniformLocation(getProgram(), "aspectRatio");
         setFractionalWidthOfAPixel(mFractionalWidthOfAPixel);
     }
 

@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 /**
  * 拉普拉斯算子滤镜，噪音敏感
@@ -67,7 +67,7 @@ public class GPUImageLaplacianFilter extends GPUImage3x3TextureSamplingFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mUniformConvolutionMatrix = GLES20.glGetUniformLocation(getProgram(), "convolutionMatrix");
+        mUniformConvolutionMatrix = GLES30.glGetUniformLocation(getProgram(), "convolutionMatrix");
         setConvolutionKernel(mConvolutionKernel);
     }
 

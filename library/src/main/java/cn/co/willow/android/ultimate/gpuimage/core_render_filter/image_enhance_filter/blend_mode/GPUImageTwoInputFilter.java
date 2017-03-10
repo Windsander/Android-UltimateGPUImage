@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode;
 
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -54,9 +54,9 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
     public void onInit() {
         super.onInit();
 
-        mFilterSecondTextureCoordinateAttribute = GLES20.glGetAttribLocation(getProgram(), "inputTextureCoordinate2");
-        mFilterInputTextureUniform2 = GLES20.glGetUniformLocation(getProgram(), "inputImageTexture2"); // This does assume a name of "inputImageTexture2" for second input texture in the fragment shader
-        GLES20.glEnableVertexAttribArray(mFilterSecondTextureCoordinateAttribute);
+        mFilterSecondTextureCoordinateAttribute = GLES30.glGetAttribLocation(getProgram(), "inputTextureCoordinate2");
+        mFilterInputTextureUniform2 = GLES30.glGetUniformLocation(getProgram(), "inputImageTexture2"); // This does assume a name of "inputImageTexture2" for second input texture in the fragment shader
+        GLES30.glEnableVertexAttribArray(mFilterSecondTextureCoordinateAttribute);
 
         if (mBitmap != null && !mBitmap.isRecycled()) {
             setBitmap(mBitmap);
@@ -66,7 +66,7 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        GLES20.glDeleteTextures(1, new int[]{
+        GLES30.glDeleteTextures(1, new int[]{
                 mFilterSourceTexture2
         }, 0);
         mFilterSourceTexture2 = NO_TEXTURE;
@@ -74,13 +74,13 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
 
     @Override
     protected void onDrawArraysPre() {
-        GLES20.glEnableVertexAttribArray(mFilterSecondTextureCoordinateAttribute);
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mFilterSourceTexture2);
-        GLES20.glUniform1i(mFilterInputTextureUniform2, 3);
+        GLES30.glEnableVertexAttribArray(mFilterSecondTextureCoordinateAttribute);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE3);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mFilterSourceTexture2);
+        GLES30.glUniform1i(mFilterInputTextureUniform2, 3);
 
         mTexture2CoordinatesBuffer.position(0);
-        GLES20.glVertexAttribPointer(mFilterSecondTextureCoordinateAttribute, 2, GLES20.GL_FLOAT, false, 0, mTexture2CoordinatesBuffer);
+        GLES30.glVertexAttribPointer(mFilterSecondTextureCoordinateAttribute, 2, GLES30.GL_FLOAT, false, 0, mTexture2CoordinatesBuffer);
     }
 
 
@@ -99,7 +99,7 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
                     if (bitmap == null || bitmap.isRecycled()) {
                         return;
                     }
-                    GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+                    GLES30.glActiveTexture(GLES30.GL_TEXTURE3);
                     mFilterSourceTexture2 = GlUtil.createTexture(bitmap, NO_TEXTURE, false);
                 }
             }

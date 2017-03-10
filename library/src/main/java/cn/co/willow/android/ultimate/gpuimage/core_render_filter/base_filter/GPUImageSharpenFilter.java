@@ -16,7 +16,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -103,9 +103,9 @@ public class GPUImageSharpenFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mSharpnessLocation = GLES20.glGetUniformLocation(getProgram(), "sharpness");
-        mImageWidthFactorLocation = GLES20.glGetUniformLocation(getProgram(), "imageWidthFactor");
-        mImageHeightFactorLocation = GLES20.glGetUniformLocation(getProgram(), "imageHeightFactor");
+        mSharpnessLocation = GLES30.glGetUniformLocation(getProgram(), "sharpness");
+        mImageWidthFactorLocation = GLES30.glGetUniformLocation(getProgram(), "imageWidthFactor");
+        mImageHeightFactorLocation = GLES30.glGetUniformLocation(getProgram(), "imageHeightFactor");
         setSharpness(mSharpness);
     }
 

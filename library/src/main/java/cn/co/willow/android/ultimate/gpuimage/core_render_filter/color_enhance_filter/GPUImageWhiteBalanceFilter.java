@@ -1,6 +1,6 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter;
 
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
@@ -58,8 +58,8 @@ public class GPUImageWhiteBalanceFilter extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
-        mTemperatureLocation = GLES20.glGetUniformLocation(getProgram(), "temperature");
-        mTintLocation = GLES20.glGetUniformLocation(getProgram(), "tint");
+        mTemperatureLocation = GLES30.glGetUniformLocation(getProgram(), "temperature");
+        mTintLocation = GLES30.glGetUniformLocation(getProgram(), "tint");
 
         setTemperature(mTemperature);
         setTint(mTint);
