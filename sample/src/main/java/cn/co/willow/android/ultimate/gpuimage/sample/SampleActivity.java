@@ -45,8 +45,8 @@ public class SampleActivity extends AppCompatActivity {
     /** 初始化历史视屏栏 */
     private void initFuncOperatePannel() {
         mFuncOperatePannel = (FrameLayout) findViewById(R.id.control_pannel);
-        ViewGroup.LayoutParams params = mFuncOperatePannel.getLayoutParams();
-        params.height = UIUtils.getScreenHeight() - (int) (UIUtils.getScreenWidth() * 4 / 3f);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mFuncOperatePannel.getLayoutParams();
+        params.height = (UIUtils.getScreenHeight() - (int) (UIUtils.getScreenWidth() * 4 / 3f)) - UIUtils.dip2px(8);
         mFuncOperatePannel.setLayoutParams(params);
     }
 
