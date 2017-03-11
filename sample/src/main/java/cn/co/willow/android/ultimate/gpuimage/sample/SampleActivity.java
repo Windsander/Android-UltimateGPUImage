@@ -8,6 +8,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+
+import cn.co.willow.android.ultimate.gpuimage.sample.util.UIUtils;
 
 import static android.Manifest.permission.CAMERA;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
@@ -20,19 +25,29 @@ public class SampleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample);
         initFunctionContainer();
+        initFuncOperatePannel();
     }
 
 
-    /*how to use UltimateGPUImage===================================================================*/
-    private ConstraintLayout mFunctionContainer;
+    /*how to use UltimateGPUImage with a holder module==============================================*/
+    private FrameLayout mFunctionContainer;                 // use as a container for video preview
+    private FrameLayout mFuncOperatePannel;                 // use to control video operate
     private VideoRecordHolder mVideoRecordHolder;
 
-    public void initFunctionContainer() {
-        mFunctionContainer = (ConstraintLayout) findViewById(R.id.cl_function_container);
+    private void initFunctionContainer() {
+        mFunctionContainer = (FrameLayout) findViewById(R.id.cl_function_container);
         mVideoRecordHolder = new VideoRecordHolder(this);
         mFunctionContainer.addView(mVideoRecordHolder.getRootView());
         requestPermission(CAMERA);
         mVideoRecordHolder.openCamera();
+    }
+
+    /** 初始化历史视屏栏 */
+    private void initFuncOperatePannel() {
+        mFuncOperatePannel = (FrameLayout) findViewById(R.id.control_pannel);
+        ViewGroup.LayoutParams params = mFuncOperatePannel.getLayoutParams();
+        params.height = UIUtils.getScreenHeight() - (int) (UIUtils.getScreenWidth() * 4 / 3f);
+        mFuncOperatePannel.setLayoutParams(params);
     }
 
     public void openCamera() {
@@ -41,6 +56,7 @@ public class SampleActivity extends AppCompatActivity {
 
 
     /*权限处理 Premission Handler===================================================================*/
+
     /** 申请权限 request premission */
     public void requestPermission(String... permissions) {
         if (checkPremission(permissions)) return;

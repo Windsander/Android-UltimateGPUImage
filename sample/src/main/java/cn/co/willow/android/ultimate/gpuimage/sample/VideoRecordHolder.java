@@ -29,7 +29,6 @@ import static cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView.ORIENT
  * <p>
  * Created by willow.li on 2016/10/22.
  */
-
 public class VideoRecordHolder extends BaseHolder {
 
     /*关键变量=======================================================================================*/
@@ -44,7 +43,7 @@ public class VideoRecordHolder extends BaseHolder {
     }
 
 
-    /*初始化========================================================================================*/
+    /*初始化 initialize ultimate gpuimage===========================================================*/
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public View initView() {
@@ -56,21 +55,24 @@ public class VideoRecordHolder extends BaseHolder {
         return view;
     }
 
-    /** 配置手势操作 */
+    /** 配置手势操作 set gesture operation */
     private void initGesture() {
         mRecorderViews.setSwitchFilterListener(new FilterRecoderView.SwitchFilterListener() {
             @Override
             public void switchFilter(int orientation) {
                 doSwitchFilter(orientation);
             }
+
             @Override
             public void handFocusTo(MotionEvent e) {
 
             }
+
             @Override
             public void focusLength(int progress, float factor) {
 
             }
+
             @Override
             public void releaseCamera() {
 
@@ -80,6 +82,7 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*手势逻辑：滤镜================================================================================*/
+
     /** 切换滤镜 */
     public synchronized void doSwitchFilter(int orientation) {
         switch (orientation) {
@@ -124,6 +127,7 @@ public class VideoRecordHolder extends BaseHolder {
             public void onAnimationStart(Animator animation) {
                 mCurFilterName.setVisibility(View.VISIBLE);
             }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 mCurFilterName.setVisibility(View.GONE);
@@ -134,6 +138,7 @@ public class VideoRecordHolder extends BaseHolder {
     
     
     /*录制控制======================================================================================*/
+
     /** 开启相机 */
     public void openCamera() {
         mRecordManager.openCamera();
@@ -170,6 +175,7 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*对外暴露监听==================================================================================*/
+
     /** 播放器状态监听 */
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRecordManager.setOnRecordStateListener(mOnRecordStateListener);

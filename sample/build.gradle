@@ -30,9 +30,9 @@ dependencies {
     compile project(path: ':library')
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.android.support:design:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
