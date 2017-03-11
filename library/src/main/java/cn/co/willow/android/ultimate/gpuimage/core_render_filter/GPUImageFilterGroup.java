@@ -191,6 +191,7 @@ public class GPUImageFilterGroup extends GPUImageFilter {
 
 
     /*滤镜组操作====================================================================================*/
+
     /** 添加滤镜到持有滤镜中 Add a filter to filter-list */
     public void addFilter(GPUImageFilter aFilter) {
         if (aFilter == null) {

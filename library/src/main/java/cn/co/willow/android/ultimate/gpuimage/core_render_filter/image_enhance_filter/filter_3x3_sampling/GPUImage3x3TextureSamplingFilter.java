@@ -4,7 +4,9 @@ import android.opengl.GLES30;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
-/** 3*3纹理采样滤镜基类 */
+/**
+ * 3*3纹理采样滤镜基类
+ */
 public class GPUImage3x3TextureSamplingFilter extends GPUImageFilter {
 
     public static final String THREE_X_THREE_TEXTURE_SAMPLING_VERTEX_SHADER = "" +

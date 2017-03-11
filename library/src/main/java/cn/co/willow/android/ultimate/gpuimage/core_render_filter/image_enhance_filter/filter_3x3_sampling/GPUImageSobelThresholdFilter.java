@@ -6,6 +6,7 @@ import android.opengl.GLES30;
  * 严格索贝尔算子边缘检测滤镜
  */
 public class GPUImageSobelThresholdFilter extends GPUImage3x3TextureSamplingFilter {
+
     public static final String SOBEL_THRESHOLD_EDGE_DETECTION = "" +
             "precision mediump float;\n" +
             "\n" +

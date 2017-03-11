@@ -23,12 +23,12 @@ public class GPUImageFilter {
     /*着色器语言====================================================================================*/
     /** 无渲染的顶点着色器 vertex shader without filter */
     protected static final String NO_FILTER_VERTEX_SHADER = "" +
-            "attribute vec4 vPosition;\n" +
+            "attribute vec4 position;\n" +
             "attribute vec4 inputTextureCoordinate;\n" +
             "varying vec2 textureCoordinate;\n" +
             "void main()\n" +
             "{\n" +
-            "    gl_Position = vPosition;\n" +
+            "    gl_Position = position;\n" +
             "    textureCoordinate = inputTextureCoordinate.xy;\n" +
             "}";
 
@@ -82,7 +82,7 @@ public class GPUImageFilter {
     /*生命周期======================================================================================*/
     public void onInit() {
         mGLProgId = GlUtil.createProgram(mVertexShader, mFragmentShader);
-        mVertexPosition = GLES30.glGetAttribLocation(mGLProgId, "vPosition");
+        mVertexPosition = GLES30.glGetAttribLocation(mGLProgId, "position");
         mVertexTexture = GLES30.glGetAttribLocation(mGLProgId, "inputTextureCoordinate");
         mFrag2DSampler = GLES30.glGetUniformLocation(mGLProgId, "inputImageTexture");
         mIsInitialized = true;
