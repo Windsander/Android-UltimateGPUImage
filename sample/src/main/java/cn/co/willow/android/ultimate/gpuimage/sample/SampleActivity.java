@@ -28,11 +28,22 @@ public class SampleActivity extends AppCompatActivity {
         initFuncOperatePannel();
     }
 
+    @Override protected void onResume() {
+        super.onResume();
+        mVideoRecordHolder.openCamera();
+    }
+
+    @Override protected void onPause() {
+        super.onPause();
+        mVideoRecordHolder.releaseCamera();
+    }
+
 
     /*how to use UltimateGPUImage with a holder module==============================================*/
     private FrameLayout mFunctionContainer;                 // use as a container for video preview
     private FrameLayout mFuncOperatePannel;                 // use to control video operate
-    private VideoRecordHolder mVideoRecordHolder;
+    private VideoRecordHolder mVideoRecordHolder;           // module: video recorder preview
+    private VideoControlHolder videoControlHolder;          // module: video recorder controller
 
     private void initFunctionContainer() {
         mFunctionContainer = (FrameLayout) findViewById(R.id.cl_function_container);
@@ -48,15 +59,12 @@ public class SampleActivity extends AppCompatActivity {
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mFuncOperatePannel.getLayoutParams();
         params.height = (UIUtils.getScreenHeight() - (int) (UIUtils.getScreenWidth() * 4 / 3f)) - UIUtils.dip2px(8);
         mFuncOperatePannel.setLayoutParams(params);
-    }
-
-    public void openCamera() {
-        mVideoRecordHolder.openCamera();
+        videoControlHolder = new VideoControlHolder(this);
+        mFuncOperatePannel.addView(videoControlHolder.getRootView());
     }
 
 
     /*权限处理 Premission Handler===================================================================*/
-
     /** 申请权限 request premission */
     public void requestPermission(String... permissions) {
         if (checkPremission(permissions)) return;
@@ -100,7 +108,7 @@ public class SampleActivity extends AppCompatActivity {
         switch (permission) {
             case CAMERA:
                 if (isGranted) {
-                    openCamera();
+                    mVideoRecordHolder.openCamera();
                 }
                 break;
         }

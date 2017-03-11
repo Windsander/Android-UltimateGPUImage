@@ -8,4 +8,7 @@
     <string name="permission_camera_rationale">request camera premission</string>
     <string name="button_allow">allow</string>
     <string name="button_deny">deny</string>
+
+    <string name="control_switch_camera">switch camera</string>
+
 </resources>

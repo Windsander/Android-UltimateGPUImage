@@ -82,8 +82,7 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*手势逻辑：滤镜================================================================================*/
-
-    /** 切换滤镜 */
+    /** 切换滤镜 switch camera filter */
     public synchronized void doSwitchFilter(int orientation) {
         switch (orientation) {
             case ORIENTATION_LEFT:
@@ -100,7 +99,7 @@ public class VideoRecordHolder extends BaseHolder {
         mRecordManager.setFilter(filter);
     }
 
-    /** 显示滤镜名称 */
+    /** 显示滤镜名称 show filter name with animation */
     private void doShowFilterName(int position, int orientation) {
         mCurFilterName.setText(FilterType.Type.getFilter(position).getName());
         AnimatorSet set = new AnimatorSet();
@@ -138,7 +137,6 @@ public class VideoRecordHolder extends BaseHolder {
     
     
     /*录制控制======================================================================================*/
-
     /** 开启相机 */
     public void openCamera() {
         mRecordManager.openCamera();
@@ -175,7 +173,6 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*对外暴露监听==================================================================================*/
-
     /** 播放器状态监听 */
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRecordManager.setOnRecordStateListener(mOnRecordStateListener);
