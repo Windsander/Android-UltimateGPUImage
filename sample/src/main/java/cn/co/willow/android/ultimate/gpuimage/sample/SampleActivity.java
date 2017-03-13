@@ -12,6 +12,7 @@ import java.io.File;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoControlHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoRecordHolder;
+import cn.co.willow.android.ultimate.gpuimage.sample.interaction_logic.SamplePresenter;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.UIUtils;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
@@ -27,6 +28,7 @@ public class SampleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample);
+        initInteractionLogics();
         initFunctionContainer();
         initFuncOperatePannel();
         bindControlToRecorder();
@@ -50,6 +52,17 @@ public class SampleActivity extends AppCompatActivity {
     private FrameLayout mFuncOperatePannel;                 // use to control video operate
     private VideoRecordHolder mVideoRecordHolder;           // module: video recorder preview
     private VideoControlHolder videoControlHolder;          // module: video recorder controller
+    private SamplePresenter mInteractionLogic;
+
+    private void initInteractionLogics() {
+        mInteractionLogic = SamplePresenter.init(new SamplePresenter.onCoverListener() {
+            @Override
+            public void onCoverFinish(String gifUrl) {
+                LogUtil.w("Video Cover Url::" + gifUrl);
+                videoControlHolder.setVideoCover(gifUrl);
+            }
+        });
+    }
 
     private void initFunctionContainer() {
         mFunctionContainer = (FrameLayout) findViewById(R.id.cl_function_container);
@@ -82,10 +95,14 @@ public class SampleActivity extends AppCompatActivity {
             @Override
             public void onRecordFinish(File mOutputRecFile) {
                 LogUtil.w("Video final Path::" + mOutputRecFile.getAbsolutePath());
-                // TODO 视频录制完成后，截帧生成gif
+                mInteractionLogic.doUpdateVideoData(mOutputRecFile);
             }
         });
         videoControlHolder.setOnRecordStateListener(new VideoControlHolder.RecordControlCallBack() {
+            @Override
+            public void playVideo() {
+                mInteractionLogic.doPlayerVideo(SampleActivity.this);
+            }
             @Override
             public void startRecord() {
                 mVideoRecordHolder.startRecord();

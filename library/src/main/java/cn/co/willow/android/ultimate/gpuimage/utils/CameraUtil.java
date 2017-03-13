@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.support.annotation.RequiresPermission;
 
@@ -31,9 +32,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.co.willow.android.ultimate.gpuimage.utils.gif_core.AnimatedGifEncoder;
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Camera related utilities.
@@ -48,8 +51,6 @@ public class CameraUtil {
         try {
             retriever.setDataSource(filePath);
             bitmap = retriever.getFrameAtTime(200);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
@@ -60,6 +61,63 @@ public class CameraUtil {
             }
         }
         return bitmap;
+    }
+
+    /** 视频随机取单帧 */
+    public static Bitmap getVideoThumbnailFF(String filePath) {
+        Bitmap bitmap = null;
+        FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
+        try {
+            fmmr.setDataSource(filePath);
+            bitmap = fmmr.getFrameAtTime();
+            if (bitmap != null) {
+                Bitmap b2 = fmmr.getFrameAtTime(
+                        1000 * 1000,
+                        FFmpegMediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                if (b2 != null) {
+                    bitmap = b2;
+                }
+                if (bitmap.getWidth() > 640) {// 如果图片宽度规格超过640px,则进行压缩
+                    bitmap = ThumbnailUtils.extractThumbnail(bitmap,
+                            640, 480,
+                            ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+                }
+            }
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        } finally {
+            fmmr.release();
+        }
+        return bitmap;
+    }
+
+    /** 截取多帧, 使用第三方 */
+    public static List<Bitmap> getVideoThumbnailFF(String filePath, int frameNum) {
+        List<Bitmap> bitmaps = new ArrayList<>();
+        FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
+        try {
+            fmmr.setDataSource(filePath);
+            String timeStr = fmmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION);
+            long durationUs = Long.valueOf(timeStr) * 1000;
+            long gapTimeUs;
+            if (durationUs > 1000 * 1000 * 2) {
+                gapTimeUs = 1000 * 200;
+            } else {
+                gapTimeUs = durationUs / frameNum;
+            }
+            for (int i = 0; i < frameNum; i++) {
+                long targetFrameTimeUs = 200 + i * gapTimeUs;
+                Bitmap singleBitmap = fmmr.getFrameAtTime(targetFrameTimeUs, FFmpegMediaMetadataRetriever.OPTION_CLOSEST);
+                if (singleBitmap == null) continue;
+                singleBitmap = compressImageByImgs(singleBitmap, 128, 96);
+                bitmaps.add(singleBitmap);
+            }
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        } finally {
+            fmmr.release();
+        }
+        return bitmaps;
     }
 
     /**

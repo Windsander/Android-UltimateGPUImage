@@ -300,7 +300,7 @@ public class GlUtil {
         int error = GLES30.glGetError();
         if (error != GLES30.GL_NO_ERROR) {
             String msg = op + ": glError 0x" + Integer.toHexString(error);
-            LogUtil.e(TAG, msg);
+            //LogUtil.e(TAG, msg);
             // throw new RuntimeException(msg);
         }
     }

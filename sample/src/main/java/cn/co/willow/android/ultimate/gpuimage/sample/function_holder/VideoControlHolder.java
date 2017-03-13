@@ -3,9 +3,14 @@ package cn.co.willow.android.ultimate.gpuimage.sample.function_holder;
 import android.app.Activity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import cn.co.willow.android.ultimate.gpuimage.sample.R;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.UIUtils;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 /**
  * 组件：视频录制
@@ -18,6 +23,7 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
     private Button mBtnRecordsVideo;
     private Button mBtnSwitchCamera;
     private boolean isRecording;
+    private ImageView mBtnLastestVideo;
 
     public VideoControlHolder(Activity context) {
         super(context);
@@ -31,12 +37,15 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
         View view = View.inflate(context, R.layout.holder_video_controller, null);
         mBtnRecordsVideo = (Button) view.findViewById(R.id.start_record_btn);
         mBtnSwitchCamera = (Button) view.findViewById(R.id.switch_camera_btn);
+        mBtnLastestVideo = (ImageView) view.findViewById(R.id.last_video_btn);
         mBtnRecordsVideo.setOnClickListener(this);
         mBtnSwitchCamera.setOnClickListener(this);
+        mBtnLastestVideo.setOnClickListener(this);
         return view;
     }
 
-    @Override public void onClick(View view) {
+    @Override
+    public void onClick(View view) {
         switch (view.getId()) {
             case R.id.start_record_btn:
                 if (mRecordControlCallBack != null) {
@@ -52,20 +61,38 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
                     mRecordControlCallBack.switchCamera();
                 }
                 break;
+            case R.id.last_video_btn:
+                if (mRecordControlCallBack != null) {
+                    mRecordControlCallBack.playVideo();
+                }
+                break;
         }
     }
 
     public void switchRecordState(final boolean isRecording) {
         this.isRecording = isRecording;
         UIUtils.runInMainThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (isRecording) {
                     mBtnRecordsVideo.setText(R.string.control_stop_record);
+                    mBtnRecordsVideo.setBackgroundResource(R.drawable.control_alert_camera_btn);
                 } else {
                     mBtnRecordsVideo.setText(R.string.control_start_record);
+                    mBtnRecordsVideo.setBackgroundResource(R.drawable.control_default_camera_btn);
                 }
             }
         });
+    }
+
+    public void setVideoCover(String gifUrl) {
+        LogUtil.w("Cover URL is::" + gifUrl);
+        Glide.with(context)
+                .load(gifUrl)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .centerCrop()
+                .crossFade()
+                .into(mBtnLastestVideo);
     }
 
 
@@ -80,6 +107,7 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
     private RecordControlCallBack mRecordControlCallBack;
 
     public interface RecordControlCallBack {
+        void playVideo();
         void startRecord();
         void stopRecord();
         void switchCamera();

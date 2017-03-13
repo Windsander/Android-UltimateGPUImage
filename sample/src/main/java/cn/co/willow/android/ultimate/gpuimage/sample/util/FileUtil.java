@@ -1,12 +1,15 @@
 package cn.co.willow.android.ultimate.gpuimage.sample.util;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOError;
 import java.io.IOException;
-
-import cn.co.willow.android.ultimate.gpuimage.sample.SampleApplication;
 
 /**
  * 简单的文件操作类
@@ -18,10 +21,18 @@ import cn.co.willow.android.ultimate.gpuimage.sample.SampleApplication;
 public class FileUtil {
 
     /*路径获取======================================================================================*/
-    private static String VIDEO_PATH = "/sample_video/";
+    private static final String ROOT_PATH = "/UlitmateGPUImage";
+    private static final String VIDEO_PATH = ROOT_PATH + "/sample_video/";
+    private static final String COVER_PATH = ROOT_PATH + "/sample_cover/";
+    private static final int MP4 = 1;
+    private static final int GIF = 2;
 
     public static String getVideoSavePath() {
         return getRootCachePath() + VIDEO_PATH;
+    }
+
+    public static String getCoverSavePath() {
+        return getRootCachePath() + COVER_PATH;
     }
 
     private static String getRootCachePath() {
@@ -42,12 +53,22 @@ public class FileUtil {
     }
 
     @NonNull
-    public static File computeMD5ForFile(String fileRootPath) {
-        return computeMD5ForFile(fileRootPath, null);
+    public static File computeMD5ForVideoFile(String fileRootPath) {
+        return computeMD5ForFile(fileRootPath, null, MP4);
+    }
+
+    @NonNull
+    public static File computeMD5ForCoverFile(String fileRootPath) {
+        return computeMD5ForFile(fileRootPath, null, GIF);
+    }
+
+    @NonNull
+    public static File computeMD5ForImageFile(String fileRootPath, Bitmap bitmap) {
+        return saveBitmap(fileRootPath, bitmap);
     }
 
 
-    /*文件存储======================================================================================*/
+    /*文件存储 store file logic=====================================================================*/
     /**
      * 获取要保存图片的MD5时序文件名，并创建该文件
      *
@@ -56,23 +77,55 @@ public class FileUtil {
      * @return 保存文件
      */
     @NonNull
-    public static File computeMD5ForFile(String fileRootPath, String extra) {
-        String imageMd5 = "" + System.currentTimeMillis();
-        String filename = fileRootPath + imageMd5 + (extra == null ? "" : extra);
-        filename = filename + ".mp4";
-        File temp = new File(filename);
-        if (!temp.getParentFile().exists()) {
-            temp.getParentFile().mkdirs();
-        }
-        if (!temp.exists()) {
-            try {
-                temp.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+    private static File computeMD5ForFile(String fileRootPath, String extra, int type) {
+        try {
+            String imageMd5 = "" + System.currentTimeMillis();
+            String filename = fileRootPath + imageMd5 + (extra == null ? "" : extra);
+            switch (type) {
+                case MP4:
+                    filename = filename + ".mp4";
+                    break;
+                case GIF:
+                    filename = filename + ".gif";
+                    break;
             }
+            File temp = new File(filename);
+            if (!temp.getParentFile().exists()) {
+                temp.getParentFile().mkdirs();
+            }
+            if (!temp.exists()) {
+                temp.createNewFile();
+            }
+            return temp;
+        } catch (FileNotFoundException e) {
+            throw new Resources.NotFoundException(e.getMessage());
+        } catch (IOException e) {
+            throw new IOError(e);
         }
-        return temp;
     }
 
+    /** save Bitmap to file */
+    private static File saveBitmap(String fileRootPath, Bitmap bitmap) {
+        try {
+            String imageMd5 = "cover_" + System.currentTimeMillis();
+            String filename = fileRootPath + imageMd5 + ".png";
+            File temp = new File(filename);
+            if (!temp.getParentFile().exists()) {
+                temp.getParentFile().mkdirs();
+            }
+            if (!temp.exists()) {
+                temp.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(temp);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, fos);
+            fos.flush();
+            fos.close();
+            return temp;
+        } catch (FileNotFoundException e) {
+            throw new Resources.NotFoundException(e.getMessage());
+        } catch (IOException e) {
+            throw new IOError(e);
+        }
+    }
 
 }
