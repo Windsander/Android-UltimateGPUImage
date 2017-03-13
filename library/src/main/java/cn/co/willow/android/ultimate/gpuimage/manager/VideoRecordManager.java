@@ -159,7 +159,7 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
     }
 
     /** 相机翻转 */
-    public void reverseCamera() {
+    public void switchCamera() {
        /* switch (mCurrentRecordState) {
             case START_RECORD:
             case RECORDING:

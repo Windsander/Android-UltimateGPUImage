@@ -12,9 +12,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import java.io.File;
+
+import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.UIUtils;
 
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.RECORD_AUDIO;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -26,6 +30,7 @@ public class SampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
         initFunctionContainer();
         initFuncOperatePannel();
+        bindControlToRecorder();
     }
 
     @Override protected void onResume() {
@@ -49,7 +54,7 @@ public class SampleActivity extends AppCompatActivity {
         mFunctionContainer = (FrameLayout) findViewById(R.id.cl_function_container);
         mVideoRecordHolder = new VideoRecordHolder(this);
         mFunctionContainer.addView(mVideoRecordHolder.getRootView());
-        requestPermission(CAMERA);
+        requestPermission(CAMERA, RECORD_AUDIO);
         mVideoRecordHolder.openCamera();
     }
 
@@ -61,6 +66,31 @@ public class SampleActivity extends AppCompatActivity {
         mFuncOperatePannel.setLayoutParams(params);
         videoControlHolder = new VideoControlHolder(this);
         mFuncOperatePannel.addView(videoControlHolder.getRootView());
+    }
+
+    private void bindControlToRecorder() {
+        mVideoRecordHolder.setOnRecordStateListener(new VideoRecorderRenderer.OnRecordStateListener() {
+            @Override public void onStartReady() {
+                videoControlHolder.switchRecordState(false);
+            }
+            @Override public void onStopsReady() {
+                videoControlHolder.switchRecordState(true);
+            }
+            @Override public void onRecordFinish(File mOutputRecFile) {
+                // TODO 视频录制完成后，截帧生成gif
+            }
+        });
+        videoControlHolder.setOnRecordStateListener(new VideoControlHolder.RecordControlCallBack() {
+            @Override public void startRecord() {
+                mVideoRecordHolder.startRecord();
+            }
+            @Override public void stopRecord() {
+                mVideoRecordHolder.stopRecord();
+            }
+            @Override public void switchCamera() {
+                mVideoRecordHolder.switchCamera();
+            }
+        });
     }
 
 

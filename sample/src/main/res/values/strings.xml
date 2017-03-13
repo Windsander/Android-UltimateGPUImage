@@ -9,6 +9,8 @@
     <string name="button_allow">allow</string>
     <string name="button_deny">deny</string>
 
+    <string name="control_start_record">start record</string>
+    <string name="control_stop_record">stop record</string>
     <string name="control_switch_camera">switch camera</string>
 
 </resources>

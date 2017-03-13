@@ -35,7 +35,7 @@ public class VideoRecordHolder extends BaseHolder {
     private FilterRecoderView mRecorderViews;          // 显示视频的控件
     private TextView mCurFilterName;                   // 当前滤镜名称
     private VideoRecordManager mRecordManager;
-    private int mCurFilter = 509;
+    private int mCurFilter = 420;
 
     public VideoRecordHolder(Activity context) {
         super(context);
@@ -159,8 +159,8 @@ public class VideoRecordHolder extends BaseHolder {
     }
 
     /** 切换前后摄像头 */
-    public void verseCamera() {
-        mRecordManager.reverseCamera();
+    public void switchCamera() {
+        mRecordManager.switchCamera();
     }
 
 

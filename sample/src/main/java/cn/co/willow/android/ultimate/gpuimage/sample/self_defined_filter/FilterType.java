@@ -79,7 +79,7 @@ public class FilterType {
         }
 
         public static int getTypeSize() {
-            return values().length - 1;
+            return values().length;
         }
     }
 }
