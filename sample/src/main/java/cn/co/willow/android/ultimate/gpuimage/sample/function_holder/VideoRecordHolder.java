@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.sample;
+package cn.co.willow.android.ultimate.gpuimage.sample.function_holder;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.manager.VideoRecordManager;
+import cn.co.willow.android.ultimate.gpuimage.sample.R;
 import cn.co.willow.android.ultimate.gpuimage.sample.self_defined_filter.FilterType;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.FileUtil;
 import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;

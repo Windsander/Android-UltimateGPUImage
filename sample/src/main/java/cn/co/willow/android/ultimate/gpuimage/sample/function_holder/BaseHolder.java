@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.sample;
+package cn.co.willow.android.ultimate.gpuimage.sample.function_holder;
 
 import android.app.Activity;
 import android.view.View;

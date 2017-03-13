@@ -1,20 +1,17 @@
 package cn.co.willow.android.ultimate.gpuimage.sample;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import java.io.File;
 
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoControlHolder;
+import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoRecordHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.UIUtils;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
@@ -84,7 +81,7 @@ public class SampleActivity extends AppCompatActivity {
             }
             @Override
             public void onRecordFinish(File mOutputRecFile) {
-                LogUtil.w("Video final Path" + mOutputRecFile.getAbsolutePath());
+                LogUtil.w("Video final Path::" + mOutputRecFile.getAbsolutePath());
                 // TODO 视频录制完成后，截帧生成gif
             }
         });
