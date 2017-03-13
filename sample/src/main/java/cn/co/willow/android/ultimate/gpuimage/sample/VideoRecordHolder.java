@@ -149,8 +149,10 @@ public class VideoRecordHolder extends BaseHolder {
 
     /** 开始录制 */
     public void startRecord() {
+        String videoSavePath = FileUtil.getVideoSavePath();
+        LogUtil.w("Video save Path::" + videoSavePath);
         mRecordManager.startRecord(
-                FileUtil.computeMD5ForFile(FileUtil.getVideoSavePath()));
+                FileUtil.computeMD5ForFile(videoSavePath));
     }
 
     /** 结束录制 */

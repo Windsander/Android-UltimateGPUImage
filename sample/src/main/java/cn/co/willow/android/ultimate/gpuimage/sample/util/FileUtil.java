@@ -36,7 +36,7 @@ public class FileUtil {
             }
         }
         if (mCacheRootPath == null || mCacheRootPath.trim().length() == 0) {
-            mCacheRootPath = SampleApplication.getApplication().getCacheDir().getPath();
+            mCacheRootPath = UIUtils.getContext().getCacheDir().getPath();
         }
         return mCacheRootPath;
     }
