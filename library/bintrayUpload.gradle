@@ -13,14 +13,14 @@ if (projectPropertiesFile.exists()) {
 }
 
 //读取属性
-def projectRepositoryName = properties.getProperty("project.repositoryName")
-def projectName = properties.getProperty("project.name")
-def projectGroupId = properties.getProperty("project.groupId")
-def projectArtifactId = properties.getProperty("project.artifactId")
+def projectRepositoryName = properties.getProperty("project.repositoryName")                // 仓库名称，就是在bintray官网建立的仓库的名称
+def projectName = properties.getProperty("project.name")                                     // 项目名称
+def projectGroupId = properties.getProperty("project.groupId")                              // 项目组id
+def projectArtifactId = properties.getProperty("project.artifactId")                        // 项目id,一般同project.name
 def projectVersionName = android.defaultConfig.versionName
-def projectPackaging = properties.getProperty("project.packaging")
-def projectSiteUrl = properties.getProperty("project.siteUrl")
-def projectGitUrl = properties.getProperty("project.gitUrl")
+def projectPackaging = properties.getProperty("project.packaging")                          // 打包类型
+def projectSiteUrl = properties.getProperty("project.siteUrl")                              // 项目官方网站地址
+def projectGitUrl = properties.getProperty("project.gitUrl")                                // 项目git地址
 
 def developerId = properties.getProperty("developer.id")
 def developerName = properties.getProperty("developer.name")
@@ -30,7 +30,7 @@ def bintrayUser = properties.getProperty("bintray.user")
 def bintrayApikey = properties.getProperty("bintray.apiKey")
 def bintrayOrganizationId = properties.getProperty("bintray.organizationId");
 
-def javadocName = properties.getProperty("javadoc.name")
+def javadocName = properties.getProperty("javadoc.name")                                    // 生成的javadoc名称
 
 /*
 *这句代码一定要加否则会出现如下错误
@@ -74,19 +74,20 @@ install {
     }
 }
 
-//生成sources.jar
+// 生成jar包的task
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
 }
 
+// 生成jarDoc的task
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     failOnError false
 }
 
-//生成javadoc.jar
+// 生成javadoc.jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
