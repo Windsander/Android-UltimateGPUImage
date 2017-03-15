@@ -1,8 +1,8 @@
 # Android-UltimateGPUImage
-provide video record function with filter and other cool staff
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/windsander/UltimateGPUImage/library/images/download.svg) ](https://bintray.com/windsander/UltimateGPUImage/library/_latestVersion)
 
+provide video record function with filter and other cool staff
 Idea from: [android-gpuimage](https://github.com/CyberAgent/android-gpuimage),which is aim to be [iOS GPUImage framework](https://github.com/BradLarson/GPUImage) in Android device.
 
 The Elder said:
