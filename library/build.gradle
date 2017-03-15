@@ -3,6 +3,7 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
+
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 25
@@ -46,3 +47,4 @@ dependencies {
     compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.14'
     testCompile 'junit:junit:4.12'
 }
+apply from: "bintrayUpload.gradle"
