@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.core_record_18;
+package cn.co.willow.android.ultimate.gpuimage.core_render;
 
 import android.app.Activity;
 import android.opengl.EGL14;
@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.microedition.khronos.opengles.GL10;
 
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
+import cn.co.willow.android.ultimate.gpuimage.core_record_18.TextureMovieEncoder;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
-import cn.co.willow.android.ultimate.gpuimage.manager.VideoRenderer;
 
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_BIT_RATE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_HEIGH;
@@ -31,16 +31,17 @@ import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderStat
  * <p>
  * Created by willow.li on 2016/10/28.
  */
-public class VideoRecorderRenderer extends VideoRenderer {
+public class VideoRecorderRenderer extends BaseRenderer {
+
+    private final byte[] lock = new byte[0];
 
     private final AtomicReference<RecordCoderState> mCoderStatus = new AtomicReference<>();
-    public final byte[] lock = new byte[0];
-    private TextureMovieEncoder mTMEncoder;                  // 音视频建简易编码器
-    private boolean mStartCoder = false;                   // 编码器启用标志
-    private File mOutputFile = null;
-    private int mRecordWidth = VIDEO_RECORD_WIDTH;
-    private int mRecordHeigh = VIDEO_RECORD_HEIGH;
-    private int mRecordBitrate = VIDEO_BIT_RATE;
+    private TextureMovieEncoder mTMEncoder;                     // 音视频建简易编码器
+    private boolean mStartCoder    = false;                     // 编码器启用标志
+    private File    mOutputFile    = null;
+    private int     mRecordWidth   = VIDEO_RECORD_WIDTH;
+    private int     mRecordHeigh   = VIDEO_RECORD_HEIGH;
+    private int     mRecordBitrate = VIDEO_BIT_RATE;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoRecorderRenderer(GPUImageFilter filter) {

@@ -1,6 +1,5 @@
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 
-import android.Manifest;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -9,7 +8,6 @@ import android.media.MediaRecorder;
 import android.os.Build;
 import android.support.annotation.MainThread;
 import android.support.annotation.RequiresApi;
-import android.support.annotation.RequiresPermission;
 import android.view.Surface;
 
 import java.io.File;
@@ -19,12 +17,13 @@ import java.util.List;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecorderMessageState;
 import cn.co.willow.android.ultimate.gpuimage.core_looper.MessagesHandlerThread;
 import cn.co.willow.android.ultimate.gpuimage.core_looper.meta.MetaData;
-import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.BaseRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.CreateNewRecordInstance;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordRelease;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStart;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStop;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.CreateNewRecordInstance;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordRelease;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordStart;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordStop;
 import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.CameraUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
@@ -40,19 +39,19 @@ import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VI
 public class VideoRecordManager implements VideoRecordConstrain, VideoRecordManagerCallback {
 
     /*关键常数=======================================================================================*/
-    private static final String TAG = VideoRecordManager.class.getSimpleName();
-    private static final int PREVIEW_RULE_SIZE = VIDEO_RECORD_WIDTH * VIDEO_RECORD_HEIGH;
+    private static final String TAG               = VideoRecordManager.class.getSimpleName();
+    private static final int    PREVIEW_RULE_SIZE = VIDEO_RECORD_WIDTH * VIDEO_RECORD_HEIGH;
 
     /*关键变量=======================================================================================*/
-    private final MessagesHandlerThread mRecordHandler = new MessagesHandlerThread();
-    private RecorderMessageState mCurrentRecordState = RecorderMessageState.IDLE;
-    private CamcorderProfile mProfile;              // 相机配置
-    private FilterRecoderView mRecorderView;       // 显示视频的控件
-    private Camera mCamera;                         // 相机对象
-    private Surface mRenderSurface;                // 渲染层对象（暂时没用上）
-    private boolean isFrontCame = true;           // 是否使用前置摄像头
+    private final MessagesHandlerThread mRecordHandler      = new MessagesHandlerThread();
+    private       RecorderMessageState  mCurrentRecordState = RecorderMessageState.IDLE;
+    private CamcorderProfile  mProfile;                     // 相机配置
+    private FilterRecoderView mRecorderView;                // 显示视频的控件
+    private Camera            mCamera;                      // 相机对象
+    private Surface           mRenderSurface;               // 渲染层对象（暂时没用上）
+    private boolean isFrontCame = true;                     // 是否使用前置摄像头
 
-    private VideoFilterManager mFilteManager;      // 视频渲染管理者
+    private VideoFilterManager mFilteManager;               // 视频渲染管理者
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoRecordManager(Context context, FilterRecoderView videoRecordView) {
@@ -99,7 +98,7 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
 
         // 4.关联渲染器  bond filter-manager
         mFilteManager.setUpCamera(mCamera, isFrontCame);
-        mFilteManager.setOnSurfaceSetListener(new VideoRenderer.OnSurfaceSetListener() {
+        mFilteManager.setOnSurfaceSetListener(new BaseRenderer.OnSurfaceSetListener() {
             @Override
             public void onSurfaceSet(SurfaceTexture mSurfaceTexture) {
                 mRenderSurface = new Surface(mSurfaceTexture);

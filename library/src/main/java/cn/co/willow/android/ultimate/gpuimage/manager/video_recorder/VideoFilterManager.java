@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -14,7 +14,8 @@ import java.io.File;
 
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
-import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.BaseRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
 /**
@@ -25,8 +26,8 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 public class VideoFilterManager {
 
     private VideoRecorderRenderer mRenderer;
-    private GLSurfaceView mGlSurfaceView;
-    private GPUImageFilter mFilter;
+    private GLSurfaceView         mGlSurfaceView;
+    private GPUImageFilter        mFilter;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoFilterManager(final Context context) {
@@ -38,7 +39,7 @@ public class VideoFilterManager {
     /*关键设置======================================================================================*/
     /** 检测是否支持OpenGl */
     private void supportsOpenGLES3(final Context context) {
-        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final ActivityManager   activityManager   = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         if (configurationInfo.reqGlEsVersion < 0x30000) {
             throw new IllegalStateException("OpenGL ES 3.0 is not supported on this phone.");
@@ -82,6 +83,7 @@ public class VideoFilterManager {
         }
     }
 
+
     /*录制逻辑======================================================================================*/
     public void clearRecorderInstance() {
         mRenderer.clearAll();
@@ -112,8 +114,8 @@ public class VideoFilterManager {
     }
 
 
-    /*渲染流程关联性监听============================================================================*/
-    public void setOnSurfaceSetListener(VideoRenderer.OnSurfaceSetListener mOnSurfaceSetListener) {
+    /*渲染流程关联性监听===============================================================================*/
+    public void setOnSurfaceSetListener(BaseRenderer.OnSurfaceSetListener mOnSurfaceSetListener) {
         mRenderer.setOnSurfaceSetListener(mOnSurfaceSetListener);
     }
 

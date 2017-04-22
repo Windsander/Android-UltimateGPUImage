@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 CyberAgent
+ * Copyright (C) 2017 Willow
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.core_render;
 
 import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
@@ -52,10 +52,10 @@ import static cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil.T
  * Created by willow.li on 2016/10/22.
  */
 @TargetApi(11)
-public class VideoRenderer implements Renderer, PreviewCallback {
-    public static final int DEFAULT_NO_IMAGE = -1;
-    public final byte[] mSurfaceChangedWaiter = new byte[0];       // 绘制锁
-    public static final float CUBE[] = {
+public class BaseRenderer implements Renderer, PreviewCallback {
+    public static final int    DEFAULT_NO_IMAGE      = -1;
+    public final        byte[] mSurfaceChangedWaiter = new byte[0];       // 绘制锁
+    public static final float  CUBE[]                = {
             -1.0f, -1.0f,
             1.0f, -1.0f,
             -1.0f, 1.0f,
@@ -64,44 +64,44 @@ public class VideoRenderer implements Renderer, PreviewCallback {
 
     // 绘制处理流
     protected GPUImageFilter mFilter;
-    protected int mGLTextureId = DEFAULT_NO_IMAGE;
+    protected int            mGLTextureId    = DEFAULT_NO_IMAGE;
     protected SurfaceTexture mSurfaceTexture = null;
-    protected final FloatBuffer mGLCubeBuffer;
-    protected final FloatBuffer mGLTextureBuffer;
-    protected IntBuffer mGLRgbBuffer;
-    private final Queue<Runnable> mRunOnDraw;
-    private final Queue<Runnable> mEndOnDraw;
+    protected final FloatBuffer     mGLCubeBuffer;
+    protected final FloatBuffer     mGLTextureBuffer;
+    protected       IntBuffer       mGLRgbBuffer;
+    private final   Queue<Runnable> mRunOnDraw;
+    private final   Queue<Runnable> mEndOnDraw;
 
     // 预览参数
-    private int mOutputWidth;
-    private int mOutputHeight;
-    private int mImageWidth;
-    private int mImageHeight;
-    private int mAddedPadding;
+    protected int mOutputWidth;
+    protected int mOutputHeight;
+    protected int mImageWidth;
+    protected int mImageHeight;
+    protected int mAddedPadding;
 
     // 适配参数（图形基本变换）
     private Rotation mRotation;
-    private boolean mFlipHor;
-    private boolean mFlipVer;
+    private boolean  mFlipHor;
+    private boolean  mFlipVer;
     private FilterConfig.ScaleType mScaleType = FilterConfig.ScaleType.CENTER_CROP;
 
     private float mBGR = 0;
     private float mBGG = 0;
     private float mBGB = 0;
 
-    public VideoRenderer(final GPUImageFilter filter) {
+    public BaseRenderer(final GPUImageFilter filter) {
         mFilter = filter;
         mRunOnDraw = new LinkedList<Runnable>();
         mEndOnDraw = new LinkedList<Runnable>();
 
         mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+                                  .order(ByteOrder.nativeOrder())
+                                  .asFloatBuffer();
         mGLCubeBuffer.put(CUBE).position(0);
 
         mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+                                     .order(ByteOrder.nativeOrder())
+                                     .asFloatBuffer();
         setRotation(Rotation.NORMAL, false, false);
     }
 
@@ -184,16 +184,20 @@ public class VideoRenderer implements Renderer, PreviewCallback {
         return mFlipVer;
     }
 
-    public void setScaleType(FilterConfig.ScaleType scaleType) {
-        mScaleType = scaleType;
-    }
-
-    protected int getFrameWidth() {
+    public int getFrameWidth() {
         return mOutputWidth;
     }
 
-    protected int getFrameHeight() {
+    public int getFrameHeight() {
         return mOutputHeight;
+    }
+
+    public FilterConfig.ScaleType getScaleType() {
+        return mScaleType;
+    }
+
+    public void setScaleType(FilterConfig.ScaleType scaleType) {
+        mScaleType = scaleType;
     }
 
 
@@ -226,7 +230,7 @@ public class VideoRenderer implements Renderer, PreviewCallback {
                 }
                 try {
                     camera.setPreviewTexture(mSurfaceTexture);
-                    camera.setPreviewCallback(VideoRenderer.this);
+                    camera.setPreviewCallback(BaseRenderer.this);
                     camera.startPreview();
                 } catch (IOException e) {
                     throw new RuntimeException(e.getMessage());
@@ -238,7 +242,6 @@ public class VideoRenderer implements Renderer, PreviewCallback {
     /** 设置滤镜 */
     public void setFilter(final GPUImageFilter filter) {
         runOnDraw(new Runnable() {
-
             @Override
             public void run() {
                 final GPUImageFilter oldFilter = mFilter;
@@ -257,27 +260,27 @@ public class VideoRenderer implements Renderer, PreviewCallback {
     /*适配算法======================================================================================*/
     /** 图像适配 */
     protected void adjustImageScaling() {
-        float outputWidth = mOutputWidth;
+        float outputWidth  = mOutputWidth;
         float outputHeight = mOutputHeight;
         if (mRotation == Rotation.ROTATION_270 || mRotation == Rotation.ROTATION_90) {
             outputWidth = mOutputHeight;
             outputHeight = mOutputWidth;
         }
 
-        float ratio1 = outputWidth / mImageWidth;
-        float ratio2 = outputHeight / mImageHeight;
-        float ratioMax = Math.max(ratio1, ratio2);
-        int imageWidthNew = Math.round(mImageWidth * ratioMax);
-        int imageHeightNew = Math.round(mImageHeight * ratioMax);
+        float ratio1         = outputWidth / mImageWidth;
+        float ratio2         = outputHeight / mImageHeight;
+        float ratioMax       = Math.max(ratio1, ratio2);
+        int   imageWidthNew  = Math.round(mImageWidth * ratioMax);
+        int   imageHeightNew = Math.round(mImageHeight * ratioMax);
 
-        float ratioWidth = imageWidthNew / outputWidth;
+        float ratioWidth  = imageWidthNew / outputWidth;
         float ratioHeight = imageHeightNew / outputHeight;
 
-        float[] cube = CUBE;
+        float[] cube         = CUBE;
         float[] textureCords = TextureRotationUtil.getRotation(mRotation, mFlipHor, mFlipVer);
         if (mScaleType == FilterConfig.ScaleType.CENTER_CROP) {
             float distHorizontal = (1 - 1 / ratioWidth) / 2;
-            float distVertical = (1 - 1 / ratioHeight) / 2;
+            float distVertical   = (1 - 1 / ratioHeight) / 2;
             textureCords = new float[]{
                     addDistance(textureCords[0], distHorizontal), addDistance(textureCords[1], distVertical),
                     addDistance(textureCords[2], distHorizontal), addDistance(textureCords[3], distVertical),

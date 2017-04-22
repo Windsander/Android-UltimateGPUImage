@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 
 import java.io.File;
 
-import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoControlHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoRecordHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.interaction_logic.SamplePresenter;
@@ -48,11 +48,11 @@ public class SampleActivity extends AppCompatActivity {
 
 
     /*how to use UltimateGPUImage with a holder module==============================================*/
-    private FrameLayout mFunctionContainer;                 // use as a container for video preview
-    private FrameLayout mFuncOperatePannel;                 // use to control video operate
-    private VideoRecordHolder mVideoRecordHolder;           // module: video recorder preview
-    private VideoControlHolder videoControlHolder;          // module: video recorder controller
-    private SamplePresenter mInteractionLogic;
+    private FrameLayout        mFunctionContainer;                  // use as a container for video preview
+    private FrameLayout        mFuncOperatePannel;                  // use to control video operate
+    private VideoRecordHolder  mVideoRecordHolder;                  // module: video recorder preview
+    private VideoControlHolder videoControlHolder;                  // module: video recorder controller
+    private SamplePresenter    mInteractionLogic;
 
     private void initInteractionLogics() {
         mInteractionLogic = SamplePresenter.init(new SamplePresenter.onCoverListener() {
@@ -128,8 +128,8 @@ public class SampleActivity extends AppCompatActivity {
 
     /** 权限检测 check premission */
     public boolean checkPremission(String... permissions) {
-        boolean allHave = true;
-        PackageManager pm = getPackageManager();
+        boolean        allHave = true;
+        PackageManager pm      = getPackageManager();
         for (String permission : permissions) {
             switch (pm.checkPermission(permission, SampleApplication.getApplication().getPackageName())) {
                 case PERMISSION_GRANTED:

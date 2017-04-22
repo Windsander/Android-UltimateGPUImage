@@ -13,9 +13,9 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
-import cn.co.willow.android.ultimate.gpuimage.core_record_18.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
-import cn.co.willow.android.ultimate.gpuimage.manager.VideoRecordManager;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoRecordManager;
 import cn.co.willow.android.ultimate.gpuimage.sample.R;
 import cn.co.willow.android.ultimate.gpuimage.sample.self_defined_filter.FilterType;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.FileUtil;

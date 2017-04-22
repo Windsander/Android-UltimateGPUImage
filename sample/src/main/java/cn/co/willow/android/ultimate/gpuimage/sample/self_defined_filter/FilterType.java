@@ -14,15 +14,15 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effec
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter_group.GPUImageThresholdEdgeDetection;
 
 public class FilterType {
-    private static GPUImageFilter lookupFilter1 = new GPUImageColorInvertFilter();          // single
-    private static GPUImageFilter lookupFilter2 = new GPUImageSketchFilter();               // group    bug     3x3
-    private static GPUImageFilter lookupFilter3 = new GPUImageSmoothCartoonFilter();        // group    bug     3x3
-    private static GPUImageFilter lookupFilter4 = new GPUImageSobelThresholdFilter();       // single   bug     3x3
-    private static GPUImageFilter lookupFilter5 = new GPUImageSobelEdgeDetection();         // group    bug     3x3
-    private static GPUImageFilter lookupFilter6 = new GPUImageThresholdEdgeDetection();     // group    bug     3x3
-    private static GPUImageFilter lookupFilter7 = new GPUImageHalftoneFilter();             // single
-    private static GPUImageFilter lookupFilter8 = new GPUImageHazeFilter();                 // single
-    private static GPUImageFilter lookupFilter9 = new GPUImageKuwaharaFilter();             // single
+    private static GPUImageFilter lookupFilter1  = new GPUImageColorInvertFilter();         // single
+    private static GPUImageFilter lookupFilter2  = new GPUImageSketchFilter();              // group    bug     3x3
+    private static GPUImageFilter lookupFilter3  = new GPUImageSmoothCartoonFilter();       // group    bug     3x3
+    private static GPUImageFilter lookupFilter4  = new GPUImageSobelThresholdFilter();      // single   bug     3x3
+    private static GPUImageFilter lookupFilter5  = new GPUImageSobelEdgeDetection();        // group    bug     3x3
+    private static GPUImageFilter lookupFilter6  = new GPUImageThresholdEdgeDetection();    // group    bug     3x3
+    private static GPUImageFilter lookupFilter7  = new GPUImageHalftoneFilter();            // single
+    private static GPUImageFilter lookupFilter8  = new GPUImageHazeFilter();                // single
+    private static GPUImageFilter lookupFilter9  = new GPUImageKuwaharaFilter();            // single
     private static GPUImageFilter lookupFilter10 = new GPUImagePixelationFilter();          // single
     private static GPUImageFilter lookupFilter11 = new GPUImageSepiaFilter();               // single
     private static GPUImageFilter lookupFilter12 = new GPUImageFace01Filter();              // TwoInput bug     2input
@@ -44,9 +44,10 @@ public class FilterType {
         f11(11, "Sepia", "Sepia", lookupFilter11),
         f12(12, "lookup-postcard", "Face01", lookupFilter12),
         f13(13, "lookup-classical", "Face02", lookupFilter13);
-        int index;
-        String name;
-        String tag;
+
+        int            index;
+        String         name;
+        String         tag;
         GPUImageFilter filter;
 
         public static Type getFilter(int index) {

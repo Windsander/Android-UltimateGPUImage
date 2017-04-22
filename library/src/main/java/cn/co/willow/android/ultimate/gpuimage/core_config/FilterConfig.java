@@ -11,7 +11,6 @@ public class FilterConfig {
 
     public enum ScaleType {
         CENTER_INSIDE,
-        CENTER_CROP }
-
-
+        CENTER_CROP
+    }
 }
