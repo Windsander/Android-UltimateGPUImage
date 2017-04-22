@@ -33,6 +33,7 @@ dependencies {
 ### Sample Code
 how to use recorder module, in a simple way. 
 
+if you want to use this lib to record or take picture:
 ```java
 @Override
 public void onCreate(final Bundle savedInstanceState) {
@@ -55,6 +56,30 @@ public void onCreate(final Bundle savedInstanceState) {
 
     // if u don't want to use camera anymore.
     mRecordManager.releaseCamera();
+}
+```
+
+if you just want to operate an image, you can do like this:
+```java
+@Override
+public void onCreate(final Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity);
+
+    // prepare surface.
+    mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
+    
+    // prepare the filter you want to use
+    final GPUImageContrastFilter contrastFilter = new GPUImageContrastFilter(1.0f);
+    contrastFilter.setContrast(contrastValue);
+    
+    // bind to PureImageManager and render
+    PureImageManager.init(context)
+                    .setGLSurfaceView(mRecorderViews)
+                    .setScaleType(GPUImage.ScaleType.CENTER_INSIDE)
+                    .setImage(mUri)
+                    .setFilter(contrastFilter)
+                    .requestRender();
 }
 ```
 
