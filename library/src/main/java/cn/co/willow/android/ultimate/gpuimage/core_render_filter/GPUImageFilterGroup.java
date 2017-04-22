@@ -13,7 +13,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.utils.GlUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil;
 
-import static cn.co.willow.android.ultimate.gpuimage.manager.VideoRenderer.CUBE;
+import static cn.co.willow.android.ultimate.gpuimage.core_render.BaseRenderer.CUBE;
 import static cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil.TEXTURE_NO_ROTATION;
 
 /**

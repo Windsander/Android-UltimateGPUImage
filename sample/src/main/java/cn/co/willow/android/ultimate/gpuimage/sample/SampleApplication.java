@@ -10,10 +10,10 @@ import android.support.multidex.MultiDexApplication;
  */
 public class SampleApplication extends MultiDexApplication {
 
-    private static SampleApplication mApplicationContext;              // 主线程的上下文
-    private static Handler mMainThreadsHandler;                         // 主线程的Handler
-    private static Thread mMainThread;                                  // 主线程
-    private static int mMainThreadId;                                   // 主线程id
+    private static SampleApplication mApplicationContext;               // 主线程的上下文
+    private static Handler           mMainThreadsHandler;               // 主线程的Handler
+    private static Thread            mMainThread;                       // 主线程
+    private static int               mMainThreadId;                     // 主线程id
 
     /*变量获取======================================================================================*/
 
