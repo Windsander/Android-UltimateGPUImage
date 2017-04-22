@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager_pure_image.image_loader;
+package cn.co.willow.android.ultimate.gpuimage.manager.image_editor.image_loader;
 
 import android.content.Context;
 import android.graphics.Bitmap;

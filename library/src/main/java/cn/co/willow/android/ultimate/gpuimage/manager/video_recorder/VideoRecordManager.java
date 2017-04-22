@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -20,10 +20,10 @@ import cn.co.willow.android.ultimate.gpuimage.core_looper.meta.MetaData;
 import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render.BaseRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.CreateNewRecordInstance;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordRelease;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStart;
-import cn.co.willow.android.ultimate.gpuimage.manager.record_messages.RecordStop;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.CreateNewRecordInstance;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordRelease;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordStart;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages.RecordStop;
 import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.CameraUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;

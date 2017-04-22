@@ -1,8 +1,8 @@
-package cn.co.willow.android.ultimate.gpuimage.manager.record_messages;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.record_messages;
 
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecorderMessageState;
-import cn.co.willow.android.ultimate.gpuimage.manager.VideoFilterManager;
-import cn.co.willow.android.ultimate.gpuimage.manager.VideoRecordManagerCallback;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoFilterManager;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoRecordManagerCallback;
 
 /**
  * This is generic interface for RecordMessage

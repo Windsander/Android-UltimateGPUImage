@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 
 import android.app.ActivityManager;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager_pure_image;
+package cn.co.willow.android.ultimate.gpuimage.manager.image_editor;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -16,9 +16,9 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.FilterConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_render.BaseRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render.PureImageRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
-import cn.co.willow.android.ultimate.gpuimage.manager_pure_image.image_loader.BaseImageLoader;
-import cn.co.willow.android.ultimate.gpuimage.manager_pure_image.image_loader.FileImageLoader;
-import cn.co.willow.android.ultimate.gpuimage.manager_pure_image.image_loader.UriImageLoader;
+import cn.co.willow.android.ultimate.gpuimage.manager.image_editor.image_loader.BaseImageLoader;
+import cn.co.willow.android.ultimate.gpuimage.manager.image_editor.image_loader.FileImageLoader;
+import cn.co.willow.android.ultimate.gpuimage.manager.image_editor.image_loader.UriImageLoader;
 
 /**
  * this is a pure image Operator, which is used to manipulate image (brightness, contrast, etc..).

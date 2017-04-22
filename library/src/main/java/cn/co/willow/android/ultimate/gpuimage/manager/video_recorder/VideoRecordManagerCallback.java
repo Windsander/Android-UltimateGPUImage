@@ -1,4 +1,4 @@
-package cn.co.willow.android.ultimate.gpuimage.manager;
+package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecorderMessageState;
 import cn.co.willow.android.ultimate.gpuimage.core_looper.meta.MetaData;
