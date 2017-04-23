@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compile 'cn.co.willow.android.ultimate.gpuimage:library:1.0'
+    compile 'cn.co.willow.android.ultimate.gpuimage:library:1.0.1'
 }
 ```
 
@@ -58,6 +58,7 @@ public void onCreate(final Bundle savedInstanceState) {
     mRecordManager.releaseCamera();
 }
 ```
+
 
 if you just want to operate an image, you can do like this:
 ```java
