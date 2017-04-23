@@ -8,3 +8,7 @@
 /captures
 .externalNativeBuild
 libs/
+
+# JCenter config #
+############
+library/bintray.properties
