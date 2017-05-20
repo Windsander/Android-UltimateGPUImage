@@ -3,8 +3,6 @@ package cn.co.willow.android.ultimate.gpuimage.manager.video_recorder;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.media.CamcorderProfile;
-import android.media.MediaRecorder;
 import android.os.Build;
 import android.support.annotation.MainThread;
 import android.support.annotation.RequiresApi;
@@ -14,6 +12,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecorderMessageState;
 import cn.co.willow.android.ultimate.gpuimage.core_looper.MessagesHandlerThread;
 import cn.co.willow.android.ultimate.gpuimage.core_looper.meta.MetaData;
@@ -28,36 +27,34 @@ import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.CameraUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_ASPECT_RATIO;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_FRAME_RATE;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_HEIGH;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_WIDTH;
-
 /**
  * 高版本MediaRecorder控制器
  */
 public class VideoRecordManager implements VideoRecordConstrain, VideoRecordManagerCallback {
 
     /*关键常数=======================================================================================*/
-    private static final String TAG               = VideoRecordManager.class.getSimpleName();
-    private static final int    PREVIEW_RULE_SIZE = VIDEO_RECORD_WIDTH * VIDEO_RECORD_HEIGH;
+    private static final String TAG = VideoRecordManager.class.getSimpleName();
 
     /*关键变量=======================================================================================*/
     private final MessagesHandlerThread mRecordHandler      = new MessagesHandlerThread();
     private       RecorderMessageState  mCurrentRecordState = RecorderMessageState.IDLE;
-    private CamcorderProfile  mProfile;                     // 相机配置
     private FilterRecoderView mRecorderView;                // 显示视频的控件
     private Camera            mCamera;                      // 相机对象
     private Surface           mRenderSurface;               // 渲染层对象（暂时没用上）
     private boolean isFrontCame = true;                     // 是否使用前置摄像头
 
-    private VideoFilterManager mFilteManager;               // 视频渲染管理者
+    private OutputConfig.VideoOutputConfig mVideoConfig;
+    private OutputConfig.AudioOutputConfig mAudioConfig;
+    private VideoFilterManager             mFilteManager;   // 视频渲染管理者
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+
     public VideoRecordManager(Context context, FilterRecoderView videoRecordView) {
+        mVideoConfig = new OutputConfig.VideoOutputConfig();
+        mAudioConfig = new OutputConfig.AudioOutputConfig();
         mRecorderView = videoRecordView;
         mFilteManager = new VideoFilterManager(context);
-        mFilteManager.setGLSurfaceView(videoRecordView);
+        mFilteManager.initManager(mVideoConfig, mAudioConfig);
+        mFilteManager.setGLSurfaceView(mRecorderView);
     }
 
 
@@ -72,7 +69,15 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
                 CameraUtil.getDefaultBackFacingCameraInstance();
         Camera.Parameters parameters = mCamera.getParameters();
         Camera.Size optimalSize = CameraUtil.getPreviewRuleSize(
-                parameters, PREVIEW_RULE_SIZE, VIDEO_ASPECT_RATIO);
+                parameters,
+                mVideoConfig.getVideoSizeLimit(),
+                mVideoConfig.getVideoAspect()
+        );
+
+        // 2.配置录制参数 init recorder params
+        mVideoConfig.setVideoWidth(optimalSize.height);      // 与系统相反
+        mVideoConfig.setVideoHight(optimalSize.width);
+        mVideoConfig.setBpsBitRate((int) (mVideoConfig.getIFrameRate() * optimalSize.width * optimalSize.height * 1.5f));
         parameters.setPreviewSize(optimalSize.width, optimalSize.height);
         // 设置对焦模式
         List<String> focusModes = parameters.getSupportedFocusModes();
@@ -80,23 +85,13 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
         }
         LogUtil.w("Camera::", "size = " + optimalSize.width + "*" + optimalSize.height);
-
-        // 2.配置录制参数 init recorder params
-        mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        mProfile.videoFrameWidth = optimalSize.width;
-        mProfile.videoFrameHeight = optimalSize.height;
-        mProfile.videoFrameRate = VIDEO_FRAME_RATE;
-        mProfile.videoBitRate = (int) (mProfile.videoFrameRate * optimalSize.width * optimalSize.height * 1.5f);
-        mProfile.fileFormat = MediaRecorder.OutputFormat.MPEG_4;
-        mProfile.videoCodec = MediaRecorder.VideoEncoder.MPEG_4_SP;
-        mProfile.audioCodec = MediaRecorder.AudioEncoder.AMR_NB;
         mCamera.setParameters(parameters);
-        LogUtil.w("Camera::", "record size = " + mProfile.videoFrameWidth + "*" + mProfile.videoFrameHeight);
 
         // 3.配置预览界面 init preview
         mRecorderView.getHolder().setFixedSize(optimalSize.height, optimalSize.width);
 
         // 4.关联渲染器  bond filter-manager
+
         mFilteManager.setUpCamera(mCamera, isFrontCame);
         mFilteManager.setOnSurfaceSetListener(new BaseRenderer.OnSurfaceSetListener() {
             @Override
@@ -125,6 +120,13 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mFilteManager.setFilter(filter);
     }
 
+    /** 切换输出格式配置 */
+    public void setAVConfig(OutputConfig.VideoOutputConfig videoConfig,
+                            OutputConfig.AudioOutputConfig audioConfig) {
+        mVideoConfig = videoConfig;
+        mAudioConfig = audioConfig;
+    }
+
 
     /*录制流程整体控制==============================================================================*/
     /** 开始录像（注意：方法必须在{@link VideoRecordManager#openCamera()} 相机完成初始化设置后，才能执行） */
@@ -133,7 +135,7 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mRecordHandler.pauseQueueProcessing(TAG);
         mRecordHandler.clearAllPendingMessages(TAG);
         mRecordHandler.addMessages(Arrays.asList(
-                new CreateNewRecordInstance(mFilteManager, mOutputRecFile, mProfile, this),
+                new CreateNewRecordInstance(mFilteManager, this, mOutputRecFile, mVideoConfig, mAudioConfig),
                 new RecordStart(mFilteManager, this)
         ));
         mRecordHandler.resumeQueueProcessing(TAG);
@@ -159,19 +161,6 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
 
     /** 相机翻转 */
     public void switchCamera() {
-       /* switch (mCurrentRecordState) {
-            case START_RECORD:
-            case RECORDING:
-                stopRecord();
-                break;
-            case INITIALIZING:
-            case INITIALIZED:
-            case PREPARING:
-            case PREPARED:
-            case ERROR:
-                releaseRecord();
-                break;
-        }*/
         releaseCamera();
         isFrontCame = !isFrontCame;
         openCamera();

@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 
 import java.io.File;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
@@ -29,25 +30,23 @@ public class VideoFilterManager {
     private GLSurfaceView         mGlSurfaceView;
     private GPUImageFilter        mFilter;
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public VideoFilterManager(final Context context) {
+
+    /*初始化流程====================================================================================*/
+    public VideoFilterManager(Context context) {
         supportsOpenGLES3(context);
-        mFilter = new GPUImageFilter();
-        mRenderer = new VideoRecorderRenderer(mFilter);
     }
 
-    /*关键设置======================================================================================*/
-    /** 检测是否支持OpenGl */
-    private void supportsOpenGLES3(final Context context) {
-        final ActivityManager   activityManager   = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-        if (configurationInfo.reqGlEsVersion < 0x30000) {
-            throw new IllegalStateException("OpenGL ES 3.0 is not supported on this phone.");
-        }
+    /** 设置基本录制参数 */
+    void initManager(OutputConfig.VideoOutputConfig mVideoConfig,
+                     OutputConfig.AudioOutputConfig mAudioConfig) {
+        mRenderer = new VideoRecorderRenderer(
+                new GPUImageFilter(),
+                mVideoConfig,
+                mAudioConfig);
     }
 
     /** 初始化GLSurfaceView */
-    public void setGLSurfaceView(final GLSurfaceView view) {
+    void setGLSurfaceView(final GLSurfaceView view) {
         mGlSurfaceView = view;
         mGlSurfaceView.setEGLContextClientVersion(2);
         mGlSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
@@ -58,14 +57,20 @@ public class VideoFilterManager {
     }
 
     /** 设置相机，并切换角度 */
-    public void setUpCamera(final Camera camera, boolean isFrontCame) {
+    void setUpCamera(final Camera camera, boolean isFrontCame) {
         mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
-            mRenderer.setUpSurfaceTexture(camera);
-            mRenderer.setRotation(isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90, false, isFrontCame);
-        } else {
-            camera.setPreviewCallback(mRenderer);
-            camera.startPreview();
+        mRenderer.setUpSurfaceTexture(camera);
+        mRenderer.setRotation(isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90, false, isFrontCame);
+    }
+
+
+    /*关键设置======================================================================================*/
+    /** 检测是否支持OpenGl */
+    private void supportsOpenGLES3(final Context context) {
+        final ActivityManager   activityManager   = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+        if (configurationInfo.reqGlEsVersion < 0x30000) {
+            throw new IllegalStateException("OpenGL ES 3.0 is not supported on this phone.");
         }
     }
 
@@ -85,16 +90,14 @@ public class VideoFilterManager {
 
 
     /*录制逻辑======================================================================================*/
-    public void clearRecorderInstance() {
-        mRenderer.clearAll();
-        mRenderer = null;
+    public RecordCoderState getCurrentState() {
+        return mRenderer.getCurrentState();
     }
 
-    public void createNewRecorderInstance(File mOutputRecFile, final CamcorderProfile mProfile) {
-        mRenderer.prepareCoder(mOutputRecFile,
-                mProfile.videoFrameHeight,          // 系统旋转长宽相反
-                mProfile.videoFrameWidth,
-                mProfile.videoBitRate);
+    public void create(File mOutputRecFile,
+                       OutputConfig.VideoOutputConfig videoConfig,
+                       OutputConfig.AudioOutputConfig audioConfig) {
+        mRenderer.prepareCoder(mOutputRecFile, videoConfig, audioConfig);
     }
 
     public void start() {
@@ -109,8 +112,9 @@ public class VideoFilterManager {
         mRenderer.releaseCoder();
     }
 
-    public RecordCoderState getCurrentState() {
-        return mRenderer.getCurrentState();
+    public void destory() {
+        mRenderer.clearAll();
+        mRenderer = null;
     }
 
 
@@ -122,4 +126,5 @@ public class VideoFilterManager {
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRenderer.setOnRecordStateListener(mOnRecordStateListener);
     }
+
 }

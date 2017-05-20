@@ -36,11 +36,6 @@ public class WindowSurface extends EGLSurfaceBase {
         mReleaseSurface = releaseSurface;
     }
 
-    public WindowSurface(EGLCore eglCore, SurfaceTexture surfaceTexture) {
-        super(eglCore);
-        createWindowSurface(surfaceTexture);
-    }
-
 
     /*对外暴露方法==================================================================================*/
     public void release() {

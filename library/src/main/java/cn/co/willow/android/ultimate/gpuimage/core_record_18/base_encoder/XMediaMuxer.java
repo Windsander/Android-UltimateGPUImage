@@ -15,6 +15,7 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 /**
@@ -29,34 +30,35 @@ public class XMediaMuxer extends Thread {
     public static final int TRACK_AUDIO = 1;
 
     private final Object lock = new Object();
-    private final File mOutputFile;
 
     private android.media.MediaMuxer mMediaMuxer;
-    private Vector<MuxerData> mMuxerDatas;
+    private Vector<MuxerData>        mMuxerDatas;
     private int videoTrackIndex = -1;
     private int audioTrackIndex = -1;
 
     private volatile boolean isVideoAdd;
     private volatile boolean isAudioAdd;
-    private volatile boolean isMuxerExit = false;
-    private boolean isMediaMuxerStart = false;
-    private boolean isMediaDataFinish = false;
+    private volatile boolean isMuxerExit       = false;
+    private          boolean isMediaMuxerStart = false;
+    private          boolean isMediaDataFinish = false;
 
     private AudioEncoder audioThread;
     private VideoEncoder videoThread;
-    private MediaFormat videoMediaFormat;
-    private MediaFormat audioMediaFormat;
+    private MediaFormat  videoMediaFormat;
+    private MediaFormat  audioMediaFormat;
+    private File         mOutputFile;
 
     private boolean isCheckFrame = false;
 
-
-    public XMediaMuxer(int width, int height, int bitRate, File outputFile) {
+    public XMediaMuxer(OutputConfig.VideoOutputConfig mVideoConfig,
+                       OutputConfig.AudioOutputConfig mAudioConfig,
+                       File outputFile) {
         try {
             mOutputFile = outputFile;
             mMuxerDatas = new Vector<>();
             mMediaMuxer = new android.media.MediaMuxer(mOutputFile.getAbsolutePath(), android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            audioThread = new AudioEncoder(new WeakReference<XMediaMuxer>(this));
-            videoThread = new VideoEncoder(width, height, bitRate, new WeakReference<XMediaMuxer>(this));
+            audioThread = new AudioEncoder(mAudioConfig, new WeakReference<XMediaMuxer>(this));
+            videoThread = new VideoEncoder(mVideoConfig, new WeakReference<XMediaMuxer>(this));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -147,8 +149,8 @@ public class XMediaMuxer extends Thread {
                 if (mMuxerDatas.isEmpty()) {
                     lockMuxer();
                 } else {
-                    MuxerData data = mMuxerDatas.remove(0);
-                    int track = (data.trackIndex == TRACK_VIDEO) ? videoTrackIndex : audioTrackIndex;
+                    MuxerData data  = mMuxerDatas.remove(0);
+                    int       track = (data.trackIndex == TRACK_VIDEO) ? videoTrackIndex : audioTrackIndex;
                     mMediaMuxer.writeSampleData(track, data.byteBuf, data.bufferInfo);
                     if (mMuxerDatas != null && mMuxerDatas.isEmpty()) {
                         isMediaDataFinish = true;
@@ -169,12 +171,12 @@ public class XMediaMuxer extends Thread {
 
     private void requestStart() {
         synchronized (lock) {
-            LogUtil.d("Muxer", "Check should start");
+            LogUtil.i("Muxer", "Check should start");
             if (isAudioAdd && isVideoAdd) {
-                LogUtil.d("Muxer", "Muxer starting");
+                LogUtil.i("Muxer", "Muxer starting");
                 mMediaMuxer.start();
                 isMediaMuxerStart = true;
-                LogUtil.d("Muxer", "Muxer started");
+                LogUtil.i("Muxer", "Muxer started");
                 lock.notify();
             }
         }
@@ -222,8 +224,8 @@ public class XMediaMuxer extends Thread {
      * 封装需要传输的数据类型
      */
     public static class MuxerData {
-        int trackIndex;
-        ByteBuffer byteBuf;
+        int                   trackIndex;
+        ByteBuffer            byteBuf;
         MediaCodec.BufferInfo bufferInfo;
 
         public MuxerData(@TrackIndex int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {

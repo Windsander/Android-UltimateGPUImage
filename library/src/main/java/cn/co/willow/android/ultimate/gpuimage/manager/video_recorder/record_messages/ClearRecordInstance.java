@@ -13,7 +13,7 @@ public class ClearRecordInstance extends BaseRecorderMessage {
 
     @Override
     protected void performAction(VideoFilterManager currentRecorder) {
-        //currentRecorder.clearRecorderInstance();
+        //currentRecorder.destory();
     }
 
     @Override

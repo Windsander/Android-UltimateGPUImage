@@ -1,23 +1,19 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render;
 
 import android.app.Activity;
-import android.opengl.EGL14;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.TextureMovieEncoder;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_BIT_RATE;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_HEIGH;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_WIDTH;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState.IDLE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState.PREPARED;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState.START;
@@ -37,24 +33,22 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
     private final AtomicReference<RecordCoderState> mCoderStatus = new AtomicReference<>();
     private TextureMovieEncoder mTMEncoder;                     // 音视频建简易编码器
-    private boolean mStartCoder    = false;                     // 编码器启用标志
-    private File    mOutputFile    = null;
-    private int     mRecordWidth   = VIDEO_RECORD_WIDTH;
-    private int     mRecordHeigh   = VIDEO_RECORD_HEIGH;
-    private int     mRecordBitrate = VIDEO_BIT_RATE;
+    private boolean mStartCoder = false;                     // 编码器启用标志
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public VideoRecorderRenderer(GPUImageFilter filter) {
+    public VideoRecorderRenderer(GPUImageFilter filter,
+                                 OutputConfig.VideoOutputConfig videoConfig,
+                                 OutputConfig.AudioOutputConfig audioConfig) {
         super(filter);
-        initTMEncoder();
+        initTMEncoder(videoConfig, audioConfig);
         mCoderStatus.set(IDLE);
     }
 
     /** 初始化编码器的控制器 */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void initTMEncoder() {
+    private void initTMEncoder(OutputConfig.VideoOutputConfig videoConfig,
+                               OutputConfig.AudioOutputConfig audioConfig) {
         if (mTMEncoder == null) {
-            mTMEncoder = new TextureMovieEncoder(mFilter);
+            mTMEncoder = new TextureMovieEncoder();
+            mTMEncoder.setAVConfig(videoConfig, audioConfig);
             mTMEncoder.setOnFinishListener(new XMediaMuxer.OnFinishListener() {
                 @Override
                 public void onFinish(File mOutputFile) {
@@ -68,30 +62,15 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
 
     /*参数配置====================================================================================*/
-    /** 1.设置输出的滤镜视频文件位置 */
-    public void setOutputFile(File outputFile) {
-        synchronized (lock) {
-            mOutputFile = outputFile;
-        }
-    }
-
-    /** 2.录制开关，只能在{@link VideoRecorderRenderer#setOutputFile(File)}之后使用 */
+    /** 录制编码器开关 */
     public void changeCoderState(boolean startCodeing) {
-        if (mOutputFile == null) return;
         mStartCoder = startCodeing;
-    }
-
-    public void resetOutputFile() {
-        synchronized (lock) {
-            mOutputFile = null;
-        }
     }
 
     /** 滤镜设置 */
     @Override
     public void setFilter(GPUImageFilter filter) {
         super.setFilter(filter);
-        mTMEncoder.setFilter(filter);
     }
 
     /** 获取当前编码器状态 */
@@ -101,7 +80,6 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
 
     /*渲染录制逻辑==================================================================================*/
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onDrawFrame(final GL10 gl) {
         super.onDrawFrame(gl);
@@ -110,29 +88,15 @@ public class VideoRecorderRenderer extends BaseRenderer {
         } else {
             stopCoder();
         }
-        mTMEncoder.setTextureId(mGLTextureId);
         mTMEncoder.frameAvailable(mSurfaceTexture);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    @Override
-    protected void adjustImageScaling() {
-        super.adjustImageScaling();
-        initVideoEncoder();
     }
 
 
     /*编码器控制====================================================================================*/
-    /** 1.初始化视频编码器（每次适配时都需调用） */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void initVideoEncoder() {
-        initTMEncoder();
-        mTMEncoder.setGLCubeBuffer(mGLCubeBuffer);
-        mTMEncoder.setGLTextureBuffer(mGLTextureBuffer);
-    }
-
     /** 2-1.编码器基本配置准备 */
-    public void prepareCoder(File outputFile, int width, int height, int bitrate) {
+    public void prepareCoder(File outputFile,
+                             OutputConfig.VideoOutputConfig videoConfig,
+                             OutputConfig.AudioOutputConfig audioConfig) {
         synchronized (mCoderStatus) {
             switch (mCoderStatus.get()) {
                 case PREPARED:
@@ -145,10 +109,8 @@ public class VideoRecorderRenderer extends BaseRenderer {
                 default:
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
-            setOutputFile(outputFile);
-            mRecordWidth = width;
-            mRecordHeigh = height;
-            mRecordBitrate = bitrate;
+            mTMEncoder.setAVConfig(videoConfig, audioConfig);
+            mTMEncoder.setOutputFile(outputFile);
             if (mOnRecordStateListener != null) {
                 mOnRecordStateListener.onStopsReady();
             }
@@ -156,7 +118,6 @@ public class VideoRecorderRenderer extends BaseRenderer {
     }
 
     /** 2-2.编码器开始录制 */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void startCoder() {
         synchronized (mCoderStatus) {
             switch (mCoderStatus.get()) {
@@ -171,12 +132,7 @@ public class VideoRecorderRenderer extends BaseRenderer {
                 default:
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
-            mTMEncoder.startRecording(
-                    new TextureMovieEncoder.EncoderConfig(
-                            mOutputFile,
-                            mRecordWidth, mRecordHeigh, mRecordBitrate,
-                            EGL14.eglGetCurrentContext()
-                    ));
+            mTMEncoder.startRecording();
         }
     }
 
@@ -216,7 +172,6 @@ public class VideoRecorderRenderer extends BaseRenderer {
                 default:
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
-            resetOutputFile();
         }
     }
 

@@ -40,6 +40,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.utils.GPUImageNativeLibrary;
 import cn.co.willow.android.ultimate.gpuimage.utils.GlUtil;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil;
 
 import static cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil.TEXTURE_NO_ROTATION;
@@ -60,7 +61,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
             1.0f, -1.0f,
             -1.0f, 1.0f,
             1.0f, 1.0f,
-    };
+            };
 
     // 绘制处理流
     protected GPUImageFilter mFilter;
@@ -120,6 +121,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         mOutputHeight = height;
         GLES30.glViewport(0, 0, width, height);
         GLES30.glUseProgram(mFilter.getProgram());
+        if (!mFilter.isInitialized()) mFilter.init();
         mFilter.onOutputSizeChanged(width, height);
         adjustImageScaling();
         synchronized (mSurfaceChangedWaiter) {
@@ -129,17 +131,21 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
     @Override
     public void onDrawFrame(final GL10 gl) {
+        LogUtil.i("Render", "onDrawFrame start");
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         runAll(mRunOnDraw);
+        if (!mFilter.isInitialized()) mFilter.init();
         mFilter.onDraw(mGLTextureId, mGLCubeBuffer, mGLTextureBuffer);
         runAll(mEndOnDraw);
         if (mSurfaceTexture != null) {
             mSurfaceTexture.updateTexImage();
         }
+        LogUtil.i("Render", "onDrawFrame finish");
     }
 
     @Override
     public void onPreviewFrame(final byte[] data, final Camera camera) {
+        LogUtil.i("Render", "onPreviewFrame start");
         final Size previewSize = camera.getParameters().getPreviewSize();
         if (mGLRgbBuffer == null) {
             mGLRgbBuffer = IntBuffer.allocate(previewSize.width * previewSize.height);
@@ -168,6 +174,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                 }
             });
         }
+        LogUtil.i("Render", "onPreviewFrame finish");
     }
 
 
@@ -201,22 +208,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
     }
 
 
-    /*参数配置====================================================================================*/
-    /** 配置相机角度 */
-    public void setRotation(Rotation rotation, boolean flipHorizontal, boolean flipVertical) {
-        mFlipHor = flipHorizontal;
-        mFlipVer = flipVertical;
-        mRotation = rotation;
-        adjustImageScaling();
-    }
-
-    /** 配置配置背景颜色 */
-    public void setBackgroundColor(float red, float green, float blue) {
-        mBGR = red;
-        mBGG = green;
-        mBGB = blue;
-    }
-
+    /*相机配置======================================================================================*/
     /** 设置相机 */
     public void setUpSurfaceTexture(final Camera camera) {
         runOnDraw(new Runnable() {
@@ -237,6 +229,23 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                 }
             }
         });
+    }
+
+    /** 配置相机角度 */
+    public void setRotation(Rotation rotation, boolean flipHorizontal, boolean flipVertical) {
+        mFlipHor = flipHorizontal;
+        mFlipVer = flipVertical;
+        mRotation = rotation;
+        adjustImageScaling();
+    }
+
+
+    /*滤镜配置======================================================================================*/
+    /** 配置配置背景颜色 */
+    public void setBackgroundColor(float red, float green, float blue) {
+        mBGR = red;
+        mBGG = green;
+        mBGB = blue;
     }
 
     /** 设置滤镜 */
@@ -286,14 +295,14 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                     addDistance(textureCords[2], distHorizontal), addDistance(textureCords[3], distVertical),
                     addDistance(textureCords[4], distHorizontal), addDistance(textureCords[5], distVertical),
                     addDistance(textureCords[6], distHorizontal), addDistance(textureCords[7], distVertical),
-            };
+                    };
         } else {
             cube = new float[]{
                     CUBE[0] / ratioHeight, CUBE[1] / ratioWidth,
                     CUBE[2] / ratioHeight, CUBE[3] / ratioWidth,
                     CUBE[4] / ratioHeight, CUBE[5] / ratioWidth,
                     CUBE[6] / ratioHeight, CUBE[7] / ratioWidth,
-            };
+                    };
         }
 
         mGLCubeBuffer.clear();
