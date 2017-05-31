@@ -72,7 +72,7 @@ public class TextureMovieEncoder implements Runnable {
     }
 
     public void setAVConfig(OutputConfig.VideoOutputConfig videoConfig,
-                            OutputConfig.AudioOutputConfig audioConfig) {
+            OutputConfig.AudioOutputConfig audioConfig) {
         mVideoConfig = videoConfig;
         mAudioConfig = audioConfig;
     }
@@ -195,7 +195,6 @@ public class TextureMovieEncoder implements Runnable {
             if (mInputWindowSurface == null) return;
             mInputWindowSurface.setPresentationTime(timestamp);
             mInputWindowSurface.swapBuffers();
-            mTMsCoreMuxer.notifyVideoData();
         }
     }
 
