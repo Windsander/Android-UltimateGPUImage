@@ -73,14 +73,6 @@ public class VideoFilterManager {
     public void setFilter(final GPUImageFilter filter) {
         mFilter = filter;
         mRenderer.setFilter(mFilter);
-        requestRender();
-    }
-
-    /** 请求刷新渲染器 */
-    public void requestRender() {
-        if (mGlSurfaceView != null) {
-            mGlSurfaceView.requestRender();
-        }
     }
 
 
