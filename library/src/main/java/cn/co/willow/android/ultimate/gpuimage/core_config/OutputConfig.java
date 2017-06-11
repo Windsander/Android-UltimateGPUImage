@@ -15,13 +15,13 @@ public class OutputConfig {
 
     /*默认输出配置==================================================================================*/
     // 输出视频参数配置
-    private static final String MIME_VIDEO_TYPE    = "video/avc";            // H.264 Advanced Video Coding
-    private static final int    VIDEO_FRAME_RATE   = 25;                     // fps
-    private static final int    IFRAME_INTERVAL    = 5;                      // 5 seconds between I-frames
-    private static final int    VIDEO_BIT_RATE     = 800000;                 // 默认 bps
-    private static final int    VIDEO_RECORD_WIDTH = 480;
-    private static final int    VIDEO_RECORD_HEIGH = 640;
-    private static final float  VIDEO_ASPECT_RATIO = 4 / 3f;                 // 宽高比
+    public static final String MIME_VIDEO_TYPE    = "video/avc";            // H.264 Advanced Video Coding
+    public static final int    VIDEO_FRAME_RATE   = 25;                     // fps
+    public static final int    IFRAME_INTERVAL    = 5;                      // 5 seconds between I-frames
+    public static final int    VIDEO_BIT_RATE     = 800000;                 // 默认 bps
+    public static final int    VIDEO_RECORD_WIDTH = 480;
+    public static final int    VIDEO_RECORD_HEIGH = 640;
+    public static final float  VIDEO_ASPECT_RATIO = 4 / 3f;                 // 宽高比
     /** 其余的视频参数，由当前机型动态适配算法提供 */
 
     // 输出音频参数配置

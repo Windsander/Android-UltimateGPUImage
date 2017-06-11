@@ -89,11 +89,6 @@ public class XMediaMuxer extends Thread {
         return videoThread.getInputSurface();
     }
 
-    public void notifyVideoData() {
-        audioThread.notifyDataChanged();
-        videoThread.notifyDataChanged();
-    }
-
     public void addMuxerData(MuxerData data) {
         if (mMuxerDatas == null) return;
         mMuxerDatas.add(data);
@@ -173,10 +168,10 @@ public class XMediaMuxer extends Thread {
         synchronized (lock) {
             LogUtil.i("Muxer", "Check should start");
             if (isAudioAdd && isVideoAdd) {
-                LogUtil.i("Muxer", "Muxer starting");
+                LogUtil.d("Muxer", "Muxer starting");
                 mMediaMuxer.start();
                 isMediaMuxerStart = true;
-                LogUtil.i("Muxer", "Muxer started");
+                LogUtil.d("Muxer", "Muxer started");
                 lock.notify();
             }
         }

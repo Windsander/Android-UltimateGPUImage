@@ -5,10 +5,7 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.media.CamcorderProfile;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import java.io.File;
 
@@ -26,7 +23,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
  */
 public class VideoFilterManager {
 
-    private VideoRecorderRenderer mRenderer;
+    private VideoRecorderRenderer mRecordRenderer;
     private GLSurfaceView         mGlSurfaceView;
     private GPUImageFilter        mFilter;
 
@@ -39,7 +36,7 @@ public class VideoFilterManager {
     /** 设置基本录制参数 */
     void initManager(OutputConfig.VideoOutputConfig mVideoConfig,
                      OutputConfig.AudioOutputConfig mAudioConfig) {
-        mRenderer = new VideoRecorderRenderer(
+        mRecordRenderer = new VideoRecorderRenderer(
                 new GPUImageFilter(),
                 mVideoConfig,
                 mAudioConfig);
@@ -51,7 +48,7 @@ public class VideoFilterManager {
         mGlSurfaceView.setEGLContextClientVersion(2);
         mGlSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         mGlSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
-        mGlSurfaceView.setRenderer(mRenderer);
+        mGlSurfaceView.setRenderer(mRecordRenderer);
         mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         mGlSurfaceView.requestRender();
     }
@@ -59,8 +56,8 @@ public class VideoFilterManager {
     /** 设置相机，并切换角度 */
     void setUpCamera(final Camera camera, boolean isFrontCame) {
         mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        mRenderer.setUpSurfaceTexture(camera);
-        mRenderer.setRotation(isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90, false, isFrontCame);
+        mRecordRenderer.setUpSurfaceTexture(camera);
+        mRecordRenderer.setRotation(isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90, false, isFrontCame);
     }
 
 
@@ -77,7 +74,7 @@ public class VideoFilterManager {
     /** 设置滤镜 */
     public void setFilter(final GPUImageFilter filter) {
         mFilter = filter;
-        mRenderer.setFilter(mFilter);
+        mRecordRenderer.setFilter(mFilter);
         requestRender();
     }
 
@@ -91,40 +88,40 @@ public class VideoFilterManager {
 
     /*录制逻辑======================================================================================*/
     public RecordCoderState getCurrentState() {
-        return mRenderer.getCurrentState();
+        return mRecordRenderer.getCurrentState();
     }
 
     public void create(File mOutputRecFile,
                        OutputConfig.VideoOutputConfig videoConfig,
                        OutputConfig.AudioOutputConfig audioConfig) {
-        mRenderer.prepareCoder(mOutputRecFile, videoConfig, audioConfig);
+        mRecordRenderer.prepareCoder(mOutputRecFile, videoConfig, audioConfig);
     }
 
     public void start() {
-        mRenderer.changeCoderState(true);
+        mRecordRenderer.changeCoderState(true);
     }
 
     public void stop() {
-        mRenderer.changeCoderState(false);
+        mRecordRenderer.changeCoderState(false);
     }
 
     public void release() {
-        mRenderer.releaseCoder();
+        mRecordRenderer.releaseCoder();
     }
 
     public void destory() {
-        mRenderer.clearAll();
-        mRenderer = null;
+        mRecordRenderer.clearAll();
+        mRecordRenderer = null;
     }
 
 
     /*渲染流程关联性监听===============================================================================*/
     public void setOnSurfaceSetListener(BaseRenderer.OnSurfaceSetListener mOnSurfaceSetListener) {
-        mRenderer.setOnSurfaceSetListener(mOnSurfaceSetListener);
+        mRecordRenderer.setOnSurfaceSetListener(mOnSurfaceSetListener);
     }
 
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
-        mRenderer.setOnRecordStateListener(mOnRecordStateListener);
+        mRecordRenderer.setOnRecordStateListener(mOnRecordStateListener);
     }
 
 }

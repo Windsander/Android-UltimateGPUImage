@@ -19,6 +19,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_record_18;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.EGLCore;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.WindowSurface;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 /**
  * 视频同步合成流程队列式控制类
@@ -190,12 +192,9 @@ public class TextureMovieEncoder implements Runnable {
     /** 通知视频帧更新，设置视频更新时间戳 */
     private void handleFrameAvailable(long timestamp) {
         if (mMuxersReady) {
-            /*long timestamp = (((long) inputMessage.arg1) << 32) |
-                    (((long) inputMessage.arg2) & 0xffffffffL);*/
             if (mInputWindowSurface == null) return;
             mInputWindowSurface.setPresentationTime(timestamp);
             mInputWindowSurface.swapBuffers();
-            mTMsCoreMuxer.notifyVideoData();
         }
     }
 

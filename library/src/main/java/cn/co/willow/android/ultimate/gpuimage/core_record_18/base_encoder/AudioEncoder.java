@@ -63,21 +63,6 @@ class AudioEncoder extends Thread {
         isExit = true;
     }
 
-    public void notifyDataChanged() {
-        synchronized (lock) {
-            lock.notify();
-        }
-    }
-
-    public void lockAudioThread() {
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-            }
-        }
-    }
-
 
     /*录音流程======================================================================================*/
     @Override

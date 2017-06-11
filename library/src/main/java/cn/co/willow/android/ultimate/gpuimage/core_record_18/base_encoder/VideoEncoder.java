@@ -11,6 +11,10 @@ import android.view.Surface;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.util.Arrays;
 import java.util.Vector;
 
 import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
@@ -120,22 +124,6 @@ class VideoEncoder extends Thread {
 
     public void exit() {
         isExit = true;
-        notifyDataChanged();
-    }
-
-    public void notifyDataChanged() {
-        synchronized (lock) {
-            lock.notify();
-        }
-    }
-
-    public void lockVideoThread() {
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-            }
-        }
     }
 
 
@@ -144,7 +132,6 @@ class VideoEncoder extends Thread {
     public void run() {
         while (!isExit) {
             encodeFrame();
-            //lockVideoThread();
         }
         stopMediaCodec();
     }
@@ -183,6 +170,7 @@ class VideoEncoder extends Thread {
                     if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                         mVideoBufferInfo.size = 0;
                     }
+                    LogUtil.i("VideoEncoder_dead", "  mVideoBufferInfo.size   " + mVideoBufferInfo.size);
                     if (mVideoBufferInfo.size != 0 && muxer != null) {
                         LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
                         outputBuffer.position(mVideoBufferInfo.offset);
@@ -207,7 +195,7 @@ class VideoEncoder extends Thread {
                     mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
                     break;
             }
-        } while ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0);
+        } while (encoderStatus >= 0);
     }
 
 }

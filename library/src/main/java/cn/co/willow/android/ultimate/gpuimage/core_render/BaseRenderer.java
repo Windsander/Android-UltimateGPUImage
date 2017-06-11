@@ -22,6 +22,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.opengl.GLES30;
+import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 
 import java.io.IOException;
@@ -40,7 +41,6 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.utils.GPUImageNativeLibrary;
 import cn.co.willow.android.ultimate.gpuimage.utils.GlUtil;
-import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil;
 
 import static cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil.TEXTURE_NO_ROTATION;
@@ -131,7 +131,6 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
     @Override
     public void onDrawFrame(final GL10 gl) {
-        LogUtil.i("Render", "onDrawFrame start");
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         runAll(mRunOnDraw);
         if (!mFilter.isInitialized()) mFilter.init();
@@ -140,12 +139,10 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         if (mSurfaceTexture != null) {
             mSurfaceTexture.updateTexImage();
         }
-        LogUtil.i("Render", "onDrawFrame finish");
     }
 
     @Override
     public void onPreviewFrame(final byte[] data, final Camera camera) {
-        LogUtil.i("Render", "onPreviewFrame start");
         final Size previewSize = camera.getParameters().getPreviewSize();
         if (mGLRgbBuffer == null) {
             mGLRgbBuffer = IntBuffer.allocate(previewSize.width * previewSize.height);
@@ -154,7 +151,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
             runOnDraw(new Runnable() {
                 @Override
                 public void run() {
-                    GPUImageNativeLibrary.YUVtoRBGA(
+                    GPUImageNativeLibrary.YUVtoARBG(
                             data,
                             previewSize.width,
                             previewSize.height,
@@ -174,7 +171,6 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                 }
             });
         }
-        LogUtil.i("Render", "onPreviewFrame finish");
     }
 
 

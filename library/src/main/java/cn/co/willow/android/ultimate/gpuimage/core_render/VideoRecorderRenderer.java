@@ -13,6 +13,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.TextureMovieEncoder;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState.IDLE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState.PREPARED;
