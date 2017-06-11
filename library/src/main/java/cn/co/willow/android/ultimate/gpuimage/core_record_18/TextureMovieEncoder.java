@@ -74,7 +74,7 @@ public class TextureMovieEncoder implements Runnable {
     }
 
     public void setAVConfig(OutputConfig.VideoOutputConfig videoConfig,
-                            OutputConfig.AudioOutputConfig audioConfig) {
+            OutputConfig.AudioOutputConfig audioConfig) {
         mVideoConfig = videoConfig;
         mAudioConfig = audioConfig;
     }

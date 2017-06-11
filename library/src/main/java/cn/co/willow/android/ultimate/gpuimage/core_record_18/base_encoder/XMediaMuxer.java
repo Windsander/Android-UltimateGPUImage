@@ -24,12 +24,10 @@ import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
  * Created by willow.li on 2016/11/4.
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class XMediaMuxer extends Thread {
+public class XMediaMuxer {
 
-    public static final int TRACK_VIDEO = 0;
-    public static final int TRACK_AUDIO = 1;
-
-    private final Object lock = new Object();
+    static final int TRACK_VIDEO = 0;
+    static final int TRACK_AUDIO = 1;
 
     private android.media.MediaMuxer mMediaMuxer;
     private Vector<MuxerData>        mMuxerDatas;
@@ -48,38 +46,34 @@ public class XMediaMuxer extends Thread {
     private MediaFormat  audioMediaFormat;
     private File         mOutputFile;
 
-    private boolean isCheckFrame = false;
-
-    public XMediaMuxer(OutputConfig.VideoOutputConfig mVideoConfig,
-                       OutputConfig.AudioOutputConfig mAudioConfig,
-                       File outputFile) {
+    public XMediaMuxer(
+            OutputConfig.VideoOutputConfig mVideoConfig,
+            OutputConfig.AudioOutputConfig mAudioConfig,
+            File outputFile) {
         try {
             mOutputFile = outputFile;
             mMuxerDatas = new Vector<>();
             mMediaMuxer = new android.media.MediaMuxer(mOutputFile.getAbsolutePath(), android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            audioThread = new AudioEncoder(mAudioConfig, new WeakReference<XMediaMuxer>(this));
-            videoThread = new VideoEncoder(mVideoConfig, new WeakReference<XMediaMuxer>(this));
+            audioThread = new AudioEncoder(mAudioConfig, this);
+            videoThread = new VideoEncoder(mVideoConfig, this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+
     /*混合器流程控制================================================================================*/
     public void startMuxer() {
-        this.start();
+        videoThread.start();
+        audioThread.start();
+        isMuxerExit = false;
     }
 
     public void stopMuxer() {
-        this.exit();
-    }
-
-    private void exit() {
         audioThread.exit();
         videoThread.exit();
         isMuxerExit = true;
-        synchronized (lock) {
-            lock.notify();
-        }
+        stopMediaMuxer();
     }
 
 
@@ -89,91 +83,48 @@ public class XMediaMuxer extends Thread {
         return videoThread.getInputSurface();
     }
 
-    public void addMuxerData(MuxerData data) {
-        if (mMuxerDatas == null) return;
-        mMuxerDatas.add(data);
-        if (!isCheckFrame) {
-            switchSyncFrameToFirst();
-            isCheckFrame = true;
-        }
-        isMediaDataFinish = false;
-        synchronized (lock) {
-            lock.notify();
-        }
-    }
-
-    public void switchSyncFrameToFirst() {
-        for (int i = 0; i < mMuxerDatas.size(); i++) {
-            MuxerData muxerData = mMuxerDatas.get(i);
-            if (muxerData.trackIndex == TRACK_VIDEO) {
-                if (muxerData.bufferInfo.flags == MediaCodec.BUFFER_FLAG_SYNC_FRAME) {
-                    return;
-                } else {
-                    mMuxerDatas.remove(i);
-                    i = i - 1;
-                }
-            }
+    void addMuxerData(@TrackIndex int trackType, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
+        if (mMediaMuxer == null || !isMediaMuxerStart) return;
+        switch (trackType) {
+            case TRACK_AUDIO:
+                mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
+                break;
+            case TRACK_VIDEO:
+                mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
+                break;
         }
     }
 
-    public synchronized void addMediaTrack(@TrackIndex int index, MediaFormat mediaFormat) {
+    synchronized void addMediaTrack(@TrackIndex int trackType, MediaFormat mediaFormat) {
         if (mMediaMuxer == null) return;
-        if (index == TRACK_VIDEO) {
-            if (videoMediaFormat == null) {
-                videoMediaFormat = mediaFormat;
-                videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
-                isVideoAdd = true;
-            }
-        } else {
-            if (audioMediaFormat == null) {
-                audioMediaFormat = mediaFormat;
-                audioTrackIndex = mMediaMuxer.addTrack(mediaFormat);
-                isAudioAdd = true;
-            }
+        switch (trackType) {
+            case TRACK_AUDIO:
+                if (audioMediaFormat == null) {
+                    audioMediaFormat = mediaFormat;
+                    audioTrackIndex = mMediaMuxer.addTrack(mediaFormat);
+                    isAudioAdd = true;
+                }
+                break;
+            case TRACK_VIDEO:
+                if (videoMediaFormat == null) {
+                    videoMediaFormat = mediaFormat;
+                    videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
+                    isVideoAdd = true;
+                }
+                break;
         }
         requestStart();
     }
 
 
     /*混合流程======================================================================================*/
-    @Override
-    public void run() {
-        initMuxer();
-        while (!isMuxerExit || !isMediaDataFinish) {
-            if (isMediaMuxerStart) {
-                if (mMuxerDatas.isEmpty()) {
-                    lockMuxer();
-                } else {
-                    MuxerData data  = mMuxerDatas.remove(0);
-                    int       track = (data.trackIndex == TRACK_VIDEO) ? videoTrackIndex : audioTrackIndex;
-                    mMediaMuxer.writeSampleData(track, data.byteBuf, data.bufferInfo);
-                    if (mMuxerDatas != null && mMuxerDatas.isEmpty()) {
-                        isMediaDataFinish = true;
-                    }
-                }
-            } else {
-                lockMuxer();
-            }
-        }
-        stopMediaMuxer();
-    }
-
-    private void initMuxer() {
-        videoThread.start();
-        audioThread.start();
-    }
-
-
     private void requestStart() {
-        synchronized (lock) {
-            LogUtil.i("Muxer", "Check should start");
-            if (isAudioAdd && isVideoAdd) {
-                LogUtil.d("Muxer", "Muxer starting");
-                mMediaMuxer.start();
-                isMediaMuxerStart = true;
-                LogUtil.d("Muxer", "Muxer started");
-                lock.notify();
-            }
+        LogUtil.i("Muxer", "Check should start");
+        if (isAudioAdd && isVideoAdd) {
+            LogUtil.i("Muxer", "Muxer starting");
+            mMediaMuxer.start();
+            isMediaMuxerStart = true;
+            LogUtil.i("Muxer", "Muxer started");
         }
     }
 
@@ -191,20 +142,9 @@ public class XMediaMuxer extends Thread {
         if (mMuxerDatas != null) {
             mMuxerDatas.clear();
             mMuxerDatas = null;
-            isCheckFrame = false;
         }
         if (mOnFinishListener != null) {
             mOnFinishListener.onFinish(mOutputFile);
-        }
-    }
-
-    private void lockMuxer() {
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -215,9 +155,7 @@ public class XMediaMuxer extends Thread {
     public @interface TrackIndex {
     }
 
-    /**
-     * 封装需要传输的数据类型
-     */
+    /** 封装需要传输的数据类型 */
     public static class MuxerData {
         int                   trackIndex;
         ByteBuffer            byteBuf;
