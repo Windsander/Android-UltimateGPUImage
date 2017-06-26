@@ -22,6 +22,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.utils;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -48,6 +49,8 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * 通用日志工具类
+ * 对外暴露：日志记录方法、易读化方法
+ * 不对外暴露（日志处理框架）：错误日志关键数据获取逻辑、表格化显示日志信息、日志记录自动流
  * <p/>
  * Created by willow.li on 16/5/27.
  */
@@ -55,42 +58,38 @@ public class LogUtil {
 
     public static final int TYPE_TEXT = 0;
     public static final int TYPE_JSON = 1;
-    public static final int TYPE_XML = 2;
+    public static final int TYPE_XML  = 2;
 
-    private static final int JSON_INDENT = 4;
-    private static final String XML_INDENT = "4";
+    private static final int    JSON_INDENT = 4;
+    private static final String XML_INDENT  = "4";
 
-    private static final String LINE_TOP_LEFT = "┏┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
-    private static final String LINE_CENTER_LEFT = "┣┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
-    private static final String LINE_BOTTOM_LEFT = "┗┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
-    private static final String LINE_VERTICAL_DASH = "┇";
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-    private static final String CLASSNAME = LogUtil.class.getName();
+    private static final String LINE_TOP_LEFT         = "┏┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
+    private static final String LINE_CENTER_LEFT      = "┣┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
+    private static final String LINE_BOTTOM_LEFT      = "┗┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅";
+    private static final String LINE_VERTICAL_DASH    = "┇";
+    private static final String LINE_SEPARATOR        = System.getProperty("line.separator");
+    private static final String CLASSNAME             = LogUtil.class.getName();
     private static final String LOCAL_LOG_FILE_PREFIX = "LogUtil_";
 
 
-    private static String sLogFileDirPath = ""; // Application.getContext().getFilesDir().getAbsolutePath();
-    private static String sLogFileName = "";
-    private static String sLogFilePath = "";
-    private static String sDefaultTag = "UtlimateRecorder";
-    ;
+    private static String sLogFileDirPath = "";
+    private static String sLogFileName    = "";
+    private static String sLogFilePath    = "";
+    private static String sDefaultTag     = "Ultra";
 
-    public static boolean showMethodInfo = true;
-    public static boolean showThreadName = true;
-    public static boolean showDateTime = true;
+    private static boolean showLog        = true;                           // 是否启用日志
+    private static boolean showMethodInfo = true;                           // 是否显示方法信息
+    private static boolean showThreadName = true;                           // 是否显示线程信息
+    private static boolean showDateTime   = true;                           // 是否显示日志信息
+    private static boolean showWithFormat = true;                           // 是否启用表格格式
 
-    private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
-    /**
-     * controller of log showing
-     */
-    public static boolean showLog = true;
+    @SuppressLint("SimpleDateFormat")
+    private static SimpleDateFormat logFullDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    @SuppressLint("SimpleDateFormat")
+    private static SimpleDateFormat logSaveDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
-    private LogUtil() throws IllegalAccessException {
-        throw new IllegalAccessException("Instantiation is not allowed! Use static methods only!");
-    }
-
+    /*错误日志关键数据获取逻辑==========================================================================*/
     /**
      * Get class simple name by object
      *
@@ -110,8 +109,8 @@ public class LogUtil {
     private static int getStackTraceOffset(StackTraceElement[] stackTraceElements) {
         boolean findLogUtil = true;
         for (int i = 0; i < stackTraceElements.length; i++) {
-            StackTraceElement e = stackTraceElements[i];
-            String name = e.getClassName();
+            StackTraceElement e    = stackTraceElements[i];
+            String            name = e.getClassName();
             if (findLogUtil) {
                 if (name.equals(CLASSNAME)) {
                     //reach LogUtil stack
@@ -134,7 +133,7 @@ public class LogUtil {
      */
     private static StackTraceElement getStackTraceElement() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        int stackTraceOffset = getStackTraceOffset(stackTraceElements);
+        int                 stackTraceOffset   = getStackTraceOffset(stackTraceElements);
         return stackTraceElements[stackTraceOffset];
     }
 
@@ -183,7 +182,27 @@ public class LogUtil {
     }
 
     private static String getDateTime() {
-        return sSimpleDateFormat.format(new Date());
+        return logFullDateFormat.format(new Date());
+    }
+
+
+    /*表格化显示日志信息===============================================================================*/
+    /**
+     * Generate log message with grid
+     *
+     * @param msg msg
+     * @return log message with grid
+     */
+    private static String generateGridMsg(String msg) {
+        if (showWithFormat) {
+            return LINE_TOP_LEFT + LINE_SEPARATOR
+                    + LINE_VERTICAL_DASH + getClickableLineNumber() + LINE_SEPARATOR
+                    + LINE_CENTER_LEFT + LINE_SEPARATOR
+                    + addLineAhead(msg)
+                    + LINE_BOTTOM_LEFT;
+        } else {
+            return getClickableLineNumber() + LINE_SEPARATOR + msg;
+        }
     }
 
     /**
@@ -193,13 +212,13 @@ public class LogUtil {
      */
     private static String getClickableLineNumber() {
         StackTraceElement stackTraceElement = getStackTraceElement();
-        String fileName = getFileName(stackTraceElement);
-        String className = getSingleClassName(stackTraceElement);
-        int lineNumber = getLineNumber(stackTraceElement);
-        String methodName = getMethodName(stackTraceElement);
-        String threadName = Thread.currentThread().getName();
-        String dateTime = getDateTime();
-        String result = "";
+        String            fileName          = getFileName(stackTraceElement);
+        String            className         = getSingleClassName(stackTraceElement);
+        int               lineNumber        = getLineNumber(stackTraceElement);
+        String            methodName        = getMethodName(stackTraceElement);
+        String            threadName        = Thread.currentThread().getName();
+        String            dateTime          = getDateTime();
+        String            result            = "";
         if (showMethodInfo) {
             result += "Method: " + className + "." + methodName + " " + "(" + fileName + ":" + lineNumber + ") " + LINE_VERTICAL_DASH + " ";
         }
@@ -219,7 +238,7 @@ public class LogUtil {
      * @return string with vertical line ahead of each line
      */
     private static String addLineAhead(String string) {
-        String result = "";
+        String   result       = "";
         String[] splitStrings = string.split(LINE_SEPARATOR);
         for (String splitString : splitStrings) {
             result += LINE_VERTICAL_DASH + splitString + LINE_SEPARATOR;
@@ -227,19 +246,18 @@ public class LogUtil {
         return result;
     }
 
+
+    /*日志记录自动流==================================================================================*/
     /**
-     * Generate log message with grid
+     * Save string to local dir
      *
-     * @param msg msg
-     * @return log message with grid
+     * @param logFileDirPath local log file dir path
+     * @param msg            msg
      */
-    private static String generateGridMsg(String msg) {
-//        return LINE_TOP_LEFT + LINE_SEPARATOR
-//                + LINE_VERTICAL_DASH + getClickableLineNumber() + LINE_SEPARATOR
-//                + LINE_CENTER_LEFT + LINE_SEPARATOR
-//                + addLineAhead(msg)
-//                + LINE_BOTTOM_LEFT;
-        return getClickableLineNumber() + LINE_SEPARATOR + msg;
+    private static void saveLogLocally(String logFileDirPath, String msg) {
+        String logFileName = LOCAL_LOG_FILE_PREFIX + logSaveDateFormat.format(new Date());
+        File   logFile     = createLocalFile(logFileDirPath, logFileName);
+        append(logFile, generateGridMsg(msg) + LINE_SEPARATOR);
     }
 
     /**
@@ -259,7 +277,7 @@ public class LogUtil {
             }
         }
         String filePath = dirPath + "/" + fileName;
-        File file = new File(filePath);
+        File   file     = new File(filePath);
         try {
             if (!file.exists()) {
                 if (!file.createNewFile()) {
@@ -302,18 +320,8 @@ public class LogUtil {
         }
     }
 
-    /**
-     * Save string to local dir
-     *
-     * @param logFileDirPath local log file dir path
-     * @param msg            msg
-     */
-    private static void saveLogLocally(String logFileDirPath, String msg) {
-        String logFileName = LOCAL_LOG_FILE_PREFIX + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        File logFile = createLocalFile(logFileDirPath, logFileName);
-        append(logFile, generateGridMsg(msg) + LINE_SEPARATOR);
-    }
 
+    /*日志记录方法====================================================================================*/
     /**
      * Set log tag
      *
@@ -327,7 +335,7 @@ public class LogUtil {
      * print a VERBOSE log
      *
      * @param tag tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void v(String tag, String msg) {
         if (showLog && (msg != null)) {
@@ -339,7 +347,7 @@ public class LogUtil {
      * print a VERBOSE log
      *
      * @param obj Object that use its class name to be as a tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void v(Object obj, String msg) {
         if (showLog && (msg != null)) {
@@ -398,7 +406,7 @@ public class LogUtil {
      * print a DEBUG log
      *
      * @param tag tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void d(String tag, String msg) {
         if (showLog && (msg != null)) {
@@ -410,7 +418,7 @@ public class LogUtil {
      * print a DEBUG log
      *
      * @param obj Object that use its class name to be as a tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void d(Object obj, String msg) {
         if (showLog && (msg != null)) {
@@ -469,7 +477,7 @@ public class LogUtil {
      * print an INFO log
      *
      * @param tag tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void i(String tag, String msg) {
         if (showLog && (msg != null)) {
@@ -481,7 +489,7 @@ public class LogUtil {
      * print an INFO log
      *
      * @param obj Object that use its class name to be as a tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void i(Object obj, String msg) {
         if (showLog && (msg != null)) {
@@ -540,7 +548,7 @@ public class LogUtil {
      * print a WARN log
      *
      * @param tag tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void w(String tag, String msg) {
         if (showLog && (msg != null)) {
@@ -552,7 +560,7 @@ public class LogUtil {
      * print a WARN log
      *
      * @param obj Object that use its class name to be as a tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void w(Object obj, String msg) {
         if (showLog && (msg != null)) {
@@ -611,7 +619,7 @@ public class LogUtil {
      * print an ERROR log
      *
      * @param tag tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void e(String tag, String msg) {
         if (showLog && (msg != null)) {
@@ -623,7 +631,7 @@ public class LogUtil {
      * print an ERROR log
      *
      * @param obj Object that use its class name to be as a tag
-     * @param msg BaseMessage to be shown
+     * @param msg Message to be shown
      */
     public static void e(Object obj, String msg) {
         if (showLog && (msg != null)) {
@@ -678,6 +686,8 @@ public class LogUtil {
         }
     }
 
+
+    /*易读化方法======================================================================================*/
     /**
      * Format Json to a human readable string
      *
@@ -715,9 +725,9 @@ public class LogUtil {
             return "Empty/Null xml content";
         }
         try {
-            Source xmlInput = new StreamSource(new StringReader(xml));
-            StreamResult xmlOutput = new StreamResult(new StringWriter());
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Source       xmlInput    = new StreamSource(new StringReader(xml));
+            StreamResult xmlOutput   = new StreamResult(new StringWriter());
+            Transformer  transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", XML_INDENT);
             transformer.transform(xmlInput, xmlOutput);

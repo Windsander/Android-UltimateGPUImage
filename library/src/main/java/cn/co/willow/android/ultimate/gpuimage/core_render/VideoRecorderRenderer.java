@@ -6,6 +6,8 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -15,6 +17,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_record_18.TextureMovieEncoder
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
+import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.TIMEOUT_USEC;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_BIT_RATE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_HEIGH;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_WIDTH;
@@ -173,9 +176,8 @@ public class VideoRecorderRenderer extends BaseRenderer {
             }
             mTMEncoder.startRecording(
                     new TextureMovieEncoder.EncoderConfig(
-                            mOutputFile,
-                            mRecordWidth, mRecordHeigh, mRecordBitrate,
-                            EGL14.eglGetCurrentContext()
+                            EGL14.eglGetCurrentContext(),
+                            mOutputFile
                     ));
         }
     }
@@ -195,9 +197,16 @@ public class VideoRecorderRenderer extends BaseRenderer {
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
             mTMEncoder.stopRecording();
-            if (mOnRecordStateListener != null) {
-                mOnRecordStateListener.onStartReady();
-            }
+            // wait 1 seconds to deal with record
+            Executors.newScheduledThreadPool(1)
+                     .schedule(new Runnable() {
+                         @Override
+                         public void run() {
+                             if (mOnRecordStateListener != null) {
+                                 mOnRecordStateListener.onStartReady();
+                             }
+                         }
+                     }, 1, TimeUnit.SECONDS);
         }
         releaseCoder();
     }

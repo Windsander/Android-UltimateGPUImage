@@ -83,14 +83,18 @@ public class XMediaMuxer {
     }
 
     void addMuxerData(@TrackIndex int trackType, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
-        if (mMediaMuxer == null || !isMediaMuxerStart) return;
-        switch (trackType) {
-            case TRACK_AUDIO:
-                mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
-                break;
-            case TRACK_VIDEO:
-                mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
-                break;
+        if (mMediaMuxer == null || !isMediaMuxerStart || isMuxerExit) return;
+        try {
+            switch (trackType) {
+                case TRACK_AUDIO:
+                    mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
+                    break;
+                case TRACK_VIDEO:
+                    mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
+                    break;
+            }
+        } catch (IllegalStateException e) {
+            LogUtil.w(e.toString());
         }
     }
 

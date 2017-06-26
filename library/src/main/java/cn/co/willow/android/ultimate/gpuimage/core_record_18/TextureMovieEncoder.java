@@ -71,25 +71,12 @@ public class TextureMovieEncoder implements Runnable {
 
     /** Encoder configuration. */
     public static class EncoderConfig {
-        final File       mOutputFile;
-        final int        mWidth;
-        final int        mHeight;
-        final int        mBitRate;
         final EGLContext mEglContext;
+        final File       mOutputFile;
 
-        public EncoderConfig(File outputFile, int width, int height, int bitRate,
-                             EGLContext sharedEglContext) {
-            mOutputFile = outputFile;
-            mWidth = width;
-            mHeight = height;
-            mBitRate = bitRate;
+        public EncoderConfig(EGLContext sharedEglContext, File outputFile) {
             mEglContext = sharedEglContext;
-        }
-
-        @Override
-        public String toString() {
-            return "EncoderConfig: " + mWidth + "x" + mHeight + " @" + mBitRate +
-                    " to '" + mOutputFile.toString() + "' ctxt=" + mEglContext;
+            mOutputFile = outputFile;
         }
     }
 
@@ -97,20 +84,20 @@ public class TextureMovieEncoder implements Runnable {
         mFilter = filter;
     }
 
+
+    /*关键参数设置====================================================================================*/
     public void setFilter(GPUImageFilter filter) {
         mFilter = filter;
     }
-
     public void setGLCubeBuffer(FloatBuffer buffer) {
         mGLCubeBuffer = buffer;
     }
-
     public void setGLTextureBuffer(FloatBuffer buffer) {
         mGLTextureBuffer = buffer;
     }
 
 
-    /**录制流程控制=================================================================================*/
+    /*录制流程控制====================================================================================*/
     /** 1.开启录制 */
     public void startRecording(EncoderConfig config) {
         synchronized (mReadyFence) {
@@ -157,7 +144,7 @@ public class TextureMovieEncoder implements Runnable {
 
         if (mHandler == null) return;
         mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE,
-                                                    (int) (timestamp >> 32), (int) timestamp, transform));
+                (int) (timestamp >> 32), (int) timestamp, transform));
     }
 
     /** 4.EGL Surface 更新方法 */
@@ -227,7 +214,7 @@ public class TextureMovieEncoder implements Runnable {
                 case MSG_FRAME_AVAILABLE:               // xn
                     long timestamp = (((long) inputMessage.arg1) << 32) |
                             (((long) inputMessage.arg2) & 0xffffffffL);
-                    encoder.handleFrameAvailable((float[]) obj, timestamp);
+                    encoder.handleFrameAvailable(timestamp);
                     break;
                 case MSG_UPDATE_SHARED_CONTEXT:        // x2
                     encoder.handleUpdateSharedContext((EGLContext) inputMessage.obj);
@@ -251,9 +238,6 @@ public class TextureMovieEncoder implements Runnable {
     private void handleStartRecording(EncoderConfig config) {
         prepareEncoder(
                 config.mEglContext,
-                config.mWidth,
-                config.mHeight,
-                config.mBitRate,
                 config.mOutputFile);
     }
 
@@ -264,7 +248,7 @@ public class TextureMovieEncoder implements Runnable {
 
     /** 通知视频帧更新 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void handleFrameAvailable(float[] transform, long timestampNanos) {
+    private void handleFrameAvailable(long timestampNanos) {
         if (!mMuxersReady) return;
         if (!mFilter.isInitialized()) mFilter.init();
         mFilter.onDraw(mTextureId, mGLCubeBuffer, mGLTextureBuffer);
@@ -294,8 +278,7 @@ public class TextureMovieEncoder implements Runnable {
     /*混合器逻辑====================================================================================*/
     /** 准备实时混合器 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void prepareEncoder(final EGLContext sharedContext, int width, int height, int bitRate,
-                                File outputFile) {
+    private void prepareEncoder(final EGLContext sharedContext, File outputFile) {
         if (!mMuxersReady) {
             mTMsCoreMuxer = new XMediaMuxer(
                     new OutputConfig.VideoOutputConfig(),
