@@ -21,7 +21,6 @@ import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 public class MessagesHandlerThread {
 
     private static final String TAG = MessagesHandlerThread.class.getSimpleName();
-    private static final boolean SHOW_LOGS = LogUtil.showLog;
 
     private final Queue<BaseMessage> mPlayerMessagesQueue = new ConcurrentLinkedQueue<>();
     private final PlayerQueueLock mQueueLock = new PlayerQueueLock();
