@@ -17,7 +17,7 @@ public class OutputConfig {
     // 输出视频参数配置
     public static final  String MIME_VIDEO_TYPE    = "video/avc";            // H.264 Advanced Video Coding
     public static final  int    VIDEO_FRAME_RATE   = 25;                     // fps
-    public static final  int    IFRAME_INTERVAL    = 1;                      // 5 seconds between I-frames
+    public static final  int    IFRAME_INTERVAL    = 5;                      // 5 seconds between I-frames
     public static final  int    VIDEO_BIT_RATE     = 180000;                 // 默认 bps = videoFrameRate * width * height * 1.5f;
     public static final  int    VIDEO_RECORD_WIDTH = 480;
     public static final  int    VIDEO_RECORD_HEIGH = 640;
@@ -31,7 +31,7 @@ public class OutputConfig {
     private static final int    FRAMES_PER_BUFFER  = 25;                     // AAC, frame/buffer/sec
     private static final int    AUDIO_SAMPLE_RATE  = 44100;                  // 44100hz
     private static final int    AUDIO_BIT_RATE     = 128000;                 // bps  比特率 = 采样率 x 采用位数 x声道数
-    private static final int    CHANNEL_CONFIG     = CHANNEL_IN_MONO;    //CHANNEL_IN_STEREO 立体声
+    private static final int    CHANNEL_CONFIG     = CHANNEL_IN_MONO;        // CHANNEL_IN_STEREO 立体声
     private static final int    CHANNEL_COUNT      = 1;                      // 1 channel
 
 
@@ -39,6 +39,7 @@ public class OutputConfig {
 
     /** 视频输出配置 */
     public static class VideoOutputConfig {
+
         String videoType   = MIME_VIDEO_TYPE;
         int    videoFrame  = VIDEO_FRAME_RATE;
         int    IFrameRate  = IFRAME_INTERVAL;
@@ -93,7 +94,8 @@ public class OutputConfig {
         public VideoOutputConfig() {
         }
 
-        public VideoOutputConfig(String videoType,
+        public VideoOutputConfig(
+                String videoType,
                 int videoFrame,
                 int IFrameRate,
                 int bpsBitRate,
@@ -116,6 +118,7 @@ public class OutputConfig {
 
     /** 音频输出配置 */
     public static class AudioOutputConfig {
+
         String audioType      = MIME_AUDIO_TYPE;
         int    audioFormat    = AUDIO_FORMAT;
         int    samplePerFrame = SAMPLES_PER_FRAME;
@@ -170,7 +173,8 @@ public class OutputConfig {
         public AudioOutputConfig() {
         }
 
-        public AudioOutputConfig(String audioType,
+        public AudioOutputConfig(
+                String audioType,
                 int audioFormat,
                 int samplePerFrame,
                 int sampleRate,
