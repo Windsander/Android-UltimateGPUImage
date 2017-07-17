@@ -17,7 +17,7 @@ public class OutputConfig {
     // 输出视频参数配置
     public static final  String MIME_VIDEO_TYPE    = "video/avc";            // H.264 Advanced Video Coding
     public static final  int    VIDEO_FRAME_RATE   = 25;                     // fps
-    public static final  int    IFRAME_INTERVAL    = 5;                      // 5 seconds between I-frames
+    public static final  int    IFRAME_INTERVAL    = 1;                      // 5 seconds between I-frames
     public static final  int    VIDEO_BIT_RATE     = 180000;                 // 默认 bps = videoFrameRate * width * height * 1.5f;
     public static final  int    VIDEO_RECORD_WIDTH = 480;
     public static final  int    VIDEO_RECORD_HEIGH = 640;

@@ -28,8 +28,8 @@ class VideoEncoder extends Thread {
     private MediaCodec            mVideoEncoder;
     private MediaCodec.BufferInfo mVideoBufferInfo;
 
-    private volatile boolean isExit        = false;
-    private          double  prevOutputPTS = 0;
+    private volatile boolean isExit          = false;
+    private          long    prevOutputPTSUs = 0;
 
     private OutputConfig.VideoOutputConfig mVideoConfig;
 
@@ -153,43 +153,38 @@ class VideoEncoder extends Thread {
 
     private void autoEncodeFrame() {
         while (!isExit) {
-            if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
-            synchronized (this) {
-                if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
-                prevOutputPTS = mVideoBufferInfo.presentationTimeUs;
-                int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
-                switch (encoderStatus) {
-                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                        LogUtil.i("VideoEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
-                        break;
-                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                        MediaFormat newFormat = mVideoEncoder.getOutputFormat();
-                        mMediaMuxer.addMediaTrack(TRACK_VIDEO, newFormat);
-                        LogUtil.i("VideoEncoder", "New format " + newFormat);
-                        break;
-                    case MediaCodec.INFO_TRY_AGAIN_LATER:
-                        try {
-                            Thread.sleep(10);       // wait 10ms
-                            LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out!");
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    default:
-                        final ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[encoderStatus];
-                        LogUtil.i("VideoEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
-                        if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                            mVideoBufferInfo.size = 0;
-                        }
-                        if (mVideoBufferInfo.size != 0 && mMediaMuxer != null) {
-                            LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
-                            outputBuffer.position(mVideoBufferInfo.offset);
-                            outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
-                            mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
-                        }
-                        mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
-                        break;
-                }
+            int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
+            switch (encoderStatus) {
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                    LogUtil.i("VideoEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
+                    break;
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                    MediaFormat newFormat = mVideoEncoder.getOutputFormat();
+                    mMediaMuxer.addMediaTrack(TRACK_VIDEO, newFormat);
+                    LogUtil.i("VideoEncoder", "New format " + newFormat);
+                    break;
+                case MediaCodec.INFO_TRY_AGAIN_LATER:
+                    try {
+                        Thread.sleep(10);       // wait 10ms
+                        LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out!");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    final ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[encoderStatus];
+                    LogUtil.i("VideoEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
+                    if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                        mVideoBufferInfo.size = 0;
+                    }
+                    if (mVideoBufferInfo.size != 0 && mMediaMuxer != null) {
+                        LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
+                        outputBuffer.position(mVideoBufferInfo.offset);
+                        outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
+                        mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
+                    }
+                    mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
+                    break;
             }
         }
     }
