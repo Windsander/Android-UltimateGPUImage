@@ -2,6 +2,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.media.MediaMuxer;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.RequiresApi;
@@ -17,6 +18,8 @@ import java.util.Vector;
 import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
+import static android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4;
+
 /**
  * 音视频同步混合器
  * <p>
@@ -28,8 +31,8 @@ public class XMediaMuxer {
     static final int TRACK_VIDEO = 0;
     static final int TRACK_AUDIO = 1;
 
-    private android.media.MediaMuxer mMediaMuxer;
-    private Vector<MuxerData>        mMuxerDatas;
+    private MediaMuxer        mMediaMuxer;
+    private Vector<MuxerData> mMuxerDatas;
     private int videoTrackIndex = -1;
     private int audioTrackIndex = -1;
 
@@ -52,7 +55,7 @@ public class XMediaMuxer {
         try {
             mOutputFile = outputFile;
             mMuxerDatas = new Vector<>();
-            mMediaMuxer = new android.media.MediaMuxer(mOutputFile.getAbsolutePath(), android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            mMediaMuxer = new MediaMuxer(mOutputFile.getAbsolutePath(), MUXER_OUTPUT_MPEG_4);
             audioThread = new AudioEncoder(mAudioConfig, this);
             videoThread = new VideoEncoder(mVideoConfig, this);
         } catch (IOException e) {
@@ -93,8 +96,9 @@ public class XMediaMuxer {
                     mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
                     break;
             }
+            byteBuf.clear();
         } catch (IllegalStateException e) {
-            LogUtil.w(e.toString());
+            LogUtil.w(trackType + "::\n" + e.toString());
         }
     }
 

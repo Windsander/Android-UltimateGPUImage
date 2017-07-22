@@ -69,19 +69,28 @@ public class TextureMovieEncoder implements Runnable {
     private FloatBuffer mGLTextureBuffer;
 
 
-    /** Encoder configuration. */
-    public static class EncoderConfig {
-        final EGLContext mEglContext;
-        final File       mOutputFile;
-
-        public EncoderConfig(EGLContext sharedEglContext, File outputFile) {
-            mEglContext = sharedEglContext;
-            mOutputFile = outputFile;
-        }
-    }
-
+    /*initial config================================================================================*/
     public TextureMovieEncoder(GPUImageFilter filter) {
         mFilter = filter;
+    }
+
+    /** Encoder configuration. */
+    public static class EncoderConfig {
+        final EGLContext                     mEglContext;
+        final File                           mOutputFile;
+        final OutputConfig.VideoOutputConfig mVideoConfig;
+        final OutputConfig.AudioOutputConfig mAudioConfig;
+
+        public EncoderConfig(
+                EGLContext sharedEglContext,
+                File outputFile,
+                OutputConfig.VideoOutputConfig videoConfig,
+                OutputConfig.AudioOutputConfig audioConfig) {
+            mEglContext = sharedEglContext;
+            mOutputFile = outputFile;
+            mVideoConfig = videoConfig;
+            mAudioConfig = audioConfig;
+        }
     }
 
 
@@ -238,7 +247,9 @@ public class TextureMovieEncoder implements Runnable {
     private void handleStartRecording(EncoderConfig config) {
         prepareEncoder(
                 config.mEglContext,
-                config.mOutputFile);
+                config.mOutputFile,
+                config.mVideoConfig,
+                config.mAudioConfig);
     }
 
     /** 设置视频帧来源SurfaceId */
@@ -271,19 +282,28 @@ public class TextureMovieEncoder implements Runnable {
         mTMsCoreMuxer.stopMuxer();
         mMuxersReady = false;
         releaseEncoder();
-        Looper.myLooper().quit();
+        exitSafeLooper();
+    }
+
+    /** 退出安全循环器 */
+    private void exitSafeLooper() {
+        Looper myLooper = Looper.myLooper();
+        if (myLooper != null) {
+            myLooper.quit();
+        }
     }
 
 
     /*混合器逻辑====================================================================================*/
     /** 准备实时混合器 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void prepareEncoder(final EGLContext sharedContext, File outputFile) {
+    private void prepareEncoder(
+            final EGLContext sharedContext,
+            File outputFile,
+            OutputConfig.VideoOutputConfig mVideoConfig,
+            OutputConfig.AudioOutputConfig mAudioConfig) {
         if (!mMuxersReady) {
-            mTMsCoreMuxer = new XMediaMuxer(
-                    new OutputConfig.VideoOutputConfig(),
-                    new OutputConfig.AudioOutputConfig(),
-                    outputFile);
+            mTMsCoreMuxer = new XMediaMuxer(mVideoConfig, mAudioConfig, outputFile);
             mTMsCoreMuxer.setOnFinishListener(mOnFinishListener);
             mEGLCore = new EGLCore(sharedContext, EGLCore.FLAG_RECORDABLE);
             mInputWindowSurface = new WindowSurface(mEGLCore, mTMsCoreMuxer.getInputSurface(), true);
