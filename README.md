@@ -43,6 +43,11 @@ public void onCreate(final Bundle savedInstanceState) {
     // prepare camera preview, and bind to recorder manager.
     mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
     mRecordManager = new VideoRecordManager(context, mRecorderViews);
+    
+    // u can use this method to set ur own config rather than default one.
+    mRecordManager.setAVConfig(videoConfig, audioConfig);
+    
+    // and now, we can start the camera
     mRecordManager.openCamera();
   
     // if u want use filter, this method can be called in any place
