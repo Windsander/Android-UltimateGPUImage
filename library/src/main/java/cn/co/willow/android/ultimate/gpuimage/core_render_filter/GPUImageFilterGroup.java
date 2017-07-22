@@ -26,8 +26,8 @@ public class GPUImageFilterGroup extends GPUImageFilter {
     /*关键变量======================================================================================*/
     protected List<GPUImageFilter> mFilters;
     protected List<GPUImageFilter> mMergedFilters;
-    private int[] mFrameBuffers;
-    private int[] mFrameBufferTextures;
+    private   int[]                mFrameBuffers;
+    private   int[]                mFrameBufferTextures;
 
     private final FloatBuffer mGLCubeBuffer;
     private final FloatBuffer mGLTextureBuffer;
@@ -47,19 +47,19 @@ public class GPUImageFilterGroup extends GPUImageFilter {
         }
 
         mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+                                  .order(ByteOrder.nativeOrder())
+                                  .asFloatBuffer();
         mGLCubeBuffer.put(CUBE).position(0);
 
         mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+                                     .order(ByteOrder.nativeOrder())
+                                     .asFloatBuffer();
         mGLTextureBuffer.put(TEXTURE_NO_ROTATION).position(0);
 
         float[] flipTexture = TextureRotationUtil.getRotation(Rotation.NORMAL, false, true);
         mGLTextureFlipBuffer = ByteBuffer.allocateDirect(flipTexture.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+                                         .order(ByteOrder.nativeOrder())
+                                         .asFloatBuffer();
         mGLTextureFlipBuffer.put(flipTexture).position(0);
     }
 
@@ -163,11 +163,11 @@ public class GPUImageFilterGroup extends GPUImageFilter {
             return;
         }
         if (mMergedFilters != null) {
-            int size = mMergedFilters.size();
+            int size            = mMergedFilters.size();
             int previousTexture = textureId;
             for (int i = 0; i < size; i++) {
-                GPUImageFilter filter = mMergedFilters.get(i);
-                boolean isNotLast = i < size - 1;
+                GPUImageFilter filter    = mMergedFilters.get(i);
+                boolean        isNotLast = i < size - 1;
                 if (isNotLast) {
                     GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFrameBuffers[i]);
                     GLES30.glClearColor(0, 0, 0, 0);
@@ -183,6 +183,7 @@ public class GPUImageFilterGroup extends GPUImageFilter {
 
                 if (isNotLast) {
                     GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
+                    if (mFrameBufferTextures == null) return;
                     previousTexture = mFrameBufferTextures[i];
                 }
             }

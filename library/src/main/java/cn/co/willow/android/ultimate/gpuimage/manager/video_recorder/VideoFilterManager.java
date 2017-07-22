@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 
 import java.io.File;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
@@ -73,14 +74,6 @@ public class VideoFilterManager {
     public void setFilter(final GPUImageFilter filter) {
         mFilter = filter;
         mRenderer.setFilter(mFilter);
-        requestRender();
-    }
-
-    /** 请求刷新渲染器 */
-    public void requestRender() {
-        if (mGlSurfaceView != null) {
-            mGlSurfaceView.requestRender();
-        }
     }
 
 
@@ -90,11 +83,14 @@ public class VideoFilterManager {
         mRenderer = null;
     }
 
-    public void createNewRecorderInstance(File mOutputRecFile, final CamcorderProfile mProfile) {
-        mRenderer.prepareCoder(mOutputRecFile,
-                mProfile.videoFrameHeight,          // 系统旋转长宽相反
-                mProfile.videoFrameWidth,
-                mProfile.videoBitRate);
+    public void createNewRecorderInstance(
+            File mOutputRecFile,
+            OutputConfig.VideoOutputConfig mVideoConfig,
+            OutputConfig.AudioOutputConfig mAudioConfig) {
+        mRenderer.prepareCoder(
+                mOutputRecFile,
+                mVideoConfig,          // 系统旋转长宽相反
+                mAudioConfig);
     }
 
     public void start() {
@@ -122,4 +118,5 @@ public class VideoFilterManager {
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRenderer.setOnRecordStateListener(mOnRecordStateListener);
     }
+
 }

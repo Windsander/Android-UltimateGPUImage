@@ -6,15 +6,19 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecordCoderState;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.TextureMovieEncoder;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 
+import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.TIMEOUT_USEC;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_BIT_RATE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_HEIGH;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_RECORD_WIDTH;
@@ -37,11 +41,11 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
     private final AtomicReference<RecordCoderState> mCoderStatus = new AtomicReference<>();
     private TextureMovieEncoder mTMEncoder;                     // 音视频建简易编码器
-    private boolean mStartCoder    = false;                     // 编码器启用标志
-    private File    mOutputFile    = null;
-    private int     mRecordWidth   = VIDEO_RECORD_WIDTH;
-    private int     mRecordHeigh   = VIDEO_RECORD_HEIGH;
-    private int     mRecordBitrate = VIDEO_BIT_RATE;
+    private boolean                        mStartCoder  = false;                     // 编码器启用标志
+    private File                           mOutputFile  = null;
+    private OutputConfig.VideoOutputConfig mVideoConfig = new OutputConfig.VideoOutputConfig();
+    private OutputConfig.AudioOutputConfig mAudioConfig = new OutputConfig.AudioOutputConfig();
+
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoRecorderRenderer(GPUImageFilter filter) {
@@ -132,7 +136,10 @@ public class VideoRecorderRenderer extends BaseRenderer {
     }
 
     /** 2-1.编码器基本配置准备 */
-    public void prepareCoder(File outputFile, int width, int height, int bitrate) {
+    public void prepareCoder(
+            File outputFile,
+            OutputConfig.VideoOutputConfig videoConfig,
+            OutputConfig.AudioOutputConfig audioConfig) {
         synchronized (mCoderStatus) {
             switch (mCoderStatus.get()) {
                 case PREPARED:
@@ -146,9 +153,8 @@ public class VideoRecorderRenderer extends BaseRenderer {
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
             setOutputFile(outputFile);
-            mRecordWidth = width;
-            mRecordHeigh = height;
-            mRecordBitrate = bitrate;
+            mVideoConfig = (videoConfig == null) ? mVideoConfig : videoConfig;
+            mAudioConfig = (audioConfig == null) ? mAudioConfig : audioConfig;
             if (mOnRecordStateListener != null) {
                 mOnRecordStateListener.onStopsReady();
             }
@@ -173,9 +179,10 @@ public class VideoRecorderRenderer extends BaseRenderer {
             }
             mTMEncoder.startRecording(
                     new TextureMovieEncoder.EncoderConfig(
+                            EGL14.eglGetCurrentContext(),
                             mOutputFile,
-                            mRecordWidth, mRecordHeigh, mRecordBitrate,
-                            EGL14.eglGetCurrentContext()
+                            mVideoConfig,
+                            mAudioConfig
                     ));
         }
     }
@@ -195,9 +202,16 @@ public class VideoRecorderRenderer extends BaseRenderer {
                     throw new IllegalStateException("unknown status: " + mCoderStatus);
             }
             mTMEncoder.stopRecording();
-            if (mOnRecordStateListener != null) {
-                mOnRecordStateListener.onStartReady();
-            }
+            // wait 1 seconds to deal with record, seriously important action.
+            Executors.newScheduledThreadPool(1)
+                     .schedule(new Runnable() {
+                         @Override
+                         public void run() {
+                             if (mOnRecordStateListener != null) {
+                                 mOnRecordStateListener.onStartReady();
+                             }
+                         }
+                     }, 1, TimeUnit.SECONDS);
         }
         releaseCoder();
     }

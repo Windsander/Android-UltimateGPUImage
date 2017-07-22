@@ -9,52 +9,55 @@ import android.support.annotation.RequiresApi;
 import android.view.Surface;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.util.Vector;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.IFRAME_INTERVAL;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.MIME_VIDEO_TYPE;
 import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.TIMEOUT_USEC;
-import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VIDEO_FRAME_RATE;
 import static cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer.TRACK_VIDEO;
 
 /**
  * Created by willow.li on 2016/11/4.
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class VideoEncoder extends Thread {
+class VideoEncoder extends Thread {
 
-    private final Object lock = new Object();
-    Vector<byte[]> frameBytes;
-
-    private WeakReference<XMediaMuxer> mediaMuxerRunnable;
-    private Surface mInputSurface;
-    private MediaCodec mVideoEncoder;
+    private XMediaMuxer           mMediaMuxer;
+    private Surface               mInputSurface;
+    private MediaCodec            mVideoEncoder;
     private MediaCodec.BufferInfo mVideoBufferInfo;
 
-    private volatile boolean isExit = false;
-    private MediaFormat videoFormat;
+    private volatile boolean isExit        = false;
+    private          double  prevOutputPTS = 0;
 
+    private OutputConfig.VideoOutputConfig mVideoConfig;
 
-    public VideoEncoder(int width, int height, int bitRate, WeakReference<XMediaMuxer> mediaMuxerRunnable) {
-        this.mediaMuxerRunnable = mediaMuxerRunnable;
+    VideoEncoder(OutputConfig.VideoOutputConfig videoConfig, XMediaMuxer mMediaMuxer) {
         try {
-            mVideoBufferInfo = new MediaCodec.BufferInfo();
-            videoFormat = MediaFormat.createVideoFormat(MIME_VIDEO_TYPE, width, height);
-            videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-            videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, VIDEO_FRAME_RATE);
-            videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            mVideoEncoder = MediaCodec.createEncoderByType(MIME_VIDEO_TYPE);
-            mVideoEncoder.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            mInputSurface = mVideoEncoder.createInputSurface();
-            mVideoEncoder.start();
+            this.mVideoConfig = videoConfig;
+            this.mMediaMuxer = mMediaMuxer;
+            this.mVideoBufferInfo = new MediaCodec.BufferInfo();
+            initVideoEncoder(videoConfig);
         } catch (IOException e) {
-            LogUtil.e("VideoEncoder:Failed to start encoder. Make sure the width and height are supported.");
+            e.printStackTrace();
         }
+    }
+
+    private void initVideoEncoder(OutputConfig.VideoOutputConfig videoConfig) throws IOException {
+        MediaFormat videoFormat =
+                MediaFormat.createVideoFormat(
+                        videoConfig.getVideoType(),
+                        videoConfig.getVideoWidth(),
+                        videoConfig.getVideoHight()
+                );
+        videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+        videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, videoConfig.getBpsBitRate());
+        videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, videoConfig.getVideoFrame());
+        videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, videoConfig.getIFrameRate());
+        mVideoEncoder = MediaCodec.createEncoderByType(videoConfig.getVideoType());
+        mVideoEncoder.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mInputSurface = mVideoEncoder.createInputSurface();
     }
 
 
@@ -95,8 +98,8 @@ public class VideoEncoder extends Thread {
                 continue;
             }
             String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-                if (types[j].equalsIgnoreCase(mimeType)) {
+            for (String type : types) {
+                if (type.equalsIgnoreCase(mimeType)) {
                     return codecInfo;
                 }
             }
@@ -107,39 +110,37 @@ public class VideoEncoder extends Thread {
 
     /*对外暴露控制==================================================================================*/
     /** 返回当前设定的WindowSurface录制层 */
-    public Surface getInputSurface() {
+    Surface getInputSurface() {
+        LogUtil.i("VideoEncoder", "mInputSurface isEmpty? " + (mInputSurface == null));
         return mInputSurface;
+    }
+
+    @Override
+    public synchronized void start() {
+        isExit = false;
+        super.start();
     }
 
     public void exit() {
         isExit = true;
-        notifyDataChanged();
-    }
-
-    public void notifyDataChanged() {
-        synchronized (lock) {
-            lock.notify();
-        }
-    }
-
-    public void lockVideoThread() {
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-            }
-        }
     }
 
 
     /*视频流程======================================================================================*/
     @Override
     public void run() {
-        while (!isExit) {
-            encodeFrame();
-            //lockVideoThread();
+        try {
+            startMediaCodec();
+            autoEncodeFrame();
+        } finally {
+            stopMediaCodec();
         }
-        stopMediaCodec();
+    }
+
+    private void startMediaCodec() {
+        if (mVideoEncoder != null) {
+            mVideoEncoder.start();
+        }
     }
 
     private void stopMediaCodec() {
@@ -150,37 +151,47 @@ public class VideoEncoder extends Thread {
         }
     }
 
-    private void encodeFrame() {
-        final XMediaMuxer muxer = mediaMuxerRunnable.get();
-        ByteBuffer[] encoderOutputBuffers = mVideoEncoder.getOutputBuffers();
-        int encoderStatus;
-
-        do {
-            encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
-            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                encoderOutputBuffers = mVideoEncoder.getOutputBuffers();
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                LogUtil.d("VideoRunner:video track add to muxer");
-                MediaFormat newFormat = mVideoEncoder.getOutputFormat();
-                muxer.addMediaTrack(TRACK_VIDEO, newFormat);
-                // lockVideoThread();
-            } else if (encoderStatus < 0) {
-            } else {
-                ByteBuffer outputBuffer = encoderOutputBuffers[encoderStatus];
-                if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                    mVideoBufferInfo.size = 0;
+    private void autoEncodeFrame() {
+        while (!isExit) {
+            if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
+            synchronized (this) {
+                if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
+                prevOutputPTS = mVideoBufferInfo.presentationTimeUs;
+                int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
+                switch (encoderStatus) {
+                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                        LogUtil.i("VideoEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
+                        break;
+                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                        MediaFormat newFormat = mVideoEncoder.getOutputFormat();
+                        mMediaMuxer.addMediaTrack(TRACK_VIDEO, newFormat);
+                        LogUtil.i("VideoEncoder", "New format " + newFormat);
+                        break;
+                    case MediaCodec.INFO_TRY_AGAIN_LATER:
+                        try {
+                            Thread.sleep(10);       // wait 10ms
+                            LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out!");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        final ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[encoderStatus];
+                        LogUtil.i("VideoEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
+                        if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                            mVideoBufferInfo.size = 0;
+                        }
+                        if (mVideoBufferInfo.size != 0 && mMediaMuxer != null) {
+                            LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
+                            outputBuffer.position(mVideoBufferInfo.offset);
+                            outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
+                            mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
+                        }
+                        mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
+                        break;
                 }
-                if (mVideoBufferInfo.size != 0 && muxer != null) {
-                    outputBuffer.position(mVideoBufferInfo.offset);
-                    outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
-                    muxer.addMuxerData(new XMediaMuxer.MuxerData(
-                            TRACK_VIDEO, outputBuffer, mVideoBufferInfo));
-                    //Log.d("TimeStamp", "Video_TimeStamp:" + mVideoBufferInfo.presentationTimeUs);
-                }
-                mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
             }
-        } while (encoderStatus >= 0);
+        }
     }
 
 }

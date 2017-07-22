@@ -4,25 +4,32 @@ import android.media.CamcorderProfile;
 
 import java.io.File;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.RecorderMessageState;
 import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoFilterManager;
+import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoRecordManager;
 import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoRecordManagerCallback;
 
 public class CreateNewRecordInstance extends BaseRecorderMessage {
 
-    private final File mOutputRecFile;
-    private final CamcorderProfile mProfile;
-    public CreateNewRecordInstance(VideoFilterManager currentRecorder,
-                                   File mOutputRecFile, CamcorderProfile mProfile,
-                                   VideoRecordManagerCallback callback) {
+    private final File                           mOutputRecFile;
+    private final OutputConfig.VideoOutputConfig mVideoConfig;
+    private final OutputConfig.AudioOutputConfig mAudioConfig;
+    public CreateNewRecordInstance(
+            VideoFilterManager currentRecorder,
+            File mOutputRecFile,
+            OutputConfig.VideoOutputConfig mVideoConfig,
+            OutputConfig.AudioOutputConfig mAudioConfig,
+            VideoRecordManagerCallback callback) {
         super(currentRecorder, callback);
         this.mOutputRecFile = mOutputRecFile;
-        this.mProfile = mProfile;
+        this.mVideoConfig = mVideoConfig;
+        this.mAudioConfig = mAudioConfig;
     }
 
     @Override
     protected void performAction(VideoFilterManager currentRecorder) {
-        currentRecorder.createNewRecorderInstance(mOutputRecFile, mProfile);
+        currentRecorder.createNewRecorderInstance(mOutputRecFile, mVideoConfig, mAudioConfig);
     }
 
     @Override

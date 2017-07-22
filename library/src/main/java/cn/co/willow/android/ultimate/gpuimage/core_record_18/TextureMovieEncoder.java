@@ -29,6 +29,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.FloatBuffer;
 
+import cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMediaMuxer;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.EGLCore;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.WindowSurface;
@@ -42,24 +43,24 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
  */
 public class TextureMovieEncoder implements Runnable {
 
-    private static final int MSG_START_RECORDING = 0;
-    private static final int MSG_FRAME_AVAILABLE = 1;
-    private static final int MSG_SET_TEXTURE_ID = 2;
+    private static final int MSG_START_RECORDING       = 0;
+    private static final int MSG_FRAME_AVAILABLE       = 1;
+    private static final int MSG_SET_TEXTURE_ID        = 2;
     private static final int MSG_UPDATE_SHARED_CONTEXT = 3;
-    private static final int MSG_STOP_RECORDING = 4;
-    private static final int MSG_QUIT = 5;
+    private static final int MSG_STOP_RECORDING        = 4;
+    private static final int MSG_QUIT                  = 5;
 
     // ----- accessed exclusively by encoder thread -----
-    private WindowSurface mInputWindowSurface;
-    private EGLCore mEGLCore;
+    private WindowSurface  mInputWindowSurface;
+    private EGLCore        mEGLCore;
     private GPUImageFilter mFilter;
-    private int mTextureId;
-    private XMediaMuxer mTMsCoreMuxer;
+    private int            mTextureId;
+    private XMediaMuxer    mTMsCoreMuxer;
 
     // ----- accessed by multiple threads -----
     private volatile EncoderHandler mHandler;
 
-    private Object mReadyFence = new Object();       // guards ready/running
+    private Object  mReadyFence  = new Object();       // guards ready/running
     private boolean mLooperReady = false;           // 循环器就绪标识
     private boolean mMuxersReady = false;           // 混合器就绪标识
     private boolean mRecrRunning = false;           // 录制器录制标识
@@ -68,48 +69,44 @@ public class TextureMovieEncoder implements Runnable {
     private FloatBuffer mGLTextureBuffer;
 
 
-    /** Encoder configuration. */
-    public static class EncoderConfig {
-        final File mOutputFile;
-        final int mWidth;
-        final int mHeight;
-        final int mBitRate;
-        final EGLContext mEglContext;
-
-        public EncoderConfig(File outputFile, int width, int height, int bitRate,
-                             EGLContext sharedEglContext) {
-            mOutputFile = outputFile;
-            mWidth = width;
-            mHeight = height;
-            mBitRate = bitRate;
-            mEglContext = sharedEglContext;
-        }
-
-        @Override
-        public String toString() {
-            return "EncoderConfig: " + mWidth + "x" + mHeight + " @" + mBitRate +
-                    " to '" + mOutputFile.toString() + "' ctxt=" + mEglContext;
-        }
-    }
-
+    /*initial config================================================================================*/
     public TextureMovieEncoder(GPUImageFilter filter) {
         mFilter = filter;
     }
 
+    /** Encoder configuration. */
+    public static class EncoderConfig {
+        final EGLContext                     mEglContext;
+        final File                           mOutputFile;
+        final OutputConfig.VideoOutputConfig mVideoConfig;
+        final OutputConfig.AudioOutputConfig mAudioConfig;
+
+        public EncoderConfig(
+                EGLContext sharedEglContext,
+                File outputFile,
+                OutputConfig.VideoOutputConfig videoConfig,
+                OutputConfig.AudioOutputConfig audioConfig) {
+            mEglContext = sharedEglContext;
+            mOutputFile = outputFile;
+            mVideoConfig = videoConfig;
+            mAudioConfig = audioConfig;
+        }
+    }
+
+
+    /*关键参数设置====================================================================================*/
     public void setFilter(GPUImageFilter filter) {
         mFilter = filter;
     }
-
     public void setGLCubeBuffer(FloatBuffer buffer) {
         mGLCubeBuffer = buffer;
     }
-
     public void setGLTextureBuffer(FloatBuffer buffer) {
         mGLTextureBuffer = buffer;
     }
 
 
-    /**录制流程控制=================================================================================*/
+    /*录制流程控制====================================================================================*/
     /** 1.开启录制 */
     public void startRecording(EncoderConfig config) {
         synchronized (mReadyFence) {
@@ -210,8 +207,8 @@ public class TextureMovieEncoder implements Runnable {
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
         @Override  // runs on encoder thread
         public void handleMessage(Message inputMessage) {
-            int what = inputMessage.what;
-            Object obj = inputMessage.obj;
+            int    what = inputMessage.what;
+            Object obj  = inputMessage.obj;
 
             TextureMovieEncoder encoder = mWeakEncoder.get();
             if (encoder == null) return;
@@ -226,7 +223,7 @@ public class TextureMovieEncoder implements Runnable {
                 case MSG_FRAME_AVAILABLE:               // xn
                     long timestamp = (((long) inputMessage.arg1) << 32) |
                             (((long) inputMessage.arg2) & 0xffffffffL);
-                    encoder.handleFrameAvailable((float[]) obj, timestamp);
+                    encoder.handleFrameAvailable(timestamp);
                     break;
                 case MSG_UPDATE_SHARED_CONTEXT:        // x2
                     encoder.handleUpdateSharedContext((EGLContext) inputMessage.obj);
@@ -250,10 +247,9 @@ public class TextureMovieEncoder implements Runnable {
     private void handleStartRecording(EncoderConfig config) {
         prepareEncoder(
                 config.mEglContext,
-                config.mWidth,
-                config.mHeight,
-                config.mBitRate,
-                config.mOutputFile);
+                config.mOutputFile,
+                config.mVideoConfig,
+                config.mAudioConfig);
     }
 
     /** 设置视频帧来源SurfaceId */
@@ -263,13 +259,12 @@ public class TextureMovieEncoder implements Runnable {
 
     /** 通知视频帧更新 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void handleFrameAvailable(float[] transform, long timestampNanos) {
+    private void handleFrameAvailable(long timestampNanos) {
         if (!mMuxersReady) return;
         if (!mFilter.isInitialized()) mFilter.init();
         mFilter.onDraw(mTextureId, mGLCubeBuffer, mGLTextureBuffer);
         mInputWindowSurface.setPresentationTime(timestampNanos);
         mInputWindowSurface.swapBuffers();
-        mTMsCoreMuxer.notifyVideoData();
     }
 
     /** 处理EGLSurface切换时，录屏监控对象的切换，以避免裂屏 */
@@ -287,17 +282,28 @@ public class TextureMovieEncoder implements Runnable {
         mTMsCoreMuxer.stopMuxer();
         mMuxersReady = false;
         releaseEncoder();
-        Looper.myLooper().quit();
+        exitSafeLooper();
+    }
+
+    /** 退出安全循环器 */
+    private void exitSafeLooper() {
+        Looper myLooper = Looper.myLooper();
+        if (myLooper != null) {
+            myLooper.quit();
+        }
     }
 
 
     /*混合器逻辑====================================================================================*/
     /** 准备实时混合器 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void prepareEncoder(final EGLContext sharedContext, int width, int height, int bitRate,
-                                File outputFile) {
+    private void prepareEncoder(
+            final EGLContext sharedContext,
+            File outputFile,
+            OutputConfig.VideoOutputConfig mVideoConfig,
+            OutputConfig.AudioOutputConfig mAudioConfig) {
         if (!mMuxersReady) {
-            mTMsCoreMuxer = new XMediaMuxer(width, height, bitRate, outputFile);
+            mTMsCoreMuxer = new XMediaMuxer(mVideoConfig, mAudioConfig, outputFile);
             mTMsCoreMuxer.setOnFinishListener(mOnFinishListener);
             mEGLCore = new EGLCore(sharedContext, EGLCore.FLAG_RECORDABLE);
             mInputWindowSurface = new WindowSurface(mEGLCore, mTMsCoreMuxer.getInputSurface(), true);
