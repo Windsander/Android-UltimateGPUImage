@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import cn.co.willow.android.ultimate.gpuimage.utils.GlUtil;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 import static cn.co.willow.android.ultimate.gpuimage.core_config.FilterConfig.NO_TEXTURE;
 
@@ -44,15 +46,15 @@ public class GPUImageFilter {
 
     /*关键变量======================================================================================*/
     private final LinkedList<Runnable> mRunOnDraw;
-    private final String mVertexShader;
-    private final String mFragmentShader;
-    protected int mGLProgId;                         // 着色程序片
-    protected int mVertexPosition;                  // 顶点着色器顶点坐标数据索引
-    protected int mVertexTexture;                   // 顶点着色器顶点纹理坐标索引
-    protected int mFrag2DSampler;                   // 片段着色器2D采样器索引
-    protected int mOutputWidth;
-    protected int mOutputHeight;
-    private boolean mIsInitialized;
+    private final String               mVertexShader;
+    private final String               mFragmentShader;
+    protected     int                  mGLProgId;                         // 着色程序片
+    protected     int                  mVertexPosition;                  // 顶点着色器顶点坐标数据索引
+    protected     int                  mVertexTexture;                   // 顶点着色器顶点纹理坐标索引
+    protected     int                  mFrag2DSampler;                   // 片段着色器2D采样器索引
+    protected     int                  mOutputWidth;
+    protected     int                  mOutputHeight;
+    private       boolean              mIsInitialized;
 
     public GPUImageFilter() {
         this(NO_FILTER_VERTEX_SHADER, NO_FILTER_FRAGMENT_SHADER);
@@ -126,7 +128,15 @@ public class GPUImageFilter {
 
     protected void runPendingOnDrawTasks() {
         while (!mRunOnDraw.isEmpty()) {
-            mRunOnDraw.removeFirst().run();
+            try {
+                Runnable first = mRunOnDraw.removeFirst();
+                if (first != null) {
+                    first.run();
+                }
+            } catch (NoSuchElementException e) {
+                LogUtil.e(e.toString());
+                return;
+            }
         }
     }
 
@@ -261,8 +271,8 @@ public class GPUImageFilter {
     public static String loadShader(String file, Context context) {
         try {
             AssetManager assetManager = context.getAssets();
-            InputStream ims = assetManager.open(file);
-            String re = convertStreamToString(ims);
+            InputStream  ims          = assetManager.open(file);
+            String       re           = convertStreamToString(ims);
             ims.close();
             return re;
         } catch (IOException e) {
