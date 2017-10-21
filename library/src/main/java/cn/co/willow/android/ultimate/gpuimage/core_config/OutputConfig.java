@@ -27,10 +27,10 @@ public class OutputConfig {
     // 输出音频参数配置
     private static final String MIME_AUDIO_TYPE    = "audio/mp4a-latm";
     private static final int    AUDIO_FORMAT       = AudioFormat.ENCODING_PCM_16BIT;
-    private static final int    SAMPLES_PER_FRAME  = 1024 * 2;               // AAC, frameBytes/frame/channel
+    private static final int    SAMPLES_PER_FRAME  = 1024;                   // 单位帧率，单位音频帧容量 AAC, frameBytes/frame/channel
     private static final int    FRAMES_PER_BUFFER  = 25;                     // AAC, frame/buffer/sec
-    private static final int    AUDIO_SAMPLE_RATE  = 44100;                  // 44100hz
-    private static final int    AUDIO_BIT_RATE     = 128000;                 // bps  比特率 = 采样率 x 采用位数 x声道数
+    private static final int    AUDIO_SAMPLE_RATE  = 44100;                  // 采样质量，单位音频采样hz
+    private static final int    AUDIO_BIT_RATE     = 44100;                  // 音频质量，单位音频处理hz
     private static final int    CHANNEL_CONFIG     = CHANNEL_IN_MONO;        // CHANNEL_IN_STEREO 立体声
     private static final int    CHANNEL_COUNT      = 1;                      // 1 channel
 

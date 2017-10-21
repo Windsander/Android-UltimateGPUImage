@@ -85,7 +85,7 @@ public class XMediaMuxer {
         return videoThread.getInputSurface();
     }
 
-    void addMuxerData(@TrackIndex int trackType, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
+    synchronized void addMuxerData(@TrackIndex int trackType, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
         if (mMediaMuxer == null || !isMediaMuxerStart || isMuxerExit) return;
         try {
             switch (trackType) {
@@ -135,7 +135,7 @@ public class XMediaMuxer {
         }
     }
 
-    private void stopMediaMuxer() {
+    private synchronized void stopMediaMuxer() {
         if (mMediaMuxer != null) {
             mMediaMuxer.stop();
             mMediaMuxer.release();
