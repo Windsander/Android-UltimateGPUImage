@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 
@@ -137,6 +138,19 @@ public class XMediaMuxer {
 
     private synchronized void stopMediaMuxer() {
         if (mMediaMuxer != null) {
+            try {
+                Class<?> name   = Class.forName("android.media.MediaMuxer");
+                Field    mState = name.getDeclaredField("mState");
+                mState.setAccessible(true);
+                int state = (int) mState.get(mMediaMuxer);
+                LogUtil.w("Muxer", "Muxer state is :: " + state);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             mMediaMuxer.stop();
             mMediaMuxer.release();
             isAudioAdd = false;

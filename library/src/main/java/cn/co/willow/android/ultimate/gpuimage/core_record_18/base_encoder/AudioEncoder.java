@@ -184,7 +184,7 @@ class AudioEncoder extends Thread {
             case MediaCodec.INFO_TRY_AGAIN_LATER:
                 try {
                     Thread.sleep(10);       // wait 10ms
-                    LogUtil.i("AudioEncoder", "dequeueOutputBuffer timed out!");
+                    LogUtil.i("AudioEncoder", "dequeueOutputBuffer timed out! Insufficient Buffer!!");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

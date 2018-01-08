@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <fade
+        android:duration="500"
+        android:fadingMode="fade_in"/>
+    <slide
+        android:slideEdge="top"
+        android:startDelay="600">
+        <targets>
+            <target android:targetId="@+id/cl_function_container"/>
+        </targets>
+    </slide>
+    <!--<slide
+        android:slideEdge="bottom"
+        android:startDelay="700">
+        <targets android:targetId="@id/control_pannel"/>
+    </slide>-->
+</transitionSet>

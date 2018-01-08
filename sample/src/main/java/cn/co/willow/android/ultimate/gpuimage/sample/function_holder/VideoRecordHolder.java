@@ -33,10 +33,11 @@ import static cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView.ORIENT
 public class VideoRecordHolder extends BaseHolder {
 
     /*关键变量=======================================================================================*/
-    private FilterRecoderView mRecorderViews;          // 显示视频的控件
-    private TextView mCurFilterName;                   // 当前滤镜名称
+    private FilterRecoderView  mRecorderViews;          // 显示视频的控件
+    private TextView           mCurFilterName;          // 当前滤镜名称
     private VideoRecordManager mRecordManager;
-    private int mCurFilter = 420;
+    private int     mCurFilter = 420;
+    private boolean isFinish   = true;
 
     public VideoRecordHolder(Activity context) {
         super(context);
@@ -150,14 +151,15 @@ public class VideoRecordHolder extends BaseHolder {
 
     /** 开始录制 */
     public void startRecord() {
+        isFinish = false;
         String videoSavePath = FileUtil.getVideoSavePath();
         LogUtil.w("Video save Path::" + videoSavePath);
-        mRecordManager.startRecord(
-                FileUtil.computeMD5ForVideoFile(videoSavePath));
+        mRecordManager.startRecord(FileUtil.computeMD5ForVideoFile(videoSavePath));
     }
 
     /** 结束录制 */
     public void stopRecord() {
+        isFinish = true;
         mRecordManager.stopRecord();
     }
 
@@ -180,4 +182,9 @@ public class VideoRecordHolder extends BaseHolder {
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRecordManager.setOnRecordStateListener(mOnRecordStateListener);
     }
+
+    public boolean isFinish() {
+        return isFinish;
+    }
+
 }

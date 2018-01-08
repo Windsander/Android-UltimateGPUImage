@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <changeBounds>
+        <targets android:targetName="trans_control_pannel"/>
+    </changeBounds>
+    <explode>
+        <targets android:targetName="trans_control_pannel"/>
+    </explode>
+</transitionSet>

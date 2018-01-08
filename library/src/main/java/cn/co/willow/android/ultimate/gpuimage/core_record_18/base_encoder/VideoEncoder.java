@@ -159,8 +159,14 @@ class VideoEncoder extends Thread {
             synchronized (this) {
                 if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
                 prevOutputPTS = mVideoBufferInfo.presentationTimeUs;
-                int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
-                switch (encoderStatus) {
+                int                inputBufferIndex = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
+                final ByteBuffer[] inputBuffers     = mVideoEncoder.getInputBuffers();
+                if (inputBufferIndex >= 0) {
+                    int              lastIndex   = (inputBufferIndex < inputBuffers.length) ? inputBufferIndex : inputBuffers.length - 1;
+                    final ByteBuffer inputBuffer = inputBuffers[lastIndex];
+                    inputBuffer.clear();
+                }
+                switch (inputBufferIndex) {
                     case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
                         LogUtil.i("VideoEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
                         break;
@@ -176,14 +182,14 @@ class VideoEncoder extends Thread {
                     case MediaCodec.INFO_TRY_AGAIN_LATER:
                         try {
                             Thread.sleep(10);       // wait 10ms
-                            LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out!");
+                            LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out! Insufficient Buffer!!");
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                         break;
                     default:
-                        if (encoderStatus >= 0) {
-                            ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[encoderStatus];
+                        if (inputBufferIndex >= 0) {
+                            ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[inputBufferIndex];
                             LogUtil.i("VideoEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
                             if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                                 mVideoBufferInfo.size = 0;
@@ -202,7 +208,7 @@ class VideoEncoder extends Thread {
                                 outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
                                 mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
                             }
-                            mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
+                            mVideoEncoder.releaseOutputBuffer(inputBufferIndex, false);
                         } else {
                             LogUtil.i("VideoEncoder", "OutputBuffer's cur-index less than zero");
                         }

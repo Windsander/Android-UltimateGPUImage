@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="146dp"
-    android:background="@android:color/holo_blue_dark">
+    android:layout_height="146dp">
 
     <ImageView
         android:id="@+id/last_video_btn"
@@ -24,6 +23,7 @@
         android:layout_width="130dp"
         android:layout_height="25dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="26dp"
         android:background="@drawable/control_default_camera_btn"
         android:paddingLeft="7dp"
@@ -33,9 +33,8 @@
         android:textColor="@color/colorPrimary"
         android:textSize="6pt"
         app:layout_constraintLeft_toRightOf="@+id/last_video_btn"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
         android:id="@+id/switch_camera_btn"

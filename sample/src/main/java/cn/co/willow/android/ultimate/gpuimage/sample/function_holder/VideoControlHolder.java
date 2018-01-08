@@ -2,6 +2,8 @@ package cn.co.willow.android.ultimate.gpuimage.sample.function_holder;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -20,9 +22,9 @@ import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 public class VideoControlHolder extends BaseHolder implements View.OnClickListener {
 
     /*关键变量=======================================================================================*/
-    private Button mBtnRecordsVideo;
-    private Button mBtnSwitchCamera;
-    private boolean isRecording;
+    private Button    mBtnRecordsVideo;
+    private Button    mBtnSwitchCamera;
+    private boolean   isRecording;
     private ImageView mBtnLastestVideo;
 
     public VideoControlHolder(Activity context) {
@@ -88,11 +90,42 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
     public void setVideoCover(String gifUrl) {
         LogUtil.w("Cover URL is::" + gifUrl);
         Glide.with(context)
-                .load(gifUrl)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .centerCrop()
-                .crossFade()
-                .into(mBtnLastestVideo);
+             .load(gifUrl)
+             .diskCacheStrategy(DiskCacheStrategy.NONE)
+             .centerCrop()
+             .crossFade()
+             .into(mBtnLastestVideo);
+    }
+
+
+    /*资源回收======================================================================================*/
+    public void enterAnim() {
+        AlphaAnimation alphaAnim = new AlphaAnimation(0, 1);
+        alphaAnim.setDuration(200);
+        view.setAnimation(alphaAnim);
+        view.setVisibility(View.VISIBLE);
+        view.animate();
+    }
+
+    public void exitAnim() {
+        AlphaAnimation alphaAnim = new AlphaAnimation(1, 0);
+        alphaAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        alphaAnim.setDuration(200);
+        view.setAnimation(alphaAnim);
+        view.animate();
     }
 
 
