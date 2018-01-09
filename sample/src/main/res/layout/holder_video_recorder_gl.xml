@@ -11,6 +11,18 @@
         android:layout_gravity="center"/>
 
     <TextView
+        android:id="@+id/tv_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="14dp"
+        android:layout_marginStart="14dp"
+        android:textColor="@android:color/white"
+        android:textSize="6pt"
+        tools:text="辣鸡鸡丝"/>
+
+    <TextView
         android:id="@+id/tv_filter_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -6,6 +6,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,12 +15,15 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.manager.video_recorder.VideoRecordManager;
 import cn.co.willow.android.ultimate.gpuimage.sample.R;
 import cn.co.willow.android.ultimate.gpuimage.sample.self_defined_filter.FilterType;
 import cn.co.willow.android.ultimate.gpuimage.sample.util.FileUtil;
+import cn.co.willow.android.ultimate.gpuimage.sample.util.TimeUtil;
 import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
@@ -32,11 +37,15 @@ import static cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView.ORIENT
  */
 public class VideoRecordHolder extends BaseHolder {
 
+    private static final int REFRESH_TIME = 0x1;
+
     /*关键变量=======================================================================================*/
     private FilterRecoderView  mRecorderViews;          // 显示视频的控件
+    private TextView           mRecorderTimer;          // 录制计时
     private TextView           mCurFilterName;          // 当前滤镜名称
     private VideoRecordManager mRecordManager;
     private int     mCurFilter = 420;
+    private long    startTime  = 0;
     private boolean isFinish   = true;
 
     public VideoRecordHolder(Activity context) {
@@ -51,6 +60,7 @@ public class VideoRecordHolder extends BaseHolder {
     public View initView() {
         View view = View.inflate(context, R.layout.holder_video_recorder_gl, null);
         mRecorderViews = (FilterRecoderView) view.findViewById(R.id.vp_video_recorder_gl);
+        mRecorderTimer = (TextView) view.findViewById(R.id.tv_timer);
         mCurFilterName = (TextView) view.findViewById(R.id.tv_filter_name);
         mRecordManager = new VideoRecordManager(context, mRecorderViews);
         initGesture();
@@ -154,18 +164,45 @@ public class VideoRecordHolder extends BaseHolder {
         isFinish = false;
         String videoSavePath = FileUtil.getVideoSavePath();
         LogUtil.w("Video save Path::" + videoSavePath);
+        startTimer();
         mRecordManager.startRecord(FileUtil.computeMD5ForVideoFile(videoSavePath));
     }
 
     /** 结束录制 */
     public void stopRecord() {
         isFinish = true;
+        stopTimer();
         mRecordManager.stopRecord();
     }
 
     /** 切换前后摄像头 */
     public void switchCamera() {
         mRecordManager.switchCamera();
+    }
+
+
+    /*录制时长计时====================================================================================*/
+    private Handler mTimerHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            mRecorderTimer.setText(String.format(Locale.CHINA, "%s", TimeUtil.formatDuration(startTime)));
+            mTimerHandler.sendEmptyMessageDelayed(REFRESH_TIME, 1000);
+            return true;
+        }
+    });
+
+
+    /** 设置开始时间 */
+    public void startTimer() {
+        if (startTime != 0) return;
+        this.startTime = System.currentTimeMillis() / 1000;
+        mTimerHandler.sendEmptyMessage(REFRESH_TIME);
+    }
+
+    /** 停止Handler */
+    public void stopTimer() {
+        startTime = 0;
+        mTimerHandler.removeCallbacksAndMessages(null);
     }
 
 

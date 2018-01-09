@@ -91,9 +91,11 @@ public class XMediaMuxer {
         try {
             switch (trackType) {
                 case TRACK_AUDIO:
+                    LogUtil.w("addMuxerData","TRACK_AUDIO");
                     mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
                     break;
                 case TRACK_VIDEO:
+                    LogUtil.w("addMuxerData","TRACK_VIDEO");
                     mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
                     break;
             }
@@ -111,13 +113,19 @@ public class XMediaMuxer {
                     audioMediaFormat = mediaFormat;
                     audioTrackIndex = mMediaMuxer.addTrack(mediaFormat);
                     isAudioAdd = true;
+                    if (videoMediaFormat != null) {
+                        videoTrackIndex = mMediaMuxer.addTrack(videoMediaFormat);
+                        isVideoAdd = true;
+                    }
                 }
                 break;
             case TRACK_VIDEO:
                 if (videoMediaFormat == null) {
                     videoMediaFormat = mediaFormat;
-                    videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
-                    isVideoAdd = true;
+                    if (isAudioAdd) {
+                        videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
+                        isVideoAdd = true;
+                    }
                 }
                 break;
         }

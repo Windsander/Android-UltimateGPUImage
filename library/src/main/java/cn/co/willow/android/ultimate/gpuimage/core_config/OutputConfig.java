@@ -29,8 +29,8 @@ public class OutputConfig {
     private static final int    AUDIO_FORMAT       = AudioFormat.ENCODING_PCM_16BIT;
     private static final int    SAMPLES_PER_FRAME  = 1024;                   // 单位帧率，单位音频帧容量 AAC, frameBytes/frame/channel
     private static final int    FRAMES_PER_BUFFER  = 25;                     // AAC, frame/buffer/sec
-    private static final int    AUDIO_SAMPLE_RATE  = 44100;                  // 采样质量，单位音频采样hz
-    private static final int    AUDIO_BIT_RATE     = 44100;                  // 音频质量，单位音频处理hz
+    private static final int    AUDIO_SAMPLE_RATE  = 32000;                  // 采样质量，单位音频采样hz
+    private static final int    AUDIO_BIT_RATE     = 32000;                  // 音频质量，单位音频处理hz
     private static final int    CHANNEL_CONFIG     = CHANNEL_IN_MONO;        // CHANNEL_IN_STEREO 立体声
     private static final int    CHANNEL_COUNT      = 1;                      // 1 channel
 

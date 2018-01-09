@@ -162,9 +162,10 @@ class VideoEncoder extends Thread {
                 int                inputBufferIndex = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
                 final ByteBuffer[] inputBuffers     = mVideoEncoder.getInputBuffers();
                 if (inputBufferIndex >= 0) {
-                    int              lastIndex   = (inputBufferIndex < inputBuffers.length) ? inputBufferIndex : inputBuffers.length - 1;
-                    final ByteBuffer inputBuffer = inputBuffers[lastIndex];
-                    inputBuffer.clear();
+                    int lastIndex = (inputBufferIndex < inputBuffers.length) ? inputBufferIndex : inputBuffers.length - 1;
+                    for (int i = 0; i <= lastIndex; i++) {
+                        inputBuffers[i].clear();
+                    }
                 }
                 switch (inputBufferIndex) {
                     case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
@@ -204,8 +205,8 @@ class VideoEncoder extends Thread {
                             }
                             if (outputBuffer != null && mMediaMuxer != null) {
                                 LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
-                                outputBuffer.position(mVideoBufferInfo.offset);
-                                outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
+                                //outputBuffer.position(mVideoBufferInfo.offset);
+                                //outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
                                 mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
                             }
                             mVideoEncoder.releaseOutputBuffer(inputBufferIndex, false);
