@@ -36,6 +36,8 @@ public class XMediaMuxer {
     private Vector<MuxerData> mMuxerDatas;
     private int videoTrackIndex = -1;
     private int audioTrackIndex = -1;
+    private int videoDataRemain = 0;
+    private int audioDataRemain = 0;
 
     private volatile boolean isVideoAdd;
     private volatile boolean isAudioAdd;
@@ -87,15 +89,18 @@ public class XMediaMuxer {
     }
 
     synchronized void addMuxerData(@TrackIndex int trackType, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
-        if (mMediaMuxer == null || !isMediaMuxerStart || isMuxerExit) return;
+        if (mMediaMuxer == null || !isMediaMuxerStart) return;
+        //if (isMuxerExit) return;  // this immediately shut down action, will cause a fetal stop error by supend eos signal
         try {
             switch (trackType) {
                 case TRACK_AUDIO:
-                    LogUtil.w("addMuxerData","TRACK_AUDIO");
+                    audioDataRemain++;
+                    LogUtil.w("addMuxerData", "TRACK_AUDIO :: " + audioDataRemain);
                     mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
                     break;
                 case TRACK_VIDEO:
-                    LogUtil.w("addMuxerData","TRACK_VIDEO");
+                    videoDataRemain++;
+                    LogUtil.w("addMuxerData", "TRACK_VIDEO :: " + videoDataRemain);
                     mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
                     break;
             }
