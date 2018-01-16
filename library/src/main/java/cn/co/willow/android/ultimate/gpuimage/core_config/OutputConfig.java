@@ -19,8 +19,8 @@ public class OutputConfig {
     public static final  int    VIDEO_FRAME_RATE   = 25;                     // fps
     public static final  int    IFRAME_INTERVAL    = 1;                      // 5 seconds between I-frames
     public static final  int    VIDEO_BIT_RATE     = 180000;                 // 默认 bps = videoFrameRate * width * height * 1.5f;
-    public static final  int    VIDEO_RECORD_WIDTH = 480;
-    public static final  int    VIDEO_RECORD_HEIGH = 640;
+    public static final  int    VIDEO_RECORD_WIDTH = 768;
+    public static final  int    VIDEO_RECORD_HEIGH = 1024;
     public static final  float  VIDEO_ASPECT_RATIO = 4 / 3f;                 // 宽高比
     /** 其余的视频参数，由当前机型动态适配算法提供 */
 

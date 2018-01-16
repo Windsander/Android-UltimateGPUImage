@@ -112,7 +112,7 @@ class AudioEncoder extends Thread {
             mAudioRecorder.stop();
             mAudioRecorder.release();
         }
-        sendEOS();
+        //sendEOS();
         if (mAudioEncoder != null) {
             mAudioEncoder.stop();
             mAudioEncoder.release();

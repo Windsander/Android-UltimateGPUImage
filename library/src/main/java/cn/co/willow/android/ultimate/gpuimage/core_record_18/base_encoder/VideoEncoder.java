@@ -145,6 +145,7 @@ class VideoEncoder extends Thread {
     }
 
     private void stopMediaCodec() {
+        //sendEOS();
         if (mVideoEncoder != null) {
             mVideoEncoder.stop();
             mVideoEncoder.release();
@@ -216,6 +217,17 @@ class VideoEncoder extends Thread {
                         break;
                 }
             }
+        }
+    }
+
+    public void sendEOS() {
+        LogUtil.d("VideoEncoder", "sending EOS");
+        final ByteBuffer[] inputBuffers     = mVideoEncoder.getInputBuffers();
+        final int          inputBufferIndex = mVideoEncoder.dequeueInputBuffer(TIMEOUT_USEC);
+        if (inputBufferIndex >= 0) {
+            final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
+            inputBuffer.clear();
+            mVideoEncoder.queueInputBuffer(inputBufferIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
         }
     }
 

@@ -63,7 +63,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_video_recorder:
                 Intent intent = new Intent(this, SampleVideoActivity.class);
                 ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                        new Pair<View, String>(mBtnJump2Video, "trans_control_pannel"));
+                        new Pair<View, String>(mBtnJump2Video, getString(R.string.trans_control_pannel)));
                 startActivity(intent, optionsCompat.toBundle());
                 break;
         }
