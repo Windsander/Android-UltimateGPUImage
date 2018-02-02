@@ -11,7 +11,7 @@ import static android.media.AudioFormat.CHANNEL_IN_MONO;
  */
 public class OutputConfig {
 
-    public static final int TIMEOUT_USEC = 10000;
+    public static final int TIMEOUT_USEC = 0;
 
     /*默认输出配置==================================================================================*/
     // 输出视频参数配置

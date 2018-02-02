@@ -4,6 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.RequiresApi;
 import android.view.Surface;
@@ -32,18 +33,17 @@ public class XMediaMuxer {
     static final int TRACK_VIDEO = 0;
     static final int TRACK_AUDIO = 1;
 
-    private MediaMuxer        mMediaMuxer;
-    private Vector<MuxerData> mMuxerDatas;
+    private MediaMuxer mMediaMuxer;
     private int videoTrackIndex = -1;
     private int audioTrackIndex = -1;
-    private int videoDataRemain = 0;
-    private int audioDataRemain = 0;
 
     private volatile boolean isVideoAdd;
     private volatile boolean isAudioAdd;
     private volatile boolean isMuxerExit       = false;
     private          boolean isMediaMuxerStart = false;
     private          boolean isMediaDataFinish = false;
+    private volatile boolean isVideoFinish     = false;
+    private volatile boolean isAudioFinish     = false;
 
     private AudioEncoder audioThread;
     private VideoEncoder videoThread;
@@ -57,7 +57,6 @@ public class XMediaMuxer {
             File outputFile) {
         try {
             mOutputFile = outputFile;
-            mMuxerDatas = new Vector<>();
             mMediaMuxer = new MediaMuxer(mOutputFile.getAbsolutePath(), MUXER_OUTPUT_MPEG_4);
             audioThread = new AudioEncoder(mAudioConfig, this);
             videoThread = new VideoEncoder(mVideoConfig, this);
@@ -75,10 +74,29 @@ public class XMediaMuxer {
     }
 
     public void stopMuxer() {
-        audioThread.exit();
-        videoThread.exit();
-        isMuxerExit = true;
-        stopMediaMuxer();
+        videoThread.exit(new VideoEncoder.OnFinishCallBack() {
+            @Override
+            public void onFinish() {
+                isVideoFinish = true;
+                checkTotalFinish();
+            }
+        });
+        audioThread.exit(new AudioEncoder.OnFinishCallBack() {
+            @Override
+            public void onFinish() {
+                isAudioFinish = true;
+                checkTotalFinish();
+            }
+        });
+    }
+
+    private void checkTotalFinish() {
+        if (isAudioFinish && isVideoFinish) {
+            stopMediaMuxer();
+            isAudioFinish = false;
+            isVideoFinish = false;
+            isMuxerExit = true;
+        }
     }
 
 
@@ -94,13 +112,9 @@ public class XMediaMuxer {
         try {
             switch (trackType) {
                 case TRACK_AUDIO:
-                    audioDataRemain++;
-                    LogUtil.w("addMuxerData", "TRACK_AUDIO :: " + audioDataRemain);
                     mMediaMuxer.writeSampleData(audioTrackIndex, byteBuf, bufferInfo);
                     break;
                 case TRACK_VIDEO:
-                    videoDataRemain++;
-                    LogUtil.w("addMuxerData", "TRACK_VIDEO :: " + videoDataRemain);
                     mMediaMuxer.writeSampleData(videoTrackIndex, byteBuf, bufferInfo);
                     break;
             }
@@ -118,19 +132,15 @@ public class XMediaMuxer {
                     audioMediaFormat = mediaFormat;
                     audioTrackIndex = mMediaMuxer.addTrack(mediaFormat);
                     isAudioAdd = true;
-                    if (videoMediaFormat != null) {
-                        videoTrackIndex = mMediaMuxer.addTrack(videoMediaFormat);
-                        isVideoAdd = true;
-                    }
+                    LogUtil.e("VideoEncoder", "add Success: TRACK_AUDIO");
                 }
                 break;
             case TRACK_VIDEO:
                 if (videoMediaFormat == null) {
                     videoMediaFormat = mediaFormat;
-                    if (isAudioAdd) {
-                        videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
-                        isVideoAdd = true;
-                    }
+                    videoTrackIndex = mMediaMuxer.addTrack(mediaFormat);
+                    isVideoAdd = true;
+                    LogUtil.e("VideoEncoder", "add Success: TRACK_VIDEO");
                 }
                 break;
         }
@@ -149,7 +159,7 @@ public class XMediaMuxer {
         }
     }
 
-    private synchronized void stopMediaMuxer() {
+    private void stopMediaMuxer() {
         if (mMediaMuxer != null) {
             try {
                 Class<?> name   = Class.forName("android.media.MediaMuxer");
@@ -164,7 +174,7 @@ public class XMediaMuxer {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            mMediaMuxer.stop();
+            //mMediaMuxer.stop();
             mMediaMuxer.release();
             isAudioAdd = false;
             isVideoAdd = false;
@@ -172,13 +182,9 @@ public class XMediaMuxer {
             mMediaMuxer = null;
             videoMediaFormat = null;
             audioMediaFormat = null;
-        }
-        if (mMuxerDatas != null) {
-            mMuxerDatas.clear();
-            mMuxerDatas = null;
-        }
-        if (mOnFinishListener != null) {
-            mOnFinishListener.onFinish(mOutputFile);
+            if (mOnFinishListener != null) {
+                mOnFinishListener.onFinish(mOutputFile);
+            }
         }
     }
 

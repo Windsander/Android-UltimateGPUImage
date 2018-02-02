@@ -47,8 +47,8 @@ public class SamplePresenter {
     public void doPlayerVideo(Context context) {
         if (mLastVideoFile == null) return;
         VideoPlayerDialog.getDefault(context)
-                .setVideoUrl(Uri.fromFile(mLastVideoFile).toString())
-                .show();
+                         .setVideoUrl(Uri.fromFile(mLastVideoFile).toString())
+                         .show();
     }
 
 
@@ -68,7 +68,7 @@ public class SamplePresenter {
                     @Override
                     public void call(final Subscriber<? super String> subscriber) {
                         String videoPath = mOutputRecFile.getAbsolutePath();
-                        File imgFile = createCoverImg(videoPath);
+                        File   imgFile   = createCoverImg(videoPath);
                         if (imgFile != null) {
                             subscriber.onNext(Uri.fromFile(imgFile).toString());
                         }
@@ -95,6 +95,7 @@ public class SamplePresenter {
     /** create last video image */
     private File createCoverImg(String videoPath) {
         Bitmap bitmap = CameraUtil.getVideoThumbnailFF(videoPath);
+        if (bitmap == null) return null;
         File gifFile = FileUtil.computeMD5ForImageFile(FileUtil.getCoverSavePath(), bitmap);
         bitmap.recycle();
         return gifFile;
@@ -103,7 +104,7 @@ public class SamplePresenter {
     /** create gif */
     private File createGifFile(String videoPath) {
         List<Bitmap> bitmaps = CameraUtil.getVideoThumbnailFF(videoPath, 8);
-        File gifFile = FileUtil.computeMD5ForCoverFile(FileUtil.getCoverSavePath());
+        File         gifFile = FileUtil.computeMD5ForCoverFile(FileUtil.getCoverSavePath());
         gifFile = CameraUtil.createGif(bitmaps, gifFile);
         bitmaps.clear();
         return gifFile;

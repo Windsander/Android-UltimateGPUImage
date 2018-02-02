@@ -34,6 +34,7 @@ import cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder.XMedia
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.EGLCore;
 import cn.co.willow.android.ultimate.gpuimage.core_record_18.gles.WindowSurface;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
+import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 
 /**
  * 视频同步合成流程队列式控制类

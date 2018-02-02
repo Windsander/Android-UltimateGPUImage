@@ -107,6 +107,7 @@ public class FileUtil {
 
     /** save Bitmap to file */
     private static File saveBitmap(String fileRootPath, Bitmap bitmap) {
+        if (bitmap == null) return null;
         try {
             String imageMd5 = DEF_PREFIX + "cover_" + System.currentTimeMillis();
             String filename = fileRootPath + imageMd5 + ".png";

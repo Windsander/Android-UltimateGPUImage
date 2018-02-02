@@ -20,6 +20,7 @@ import static cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder
  */
 class AudioEncoder extends Thread {
 
+    private AudioRecordThread              mAudioThread;
     private XMediaMuxer                    mMediaMuxer;
     private MediaCodec                     mAudioEncoder;            // API >= 16(Android4.1.2)
     private AudioRecord                    mAudioRecorder;
@@ -34,6 +35,7 @@ class AudioEncoder extends Thread {
             this.mAudioConfig = audioConfig;
             this.mMediaMuxer = mMediaMuxer;
             this.mAudioBufferInfo = new MediaCodec.BufferInfo();
+            this.mAudioThread = new AudioRecordThread();
             initAudioRecorder();
             initAudioEncoder();
         } catch (IOException e) {
@@ -79,10 +81,13 @@ class AudioEncoder extends Thread {
     @Override
     public synchronized void start() {
         isExit = false;
+        mAudioThread.start();
         super.start();
     }
 
-    public void exit() {
+    public void exit(OnFinishCallBack mOnFinishCallBack) {
+        this.mOnFinishCallBack = mOnFinishCallBack;
+        sendEOS();
         isExit = true;
     }
 
@@ -112,16 +117,22 @@ class AudioEncoder extends Thread {
             mAudioRecorder.stop();
             mAudioRecorder.release();
         }
-        //sendEOS();
         if (mAudioEncoder != null) {
             mAudioEncoder.stop();
             mAudioEncoder.release();
         }
-        mAudioRecorder = null;
-        mAudioEncoder = null;
     }
 
-    private void autoEncodeFrame() {
+
+    /*录音编码逻辑====================================================================================*/
+    private class AudioRecordThread extends Thread {
+        @Override
+        public void run() {
+            autoInputsFrame();
+        }
+    }
+
+    private void autoInputsFrame() {
         final ByteBuffer byteBuffs = ByteBuffer.allocateDirect(mAudioConfig.getSamplePerFrame());
         while (!isExit) {
             if (mAudioRecorder != null) {
@@ -140,88 +151,81 @@ class AudioEncoder extends Thread {
                     byteBuffs.position(readBytes);
                     byteBuffs.flip();
 
-                    encode(byteBuffs, readBytes, getPTSUs());
+                    /*向编码器输入数据*/
+                    final int          inputBufferIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
+                    final ByteBuffer[] inputBuffers     = mAudioEncoder.getInputBuffers();
+                    if (inputBufferIndex >= 0) {
+                        final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
+                        inputBuffer.clear();
+                        inputBuffer.put(byteBuffs);
+                        if (readBytes > 0) {
+                            mAudioEncoder.queueInputBuffer(inputBufferIndex, 0, readBytes, getPTSUs(), 0);
+                        }
+                    }
                 }
             }
         }
-        byteBuffs.clear();
     }
 
-
-    /*录音编码逻辑====================================================================================*/
-    private void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
-        if (isExit) return;
-        /*向编码器输入数据*/
-        final ByteBuffer[] inputBuffers     = mAudioEncoder.getInputBuffers();
-        final int          inputBufferIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
-        if (inputBufferIndex >= 0) {
-            final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
-            inputBuffer.clear();
-            if (buffer != null) {
-                inputBuffer.put(buffer);
-            }
-            if (length <= 0) {
-                LogUtil.i("AudioEncoder", "Enqueue inputbuffer with EOS. Length is : " + length);
-                mAudioEncoder.queueInputBuffer(inputBufferIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-            } else {
-                LogUtil.i("AudioEncoder", "Enqueue inputbuffer next. Length is : " + length);
-                mAudioEncoder.queueInputBuffer(inputBufferIndex, 0, length, presentationTimeUs, 0);
-            }
-        }
-
-        /*获取解码后的数据*/
-        if (mAudioEncoder == null) return;
-        int encoderStatus = mAudioEncoder.dequeueOutputBuffer(mAudioBufferInfo, TIMEOUT_USEC);
-        switch (encoderStatus) {
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                LogUtil.i("AudioEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
-                break;
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                MediaFormat newFormat = mAudioEncoder.getOutputFormat();
-                mMediaMuxer.addMediaTrack(TRACK_AUDIO, newFormat);
-                LogUtil.i("AudioEncoder", "New format " + newFormat);
-                break;
-            case MediaCodec.INFO_TRY_AGAIN_LATER:
-                try {
-                    Thread.sleep(10);       // wait 10ms
-                    LogUtil.i("AudioEncoder", "dequeueOutputBuffer timed out! Insufficient Buffer!!");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                if (encoderStatus >= 0) {
-                    ByteBuffer outputBuffer = mAudioEncoder.getOutputBuffers()[encoderStatus];
-                    LogUtil.i("AudioEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
-                    if ((mAudioBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                        mAudioBufferInfo.size = 0;
+    private void autoEncodeFrame() {
+        while (true) {
+        /*处理输出数据*/
+            if (mAudioEncoder == null) return;
+            int outputBufferId = mAudioEncoder.dequeueOutputBuffer(mAudioBufferInfo, TIMEOUT_USEC);
+            //LogUtil.i("VideoEncoder", "outputBufferId is " + outputBufferId + " " + getEncoderState(outputBufferId));
+            switch (outputBufferId) {
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                    break;
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                    MediaFormat newFormat = mAudioEncoder.getOutputFormat();
+                    mMediaMuxer.addMediaTrack(TRACK_AUDIO, newFormat);
+                    break;
+                case MediaCodec.INFO_TRY_AGAIN_LATER:
+                    try {
+                        Thread.sleep(10);       // wait 10ms
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    if (mAudioBufferInfo.size == 0) {
-                        LogUtil.d("VideoEncoder", "info.size == 0, drop it.");
-                        outputBuffer = null;
+                    break;
+                default:
+                    if (outputBufferId >= 0) {
+                        ByteBuffer outputBuffer = mAudioEncoder.getOutputBuffers()[outputBufferId];
+                        if ((mAudioBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                            mAudioBufferInfo.size = 0;
+                        }
+                        if ((mAudioBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            if (mOnFinishCallBack != null) {
+                                mOnFinishCallBack.onFinish();
+                            }
+                            return;
+                        }
+                        if (mAudioBufferInfo.size == 0) {
+                            LogUtil.d("VideoEncoder", "info.size == 0, drop it.");
+                            outputBuffer = null;
+                        } else {
+                            LogUtil.d("VideoEncoder", "got buffer, info: size=" + mAudioBufferInfo.size
+                                    + ", presentationTimeUs=" + mAudioBufferInfo.presentationTimeUs
+                                    + ", offset=" + mAudioBufferInfo.offset);
+                        }
+                        if (outputBuffer != null && mMediaMuxer != null) {
+                            LogUtil.d("AudioEncoder", "timestamp:: " + mAudioBufferInfo.presentationTimeUs / 1000 + "ms");
+                            mMediaMuxer.addMuxerData(TRACK_AUDIO, outputBuffer, mAudioBufferInfo);
+                            outputBuffer.clear();
+                        }
+                        mAudioEncoder.releaseOutputBuffer(outputBufferId, false);
+
                     } else {
-                        LogUtil.d("VideoEncoder", "got buffer, info: size=" + mAudioBufferInfo.size
-                                + ", presentationTimeUs=" + mAudioBufferInfo.presentationTimeUs
-                                + ", offset=" + mAudioBufferInfo.offset);
+                        LogUtil.i("AudioEncoder", "OutputBuffer's cur-index less than zero");
                     }
-                    if (outputBuffer != null && mMediaMuxer != null) {
-                        LogUtil.i("AudioEncoder", "timestamp:: " + mAudioBufferInfo.presentationTimeUs / 1000 + "ms");
-                        mMediaMuxer.addMuxerData(TRACK_AUDIO, outputBuffer, mAudioBufferInfo);
-                    }
-                    mAudioEncoder.releaseOutputBuffer(encoderStatus, false);
-                } else {
-                    LogUtil.i("AudioEncoder", "OutputBuffer's cur-index less than zero");
-                }
-                break;
+                    break;
+            }
         }
     }
 
-    public void sendEOS() {
-        LogUtil.d("AudioEncoder", "sending EOS");
-        final ByteBuffer bytebuffer = ByteBuffer.allocateDirect(mAudioConfig.getSamplePerFrame());
-        int              bufferReadResult;
-        bufferReadResult = mAudioRecorder.read(bytebuffer, mAudioConfig.getSamplePerFrame());
-        encode(bytebuffer, bufferReadResult, getPTSUs());
+    private void sendEOS() {
+        LogUtil.w("AudioEncoder", "sending EOS");
+        final int inputBufferIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
+        mAudioEncoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
     }
 
     private long getPTSUs() {
@@ -229,8 +233,32 @@ class AudioEncoder extends Thread {
         if (result < prevPTSUs)
             result = (prevPTSUs - result) + result;
         prevPTSUs = result;
-        LogUtil.w("AudioEncoder", "getPTSUs result : " + result);
         return result;
+    }
+
+
+    /*关键回掉========================================================================================*/
+    private OnFinishCallBack mOnFinishCallBack;
+
+    public interface OnFinishCallBack {
+        void onFinish();
+    }
+
+    private String getEncoderState(int outputBufferId) {
+        switch (outputBufferId) {
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                return "output buffers changed";
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                return "output format changed";
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                return "dequeueOutputBuffer timed out! Insufficient Buffer!!";
+            default:
+                if (outputBufferId >= 0) {
+                    return "Dealing with data!!";
+                } else {
+                    return "OutputBuffer's cur-index less than zero";
+                }
+        }
     }
 
 }
