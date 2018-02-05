@@ -222,9 +222,7 @@ public class TextureMovieEncoder implements Runnable {
                     encoder.handleSetTexture(inputMessage.arg1);
                     break;
                 case MSG_FRAME_AVAILABLE:               // xn
-                    long timestamp = (((long) inputMessage.arg1) << 32) |
-                            (((long) inputMessage.arg2) & 0xffffffffL);
-                    encoder.handleFrameAvailable(timestamp);
+                    encoder.handleFrameAvailable();
                     break;
                 case MSG_UPDATE_SHARED_CONTEXT:        // x2
                     encoder.handleUpdateSharedContext((EGLContext) inputMessage.obj);
@@ -260,11 +258,13 @@ public class TextureMovieEncoder implements Runnable {
 
     /** 通知视频帧更新 */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void handleFrameAvailable(long timestampNanos) {
+    private void handleFrameAvailable() {
         if (!mMuxersReady) return;
         if (!mFilter.isInitialized()) mFilter.init();
         mFilter.onDraw(mTextureId, mGLCubeBuffer, mGLTextureBuffer);
-        mInputWindowSurface.setPresentationTime(timestampNanos);
+        long nanoTime = System.nanoTime();
+        LogUtil.i("VideoEncoder", "timestamp:: " + nanoTime + " ns");
+        mInputWindowSurface.setPresentationTime(nanoTime);
         mInputWindowSurface.swapBuffers();
     }
 
