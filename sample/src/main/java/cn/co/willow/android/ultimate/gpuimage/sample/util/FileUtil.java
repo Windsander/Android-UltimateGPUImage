@@ -21,11 +21,12 @@ import java.io.IOException;
 public class FileUtil {
 
     /*路径获取======================================================================================*/
-    private static final String ROOT_PATH = "/UlitmateGPUImage";
+    private static final String DEF_PREFIX = "ultra_GPUImage_";
+    private static final String ROOT_PATH  = "/UlitmateGPUImage";
     private static final String VIDEO_PATH = ROOT_PATH + "/sample_video/";
     private static final String COVER_PATH = ROOT_PATH + "/sample_cover/";
-    private static final int MP4 = 1;
-    private static final int GIF = 2;
+    private static final int    MP4        = 1;
+    private static final int    GIF        = 2;
 
     public static String getVideoSavePath() {
         return getRootCachePath() + VIDEO_PATH;
@@ -79,7 +80,7 @@ public class FileUtil {
     @NonNull
     private static File computeMD5ForFile(String fileRootPath, String extra, int type) {
         try {
-            String imageMd5 = "" + System.currentTimeMillis();
+            String imageMd5 = DEF_PREFIX + System.currentTimeMillis();
             String filename = fileRootPath + imageMd5 + (extra == null ? "" : extra);
             switch (type) {
                 case MP4:
@@ -106,10 +107,11 @@ public class FileUtil {
 
     /** save Bitmap to file */
     private static File saveBitmap(String fileRootPath, Bitmap bitmap) {
+        if (bitmap == null) return null;
         try {
-            String imageMd5 = "cover_" + System.currentTimeMillis();
+            String imageMd5 = DEF_PREFIX + "cover_" + System.currentTimeMillis();
             String filename = fileRootPath + imageMd5 + ".png";
-            File temp = new File(filename);
+            File   temp     = new File(filename);
             if (!temp.getParentFile().exists()) {
                 temp.getParentFile().mkdirs();
             }

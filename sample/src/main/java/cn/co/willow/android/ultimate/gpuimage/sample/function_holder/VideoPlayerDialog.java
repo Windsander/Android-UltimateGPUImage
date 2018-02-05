@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.transition.TransitionInflater;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -34,6 +35,7 @@ public class VideoPlayerDialog extends AlertDialog {
     private void init() {
         mDialogsView = View.inflate(mContext, R.layout.holder_video_player, null);
         mVideoPlayer = (ScalePlayerView) mDialogsView.findViewById(R.id.spv_video_player);
+        //TransitionInflater.from(mContext);
     }
 
     public VideoPlayerDialog setIsCancelable(boolean cancelable) {

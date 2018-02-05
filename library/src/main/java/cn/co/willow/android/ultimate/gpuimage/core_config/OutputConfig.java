@@ -11,26 +11,26 @@ import static android.media.AudioFormat.CHANNEL_IN_MONO;
  */
 public class OutputConfig {
 
-    public static final int TIMEOUT_USEC = 10000;
+    public static final int TIMEOUT_USEC = 0;
 
     /*默认输出配置==================================================================================*/
     // 输出视频参数配置
     public static final  String MIME_VIDEO_TYPE    = "video/avc";            // H.264 Advanced Video Coding
     public static final  int    VIDEO_FRAME_RATE   = 25;                     // fps
-    public static final  int    IFRAME_INTERVAL    = 5;                      // 5 seconds between I-frames
+    public static final  int    IFRAME_INTERVAL    = 1;                      // 5 seconds between I-frames
     public static final  int    VIDEO_BIT_RATE     = 180000;                 // 默认 bps = videoFrameRate * width * height * 1.5f;
-    public static final  int    VIDEO_RECORD_WIDTH = 480;
-    public static final  int    VIDEO_RECORD_HEIGH = 640;
+    public static final  int    VIDEO_RECORD_WIDTH = 768;
+    public static final  int    VIDEO_RECORD_HEIGH = 1024;
     public static final  float  VIDEO_ASPECT_RATIO = 4 / 3f;                 // 宽高比
     /** 其余的视频参数，由当前机型动态适配算法提供 */
 
     // 输出音频参数配置
     private static final String MIME_AUDIO_TYPE    = "audio/mp4a-latm";
     private static final int    AUDIO_FORMAT       = AudioFormat.ENCODING_PCM_16BIT;
-    private static final int    SAMPLES_PER_FRAME  = 1024 * 2;               // AAC, frameBytes/frame/channel
+    private static final int    SAMPLES_PER_FRAME  = 1024;                   // 单位帧率，单位音频帧容量 AAC, frameBytes/frame/channel
     private static final int    FRAMES_PER_BUFFER  = 25;                     // AAC, frame/buffer/sec
-    private static final int    AUDIO_SAMPLE_RATE  = 44100;                  // 44100hz
-    private static final int    AUDIO_BIT_RATE     = 128000;                 // bps  比特率 = 采样率 x 采用位数 x声道数
+    private static final int    AUDIO_SAMPLE_RATE  = 32000;                  // 采样质量，单位音频采样hz
+    private static final int    AUDIO_BIT_RATE     = 32000;                  // 音频质量，单位音频处理hz
     private static final int    CHANNEL_CONFIG     = CHANNEL_IN_MONO;        // CHANNEL_IN_STEREO 立体声
     private static final int    CHANNEL_COUNT      = 1;                      // 1 channel
 

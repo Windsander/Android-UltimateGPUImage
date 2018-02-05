@@ -2,9 +2,9 @@ package cn.co.willow.android.ultimate.gpuimage.utils;
 
 public class GPUImageNativeLibrary {
     static {
-        LogUtil.e("GPUImageNativeLibrary::", "yuv-decoder loading start");
+        LogUtil.i("GPUImageNativeLibrary::", "yuv-decoder loading start");
         System.loadLibrary("yuv-decoder");
-        LogUtil.e("GPUImageNativeLibrary::", "yuv-decoder loading finish");
+        LogUtil.i("GPUImageNativeLibrary::", "yuv-decoder loading finish");
     }
 
     public static native void YUVtoRBGA(byte[] yuv, int width, int height, int[] out);

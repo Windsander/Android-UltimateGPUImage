@@ -28,10 +28,11 @@ class VideoEncoder extends Thread {
     private MediaCodec            mVideoEncoder;
     private MediaCodec.BufferInfo mVideoBufferInfo;
 
-    private volatile boolean isExit        = false;
-    private          double  prevOutputPTS = 0;
+    private boolean isExit        = false;
+    private double  prevOutputPTS = 0;
 
     private OutputConfig.VideoOutputConfig mVideoConfig;
+    private String                         encoderState;
 
     VideoEncoder(OutputConfig.VideoOutputConfig videoConfig, XMediaMuxer mMediaMuxer) {
         try {
@@ -121,7 +122,9 @@ class VideoEncoder extends Thread {
         super.start();
     }
 
-    public void exit() {
+    public void exit(OnFinishCallBack mOnFinishCallBack) {
+        this.mOnFinishCallBack = mOnFinishCallBack;
+        sendEOS();
         isExit = true;
     }
 
@@ -147,50 +150,94 @@ class VideoEncoder extends Thread {
         if (mVideoEncoder != null) {
             mVideoEncoder.stop();
             mVideoEncoder.release();
-            mVideoEncoder = null;
         }
     }
 
+
+    /*录屏编码逻辑====================================================================================*/
     private void autoEncodeFrame() {
-        while (!isExit) {
+        while (true) {
             if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
-            synchronized (this) {
-                if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
-                prevOutputPTS = mVideoBufferInfo.presentationTimeUs;
-                int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
-                switch (encoderStatus) {
-                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                        LogUtil.i("VideoEncoder", "INFO_OUTPUT_BUFFERS_CHANGED");
-                        break;
-                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                        MediaFormat newFormat = mVideoEncoder.getOutputFormat();
-                        mMediaMuxer.addMediaTrack(TRACK_VIDEO, newFormat);
-                        LogUtil.i("VideoEncoder", "New format " + newFormat);
-                        break;
-                    case MediaCodec.INFO_TRY_AGAIN_LATER:
-                        try {
-                            Thread.sleep(10);       // wait 10ms
-                            LogUtil.i("VideoEncoder", "dequeueOutputBuffer timed out!");
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    default:
-                        final ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[encoderStatus];
-                        LogUtil.i("VideoEncoder", "We can't use this buffer but render it due to the API limit, " + outputBuffer);
+            prevOutputPTS = Math.max(mVideoBufferInfo.presentationTimeUs, prevOutputPTS);
+            /*处理输出数据*/
+            if (mVideoEncoder == null) return;
+            int outputBufferId = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
+            //LogUtil.i("VideoEncoder", "outputBufferId is " + outputBufferId + " " + getEncoderState(outputBufferId));
+            switch (outputBufferId) {
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                    break;
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                    MediaFormat newFormat = mVideoEncoder.getOutputFormat();
+                    mMediaMuxer.addMediaTrack(TRACK_VIDEO, newFormat);
+                    break;
+                case MediaCodec.INFO_TRY_AGAIN_LATER:
+                    try {
+                        Thread.sleep(10);       // wait 10ms
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    if (outputBufferId >= 0) {
+                        ByteBuffer outputBuffer = mVideoEncoder.getOutputBuffers()[outputBufferId];
                         if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                             mVideoBufferInfo.size = 0;
                         }
-                        if (mVideoBufferInfo.size != 0 && mMediaMuxer != null) {
-                            LogUtil.i("VideoEncoder", "| timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms |");
-                            outputBuffer.position(mVideoBufferInfo.offset);
-                            outputBuffer.limit(mVideoBufferInfo.offset + mVideoBufferInfo.size);
-                            mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
+                        if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            if (mOnFinishCallBack != null) {
+                                mOnFinishCallBack.onFinish();
+                            }
+                            return;
                         }
-                        mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
-                        break;
-                }
+                        if (mVideoBufferInfo.size == 0) {
+                            LogUtil.d("VideoEncoder", "info.size == 0, drop it.");
+                            outputBuffer = null;
+                        } else {
+                            LogUtil.d("VideoEncoder", "got buffer, info: size=" + mVideoBufferInfo.size
+                                    + ", presentationTimeUs=" + mVideoBufferInfo.presentationTimeUs
+                                    + ", offset=" + mVideoBufferInfo.offset);
+                        }
+                        if (outputBuffer != null && mMediaMuxer != null) {
+                            LogUtil.d("VideoEncoder", "timestamp:: " + mVideoBufferInfo.presentationTimeUs / 1000 + "ms");
+                            mMediaMuxer.addMuxerData(TRACK_VIDEO, outputBuffer, mVideoBufferInfo);
+                            outputBuffer.clear();
+                        }
+                        mVideoEncoder.releaseOutputBuffer(outputBufferId, true);
+                    } else {
+                        LogUtil.i("VideoEncoder", "OutputBuffer's cur-index less than zero");
+                    }
+                    break;
             }
+        }
+    }
+
+    private void sendEOS() {
+        LogUtil.w("VideoEncoder", "sending EOS");
+        mVideoEncoder.signalEndOfInputStream();
+    }
+
+
+    /*关键回掉========================================================================================*/
+    private OnFinishCallBack mOnFinishCallBack;
+
+    public interface OnFinishCallBack {
+        void onFinish();
+    }
+
+    private String getEncoderState(int outputBufferId) {
+        switch (outputBufferId) {
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                return "output buffers changed";
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                return "output format changed";
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                return "dequeueOutputBuffer timed out! Insufficient Buffer!!";
+            default:
+                if (outputBufferId >= 0) {
+                    return "Dealing with data!!";
+                } else {
+                    return "OutputBuffer's cur-index less than zero";
+                }
         }
     }
 

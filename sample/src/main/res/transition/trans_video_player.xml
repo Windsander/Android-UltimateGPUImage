@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <changeBounds>
+        <targets android:targetName="@string/trans_video_player"/>
+    </changeBounds>
+    <fade android:fadingMode="fade_in">
+        <targets android:targetName="@string/trans_video_player"/>
+    </fade>
+    <explode>
+        <targets android:targetName="@string/trans_video_player"/>
+    </explode>
+</transitionSet>

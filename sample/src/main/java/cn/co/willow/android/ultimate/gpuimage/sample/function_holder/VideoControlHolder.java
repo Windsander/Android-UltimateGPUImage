@@ -1,9 +1,17 @@
 package cn.co.willow.android.ultimate.gpuimage.sample.function_holder;
 
 import android.app.Activity;
+import android.support.v7.widget.CardView;
+import android.transition.ChangeBounds;
+import android.transition.Fade;
+import android.transition.TransitionManager;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -20,10 +28,12 @@ import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
 public class VideoControlHolder extends BaseHolder implements View.OnClickListener {
 
     /*关键变量=======================================================================================*/
-    private Button mBtnRecordsVideo;
-    private Button mBtnSwitchCamera;
-    private boolean isRecording;
-    private ImageView mBtnLastestVideo;
+    private CardView     mCVLastVideoCont;
+    private ImageView    mBtnLastestVideo;
+    private LinearLayout mRLRecordControl;
+    private Button       mBtnRecordsVideo;
+    private Button       mBtnSwitchCamera;
+    private boolean      isRecording;
 
     public VideoControlHolder(Activity context) {
         super(context);
@@ -35,6 +45,8 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
     @Override
     public View initView() {
         View view = View.inflate(context, R.layout.holder_video_controller, null);
+        mCVLastVideoCont = (CardView) view.findViewById(R.id.last_video_cont);
+        mRLRecordControl = (LinearLayout) view.findViewById(R.id.record_controller);
         mBtnRecordsVideo = (Button) view.findViewById(R.id.start_record_btn);
         mBtnSwitchCamera = (Button) view.findViewById(R.id.switch_camera_btn);
         mBtnLastestVideo = (ImageView) view.findViewById(R.id.last_video_btn);
@@ -51,8 +63,10 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
                 if (mRecordControlCallBack != null) {
                     if (isRecording) {
                         mRecordControlCallBack.stopRecord();
+                        setReviewState(true);
                     } else {
                         mRecordControlCallBack.startRecord();
+                        setReviewState(false);
                     }
                 }
                 break;
@@ -87,12 +101,56 @@ public class VideoControlHolder extends BaseHolder implements View.OnClickListen
 
     public void setVideoCover(String gifUrl) {
         LogUtil.w("Cover URL is::" + gifUrl);
-        Glide.with(context)
-                .load(gifUrl)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .centerCrop()
-                .crossFade()
-                .into(mBtnLastestVideo);
+        try {
+            Glide.with(context)
+                 .load(gifUrl)
+                 .diskCacheStrategy(DiskCacheStrategy.NONE)
+                 .centerCrop()
+                 .crossFade()
+                 .into(mBtnLastestVideo);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    /*预览动画========================================================================================*/
+    public void setReviewState(boolean isShow) {
+        if (mCVLastVideoCont != null && mRLRecordControl != null) {
+            TransitionManager.beginDelayedTransition(mCVLastVideoCont, new Fade());
+            TransitionManager.beginDelayedTransition(mRLRecordControl, new ChangeBounds());
+            mCVLastVideoCont.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    /*滤镜说明动画====================================================================================*/
+    public void enterAnim() {
+        AlphaAnimation alphaAnim = new AlphaAnimation(0, 1);
+        alphaAnim.setDuration(200);
+        view.setAnimation(alphaAnim);
+        view.setVisibility(View.VISIBLE);
+        view.animate();
+    }
+
+    public void exitAnim() {
+        AlphaAnimation alphaAnim = new AlphaAnimation(1, 0);
+        alphaAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        alphaAnim.setDuration(200);
+        view.setAnimation(alphaAnim);
+        view.animate();
     }
 
 

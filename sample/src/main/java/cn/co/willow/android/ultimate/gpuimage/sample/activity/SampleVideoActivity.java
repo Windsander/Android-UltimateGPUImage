@@ -1,15 +1,26 @@
-package cn.co.willow.android.ultimate.gpuimage.sample;
+package cn.co.willow.android.ultimate.gpuimage.sample.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import java.io.File;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render.VideoRecorderRenderer;
+import cn.co.willow.android.ultimate.gpuimage.sample.R;
+import cn.co.willow.android.ultimate.gpuimage.sample.SampleApplication;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoControlHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.function_holder.VideoRecordHolder;
 import cn.co.willow.android.ultimate.gpuimage.sample.interaction_logic.SamplePresenter;
@@ -22,7 +33,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-public class SampleActivity extends AppCompatActivity {
+public class SampleVideoActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +43,9 @@ public class SampleActivity extends AppCompatActivity {
         initFunctionContainer();
         initFuncOperatePannel();
         bindControlToRecorder();
+
+        // set page animator
+        initPageAnimator();
     }
 
     @Override
@@ -44,6 +58,78 @@ public class SampleActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mVideoRecordHolder.releaseCamera();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mVideoRecordHolder != null) {
+            if (!mVideoRecordHolder.isFinish()) {
+                UIUtils.showToastSafe(R.string.exit_unsafe_toast);
+                return;
+            } else {
+                mFunctionContainer.removeAllViews();
+            }
+        }
+        if (videoControlHolder != null) {
+            videoControlHolder.exitAnim();
+        }
+        super.onBackPressed();
+    }
+
+
+    /*auxiliary method for this page================================================================*/
+    private void initPageAnimator() {
+        Transition enterTrans = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_enter);
+        Transition exitTrans  = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_exit);
+        getWindow().setEnterTransition(enterTrans);
+        getWindow().setSharedElementEnterTransition(initSharedElementEnterTransition());
+        getWindow().setExitTransition(exitTrans);
+    }
+
+    private Transition initSharedElementEnterTransition() {
+        final Transition shareTrans = TransitionInflater.from(this).inflateTransition(R.transition.trans_control_pannel);
+        shareTrans.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+                if (videoControlHolder == null) return;
+                View mControlPannel = videoControlHolder.getRootView();
+                mControlPannel.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+               /* View mRippleWave = findViewById(R.id.control_pannel);
+                Animator circularReveal = ViewAnimationUtils.createCircularReveal(mRippleWave,
+                        mRippleWave.getWidth() / 2,
+                        mRippleWave.getHeight() / 2,
+                        mRippleWave.getWidth() / 2,
+                        Math.max(mRippleWave.getWidth(), mRippleWave.getHeight())
+                );
+                circularReveal.setDuration(600);
+                circularReveal.start();*/
+
+                if (videoControlHolder != null) {
+                    videoControlHolder.enterAnim();
+                }
+                shareTrans.removeListener(this);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
+        return shareTrans;
     }
 
 
@@ -75,7 +161,7 @@ public class SampleActivity extends AppCompatActivity {
     /** 初始化历史视屏栏 */
     private void initFuncOperatePannel() {
         mFuncOperatePannel = (FrameLayout) findViewById(R.id.control_pannel);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mFuncOperatePannel.getLayoutParams();
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mFuncOperatePannel.getLayoutParams();
         params.height = (UIUtils.getScreenHeight() - (int) (UIUtils.getScreenWidth() * 4 / 3f)) - UIUtils.dip2px(8);
         mFuncOperatePannel.setLayoutParams(params);
         videoControlHolder = new VideoControlHolder(this);
@@ -101,7 +187,7 @@ public class SampleActivity extends AppCompatActivity {
         videoControlHolder.setOnRecordStateListener(new VideoControlHolder.RecordControlCallBack() {
             @Override
             public void playVideo() {
-                mInteractionLogic.doPlayerVideo(SampleActivity.this);
+                mInteractionLogic.doPlayerVideo(SampleVideoActivity.this);
             }
             @Override
             public void startRecord() {

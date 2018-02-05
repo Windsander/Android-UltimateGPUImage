@@ -81,7 +81,7 @@ public class LogUtil {
     private static boolean showMethodInfo = true;                           // 是否显示方法信息
     private static boolean showThreadName = true;                           // 是否显示线程信息
     private static boolean showDateTime   = true;                           // 是否显示日志信息
-    private static boolean showWithFormat = true;                           // 是否启用表格格式
+    private static boolean showWithFormat = false;                          // 是否启用表格格式
 
     @SuppressLint("SimpleDateFormat")
     private static SimpleDateFormat logFullDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
