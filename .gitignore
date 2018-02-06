@@ -12,3 +12,4 @@ libs/
 # JCenter config #
 ############
 library/bintray.properties
+.idea/modules.xml

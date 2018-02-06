@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.blend_mode;
 
 /**
- * 加深混合,通常用于重叠类型，可以类推Proter&Duff 的 darken 渲染模式
+ * 加深混合,通常用于重叠类型,可以类推Proter&Duff 的 darken 渲染模式
  */
 public class GPUImageDarkenBlendFilter extends GPUImageTwoInputFilter {
 

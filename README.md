@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compile 'cn.co.willow.android.ultimate.gpuimage:library:1.0.2'
+    compile 'cn.co.willow.android.ultimate.gpuimage:library:1.0.3'
 }
 ```
 
