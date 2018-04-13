@@ -1,32 +1,13 @@
-/*
- * Copyright (C) 2017 Willow
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling;
 
-package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter_group;
-
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilterGroup;
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter.GPUImageGrayscaleFilter;
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
+import android.opengl.GLES30;
 
 /**
- * 索贝尔黑白边缘强调滤镜，本滤镜为索贝尔算子算法结合灰度滤镜组成
- * 基本效果为素描滤镜的反色，一个标准的索贝尔结果
- * Applies sobel edge detection on the image.
+ * 严格索贝尔算子边缘检测滤镜
  */
-public class GPUImageSobelEdgeDetection extends GPUImageFilterGroup {
-    public static final String SOBEL_EDGE_DETECTION = "" +
+public class GPUImageSobelThresholdFilter extends GPUImage3x3TextureSamplingFilter {
+
+    public static final String SOBEL_THRESHOLD_EDGE_DETECTION = "" +
             "precision mediump float;\n" +
             "\n" +
             "varying vec2 textureCoordinate;\n" +
@@ -42,6 +23,9 @@ public class GPUImageSobelEdgeDetection extends GPUImageFilterGroup {
             "varying vec2 bottomRightTextureCoordinate;\n" +
             "\n" +
             "uniform sampler2D inputImageTexture;\n" +
+            "uniform lowp float threshold;\n" +
+            "\n" +
+            "const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);\n" +
             "\n" +
             "void main()\n" +
             "{\n" +
@@ -56,18 +40,38 @@ public class GPUImageSobelEdgeDetection extends GPUImageFilterGroup {
             "    float h = -topLeftIntensity - 2.0 * topIntensity - topRightIntensity + bottomLeftIntensity + 2.0 * bottomIntensity + bottomRightIntensity;\n" +
             "    float v = -bottomLeftIntensity - 2.0 * leftIntensity - topLeftIntensity + bottomRightIntensity + 2.0 * rightIntensity + topRightIntensity;\n" +
             "\n" +
-            "    float mag = length(vec2(h, v));\n" +
+            "    float mag = 1.0 - length(vec2(h, v));\n" +
+            "    mag = step(threshold, mag);\n" +
             "\n" +
             "    gl_FragColor = vec4(vec3(mag), 1.0);\n" +
-            "}";
+            "}\n";
 
-    public GPUImageSobelEdgeDetection() {
-        super();
-        addFilter(new GPUImageGrayscaleFilter());
-        addFilter(new GPUImage3x3TextureSamplingFilter(SOBEL_EDGE_DETECTION));
+    private int mUniformThresholdLocation;
+    private float mThreshold = 0.9f;
+
+    public GPUImageSobelThresholdFilter() {
+        this(0.9f);
     }
 
-    public void setLineSize(final float size) {
-        ((GPUImage3x3TextureSamplingFilter) getFilters().get(1)).setLineSize(size);
+    public GPUImageSobelThresholdFilter(float threshold) {
+        super(SOBEL_THRESHOLD_EDGE_DETECTION);
+        mThreshold = threshold;
+    }
+
+    @Override
+    public void onInit() {
+        super.onInit();
+        mUniformThresholdLocation = GLES30.glGetUniformLocation(getProgram(), "threshold");
+    }
+
+    @Override
+    public void onInitialized() {
+        super.onInitialized();
+        setThreshold(mThreshold);
+    }
+
+    public void setThreshold(final float threshold) {
+        mThreshold = threshold;
+        setFloat(mUniformThresholdLocation, threshold);
     }
 }

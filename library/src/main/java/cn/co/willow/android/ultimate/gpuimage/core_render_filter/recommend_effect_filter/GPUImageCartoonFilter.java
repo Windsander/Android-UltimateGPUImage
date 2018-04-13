@@ -2,7 +2,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effe
 
 import android.opengl.GLES30;
 
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
+import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
 
 /**
  * 特效滤镜：卡通效果滤镜，使用索贝尔边缘检测，随后转换填充色使图片展现卡通效果

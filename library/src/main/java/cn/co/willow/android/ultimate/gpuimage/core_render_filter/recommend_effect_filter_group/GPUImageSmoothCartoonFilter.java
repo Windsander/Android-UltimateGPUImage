@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter_group;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilterGroup;
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_2_pass_sampling.GPUImageGaussianBlurFilter;
+import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_dual_sampling.GPUImageGaussianBlurFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter.GPUImageCartoonFilter;
 
 /**

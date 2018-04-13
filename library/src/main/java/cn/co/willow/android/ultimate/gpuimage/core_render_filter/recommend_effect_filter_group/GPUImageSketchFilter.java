@@ -18,7 +18,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effe
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilterGroup;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.base_filter.GPUImageGrayscaleFilter;
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
+import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling.GPUImage3x3TextureSamplingFilter;
 
 /**
  * 素描滤镜，本滤镜为反色索贝尔算子算法结合灰度滤镜组成

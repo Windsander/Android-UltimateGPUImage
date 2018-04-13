@@ -16,7 +16,7 @@
 
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter;
 
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling.GPUImage3x3ConvolutionFilter;
+import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling.GPUImage3x3ConvolutionFilter;
 
 /**
  * 特效滤镜：浮雕效果，值范围 0.0~4.0，1.0为正常值

@@ -2,7 +2,7 @@ package cn.co.willow.android.ultimate.gpuimage.sample.self_defined_filter;
 
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.color_enhance_filter.GPUImageColorInvertFilter;
-import cn.co.willow.android.ultimate.gpuimage.core_render_filter.image_enhance_filter.filter_3x3_sampling.GPUImageSobelThresholdFilter;
+import cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sampling.GPUImageSobelThresholdFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter.GPUImageHalftoneFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter.GPUImageHazeFilter;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.recommend_effect_filter.GPUImageKuwaharaFilter;
