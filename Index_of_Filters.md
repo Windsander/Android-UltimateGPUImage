@@ -1,16 +1,45 @@
 
----
-
-**<font size = 6>First of all</p></font>**
-**Every single filter is based on <font color = red>GPUImageFilter</font>**</p>
-**Every filter group is based on  <font color = red>GPUImageFilterGroup</font>**</p>
+# First of all
+**Every single filter is based on ==GPUImageFilter==**</p>
+**Every filter group is based on ==GPUImageFilterGroup==**</p>
 They are the foundation of all filter we see here. So, you need to extend directly form this two or their subclass, if you want to design your own filters.
 
 ---
 
-**<font size = 6>Index</font>**
+# Index
 
-[toc]
+<ul class="toc">
+  <li>
+    <a href="#base-filter">Base filter</a>
+  </li>
+  <li>
+    <a href="#color-enhance-filter">Color Enhance Filter</a>
+  </li>
+  <li>
+    <a href="#conversion-filter">Conversion Filter</a>
+  </li>
+  <li>
+    <a href="#image-enhance-filter">Image Enhance Filter</a>
+    <ul>
+      <li>
+        <a href="#blend-mode-color-mapping-blend">Blend Mode: Color Mapping Blend</a>
+      </li>
+      <li>
+        <a href="#blend-mode-mix-control-blend">Blend Mode: Mix Control Blend</a>
+      </li>
+      <li>
+        <a href="#blend-mode-filter">Blend Mode Filter</a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <a href="#dual-sampling-filter">Dual Sampling Filter</a>
+  </li>
+  <li>
+    <a href="#3x3-sampling-filter">3x3 Sampling Filter</a>
+  </li>
+</ul>
+
 
 # Base filter
 
