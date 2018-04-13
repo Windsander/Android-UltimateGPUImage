@@ -1,10 +1,10 @@
 
 # First of all
-**Every single filter is based on ==GPUImageFilter==**</p>
-**Every filter group is based on ==GPUImageFilterGroup==**</p>
+
+**Every single filter should base on ==GPUImageFilter==**</p>
+**Every filter group should base on ==GPUImageFilterGroup==**</p>
 They are the foundation of all filter we see here. So, you need to extend directly form this two or their subclass, if you want to design your own filters.
 
----
 
 # Index
 
