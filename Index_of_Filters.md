@@ -19,7 +19,7 @@ They are the foundation of all filter we see here. So, you need to extend direct
     <a href="#conversion-filter">Conversion Filter</a>
   </li>
   <li>
-    <a href="#image-enhance-filter">Image Enhance Filter</a>
+    <a href="#blend-mode-filter">Blend Mode Filter</a>
     <ul>
       <li>
         <a href="#blend-mode-color-mapping-blend">Blend Mode: Color Mapping Blend</a>
