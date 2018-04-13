@@ -17,9 +17,12 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="14dp"
+        android:gravity="center"
         android:layout_marginStart="14dp"
+        android:drawableStart="@drawable/oval_red_point"
         android:textColor="@android:color/white"
         android:textSize="6pt"
+        android:drawablePadding="3dp"
         tools:text="辣鸡鸡丝"/>
 
     <TextView
@@ -35,6 +38,7 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="5dp"
+        android:shadowColor="@color/cardview_shadow_end_color"
         android:textColor="@android:color/white"
         android:textSize="8pt"
         android:visibility="gone"
