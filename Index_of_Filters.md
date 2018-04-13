@@ -93,7 +93,7 @@ GPUImageSphereRefractionFilter  |Make a sphere based on image. sphere will show 
 GPUImageSwirlFilter             |Creates a swirl distortion on the image.
 GPUImageVignetteFilter          |Performs a vignetting effect, fading out the image at the edges
 
-# Image Enhance Filter
+# Blend Mode Filter
 
 Based on **GPUImageTwoInputFilter**, which deal with 2 input texture.</p>
 You should prepare fragment-shader by youself.
@@ -122,7 +122,7 @@ GPUImageAlphaBlendFilter        |Blend two textures and control alpha-ratio
 GPUImageDissolveBlendFilter     |Blend two textures and control dissolve-ratio
 GPUImageMixBlendFilter          |Blend two textures and control mix-ratio
 
-## Blend Mode Filter
+## Blend Mode: Common
 
 Filter | Usage
 ---|---
