@@ -1,17 +1,27 @@
+
+[toc]
+
 # Android-UltimateGPUImage
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/windsander/UltimateGPUImage/library/images/download.svg) ](https://bintray.com/windsander/UltimateGPUImage/library/_latestVersion)
 
-provide video record function with filter and other cool staff. 
+provide video record function with filter and other cool staff.
 
 Idea from: [android-gpuimage](https://github.com/CyberAgent/android-gpuimage),which is aim to be [iOS GPUImage framework](https://github.com/BradLarson/GPUImage) in Android device.
 
 The Elder said:
 >Goal is to have something as similar to GPUImage as possible. Vertex and fragment shaders are exactly the same. That way it makes it easier to port filters from GPUImage iOS to Android.
 
-Because android-gpuimage is deprecated so long, that cause the original project is not adjust today's quest. This project deal some bug and make more effective than the elder one. Add additional powerful recorder module, which is based on design idea of Module Partition. 
-So, may the GPUImage be with us =p.  
+Because android-gpuimage is deprecated so long, that cause the original project is not adjust today's quest. This project deal some bug and make more effective than the elder one. Add additional powerful recorder module, which is based on design idea of Module Partition.
+So, may the GPUImage be with us =p.
 
+
+## Filter Index
+
+Want to see what filter the library already provide? </p>
+You should take a look at filter index with:
+- [EN_Version](/Index_of_Filters.md) </p>
+- [CN_Version](/Index_of_Filters.md)  (还未准备好) </p>
 
 ## Requirements
 * Android 4.3.1 or higher (OpenGL ES 3.0)
@@ -31,7 +41,7 @@ dependencies {
 ```
 
 ### Sample Code
-how to use recorder module, in a simple way. 
+how to use recorder module, in a simple way.
 
 if you want to use this lib to record or take picture:
 ```java
@@ -43,15 +53,15 @@ public void onCreate(final Bundle savedInstanceState) {
     // prepare camera preview, and bind to recorder manager.
     mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
     mRecordManager = new VideoRecordManager(context, mRecorderViews);
-    
+
     // u can use this method to set ur own config rather than default one.(this is not necessary)
     mRecordManager.setAVConfig(videoConfig, audioConfig);
-    
+
     // and now, we can start the camera
     mRecordManager.openCamera();
-  
+
     // if u want use filter, this method can be called in any place
-    mRecordManager.setFilter(/*filter*/); 
+    mRecordManager.setFilter(/*filter*/);
 
     // when record start
     mRecordManager.startRecord(/*videoSaveFile*/);
@@ -74,11 +84,11 @@ public void onCreate(final Bundle savedInstanceState) {
 
     // prepare surface.
     mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
-    
+
     // prepare the filter you want to use
     final GPUImageContrastFilter contrastFilter = new GPUImageContrastFilter(1.0f);
     contrastFilter.setContrast(contrastValue);
-    
+
     // bind to PureImageManager and render
     PureImageManager.init(context)
                     .setGLSurfaceView(mRecorderViews)
@@ -98,7 +108,7 @@ gradle clean assemble
 ```
 
 ## License
-    Copyright 2017 Winsander, Inc.
+    Copyright 2017-2020 Willow.li
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
