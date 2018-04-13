@@ -1,6 +1,4 @@
 
-[toc]
-
 # Android-UltimateGPUImage
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/windsander/UltimateGPUImage/library/images/download.svg) ](https://bintray.com/windsander/UltimateGPUImage/library/_latestVersion)
@@ -14,6 +12,33 @@ The Elder said:
 
 Because android-gpuimage is deprecated so long, that cause the original project is not adjust today's quest. This project deal some bug and make more effective than the elder one. Add additional powerful recorder module, which is based on design idea of Module Partition.
 So, may the GPUImage be with us =p.
+
+
+<ul class="toc">
+  <li>
+    <a href="#filter-index">Filter Index</a>
+  </li>
+  <li>
+    <a href="#requirements">Requirements</a>
+  </li>
+  <li>
+    <a href="#usage">Usage</a>
+    <ul>
+      <li>
+        <a href="#gradle-dependency">Gradle dependency</a>
+      </li>
+      <li>
+        <a href="#sample-code">Sample Code</a>
+      </li>
+      <li>
+        <a href="#gradle">Gradle</a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <a href="#license">License</a>
+  </li>
+</ul>
 
 
 ## Filter Index
