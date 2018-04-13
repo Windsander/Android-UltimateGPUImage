@@ -28,7 +28,7 @@ They are the foundation of all filter we see here. So, you need to extend direct
         <a href="#blend-mode-mix-control-blend">Blend Mode: Mix Control Blend</a>
       </li>
       <li>
-        <a href="#blend-mode-filter">Blend Mode Filter</a>
+        <a href="#blend-mode-common">Blend Mode: Common</a>
       </li>
     </ul>
   </li>
