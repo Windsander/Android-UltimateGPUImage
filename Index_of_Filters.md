@@ -1,8 +1,8 @@
 
 # First of all
 
-**Every single filter should base on ==GPUImageFilter==**</p>
-**Every filter group should base on ==GPUImageFilterGroup==**</p>
+**Every single filter should base on GPUImageFilter**</p>
+**Every filter group should base on GPUImageFilterGroup**</p>
 They are the foundation of all filter we see here. So, you need to extend directly form this two or their subclass, if you want to design your own filters.
 
 
@@ -106,6 +106,7 @@ The second texture is used by shader to create wanting effect.
 
 ## Blend Mode: Color Mapping Blend
 this is a perticular special filter, which use png as input params to filte stream
+
 Filter | Usage
 ---|---
 GPUImageLookupFilter            |According to giving mapping to render stream
@@ -114,6 +115,7 @@ GPUImageLookupFilter            |According to giving mapping to render stream
 this bunch of filter, use to control the situation, which have two texture to mix as one.
 
 0.0f only show texture-1, 1.0f only show texture-2
+
 Filter | Usage
 ---|---
 GPUImageAlphaBlendFilter        |Blend two textures and control alpha-ratio
@@ -121,6 +123,7 @@ GPUImageDissolveBlendFilter     |Blend two textures and control dissolve-ratio
 GPUImageMixBlendFilter          |Blend two textures and control mix-ratio
 
 ## Blend Mode Filter
+
 Filter | Usage
 ---|---
 GPUImageAddBlendFilter          |Always use to create animation, which do lighten and blur between 2 images
@@ -147,7 +150,7 @@ GPUImageSubtractBlendFilter     |Subtractly mixed 2 inputs together
 
 # Dual Sampling Filter
 
-Based on ==GPUImageTwoPassTextureSamplingFilter==.
+Based on **GPUImageTwoPassTextureSamplingFilter**.
 
 This kind of filters is two-pass, whitch is always use in some filter that needs x and y two way to deal in a single task</p>
 The shader used in this kind have to cooperate in a single task to get what we want, always two in a filter.
@@ -161,7 +164,7 @@ GPUImageRGBDilationFilter       |RGB extension edge blur.
 
 # 3x3 Sampling Filter
 
-Based on ==GPUImage3x3TextureSamplingFilter==.
+Based on **GPUImage3x3TextureSamplingFilter**.
 
 This kind of filters is use 3x3 matrix to convert color pixels, or compare single pixels surrounding to extract frame edges properties.
 
