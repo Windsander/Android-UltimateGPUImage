@@ -95,7 +95,7 @@ GPUImageVignetteFilter          |Performs a vignetting effect, fading out the im
 
 # Image Enhance Filter
 
-Based on ==GPUImageTwoInputFilter==, which deal with 2 input texture.</p>
+Based on **GPUImageTwoInputFilter**, which deal with 2 input texture.</p>
 You should prepare fragment-shader by youself.
 And this kind of filter use below method:
 ```java
