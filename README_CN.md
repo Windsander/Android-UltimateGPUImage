@@ -1,38 +1,42 @@
 
 # Android-UltimateGPUImage
-
-README：
-[中文版](/README_CN.md)</p>
-
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/windsander/UltimateGPUImage/library/images/download.svg) ](https://bintray.com/windsander/UltimateGPUImage/library/_latestVersion)
 
-provide video record function with filter and other cool staff.
+本库提供 短视频编辑、视频流处理、渲染滤镜、自定义滤镜 等图形功能。
 
-Idea from: [android-gpuimage](https://github.com/CyberAgent/android-gpuimage),which is aim to be [iOS GPUImage framework](https://github.com/BradLarson/GPUImage) in Android device.
+想法来自于: Android 开源库 [android-gpuimage](https://github.com/CyberAgent/android-gpuimage)，一个类似于 [iOS GPUImage framework](https://github.com/BradLarson/GPUImage) 的开源滤镜库。
 
 The Elder said:
 >Goal is to have something as similar to GPUImage as possible. Vertex and fragment shaders are exactly the same. That way it makes it easier to port filters from GPUImage iOS to Android.
 
-Because android-gpuimage is deprecated so long, that cause the original project is not adjust today's quest. This project deal some bug and make more effective than the elder one. Add additional powerful recorder module, which is based on design idea of Module Partition.
-So, may the GPUImage be with us =p.
+相对来说，android-gpuimage 这个库已经好一段时间没有更新了。我觉老版本库中的一些特性，已经不能很好的满足当前的实际需求。因此，本项目的目的是为了在原有的 android-gpuimage 的出发点下，重新对框架进行扩展性设计和整合，解决已知bug并增加新的短视频相关功能。</p>
+新框架有以下几个优点：
+- 架构上进行了重新设计、重构
+- 新增加视频录制相关功能（功能占库 51%，请自行决定是否使用）
+- 对已有的可用的滤镜进行了整合归纳
+- 修改了部分 android-gpuimage 中有 bug 的无法使用的滤镜
+- 优化了部分滤镜效果
+- 采用模块化的设计思路
+
+愿 GPUImage 与你我同在。
 
 
 <ul class="toc">
   <li>
-    <a href="#filter-index">Filter Index</a>
+    <a href="#滤镜目录">滤镜目录</a>
   </li>
   <li>
-    <a href="#requirements">Requirements</a>
+    <a href="#环境要求">环境要求</a>
   </li>
   <li>
-    <a href="#usage">Usage</a>
+    <a href="#使用方法">使用方法</a>
     <ul>
       <li>
-        <a href="#gradle-dependency">Gradle dependency</a>
+        <a href="#gradle依赖配置">Gradle依赖配置</a>
       </li>
       <li>
-        <a href="#sample-code">Sample Code</a>
+        <a href="#简单示例">简单示例</a>
       </li>
       <li>
         <a href="#gradle">Gradle</a>
@@ -45,19 +49,19 @@ So, may the GPUImage be with us =p.
 </ul>
 
 
-## Filter Index
+## 滤镜目录
 
-Want to see what filter the library already provide? </p>
-You should take a look at filter index with:
+想要看一看本库提供的滤镜都有哪些？</p>
+你需要的是一份详细的滤镜列表:
 - [EN_Version](/Index_of_Filters.md) </p>
 - [CN_Version](/Index_of_Filters.md)  (还未准备好) </p>
 
-## Requirements
+## 环境要求
 * Android 4.3.1 or higher (OpenGL ES 3.0)
 
-## Usage
+## 使用方法
 
-### Gradle dependency
+### Gradle依赖配置
 
 ```groovy
 repositories {
@@ -69,10 +73,12 @@ dependencies {
 }
 ```
 
-### Sample Code
-how to use recorder module, in a simple way.
+### 简单示例
 
-if you want to use this lib to record or take picture:
+如何快速的使用本库的录制模块，请看下面的例子。
+
+如果你想渲染一张图片的话：
+
 ```java
 @Override
 public void onCreate(final Bundle savedInstanceState) {
@@ -104,7 +110,8 @@ public void onCreate(final Bundle savedInstanceState) {
 ```
 
 
-if you just want to operate an image, you can do like this:
+如果你想操作视频流的话:
+
 ```java
 @Override
 public void onCreate(final Bundle savedInstanceState) {
@@ -130,7 +137,7 @@ public void onCreate(final Bundle savedInstanceState) {
 
 
 ### Gradle
-Make sure that you run the clean target when using maven.
+保证你在下载资源的时候，清空gradle缓存.
 
 ```groovy
 gradle clean assemble
