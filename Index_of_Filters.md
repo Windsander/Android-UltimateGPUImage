@@ -141,7 +141,7 @@ GPUImageLightenBlendFilter      |Soft lighten mode, use to create overlap effect
 GPUImageLinearBurnBlendFilter   |Simple linear blend
 GPUImageLuminosityBlendFilter   |Illuminate the first texture with second texture as render layer (not spot light), can use to "beautify" image
 GPUImageMultiplyBlendFilter     |Multi-blend with second texture, use to create shadow & deep-scale effect
-GPUImageNormalBlendFilter       |Like System Blend Mode
+GPUImageSimpleOverlayBlendFilter|Overlay with simplified overlay algorithm.
 GPUImageOverlayBlendFilter      |Overlay two inputs together, use to create shadow
 GPUImageScreenBlendFilter       |Wrap up first texture with second
 GPUImageSoftLightBlendFilter    |Create shoft light effect with second texture

@@ -50,7 +50,7 @@ So, may the GPUImage be with us =p.
 Want to see what filter the library already provide? </p>
 You should take a look at filter index with:
 - [EN_Version](/Index_of_Filters.md) </p>
-- [CN_Version](/Index_of_Filters.md)  (还未准备好) </p>
+- [CN_Version](/Index_of_Filters_CN.md) </p>
 
 ## Requirements
 * Android 4.3.1 or higher (OpenGL ES 3.0)

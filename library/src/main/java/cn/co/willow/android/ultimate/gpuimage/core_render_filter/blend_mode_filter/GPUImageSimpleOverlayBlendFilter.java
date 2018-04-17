@@ -15,7 +15,7 @@ package cn.co.willow.android.ultimate.gpuimage.core_render_filter.blend_mode_fil
  * For some reason Photoshop behaves
  * D = C1 + C2 * C2a * (1 - C1a)
  */
-public class GPUImageNormalBlendFilter extends GPUImageTwoInputFilter {
+public class GPUImageSimpleOverlayBlendFilter extends GPUImageTwoInputFilter {
 
     public static final String NORMAL_BLEND_FRAGMENT_SHADER = "" +
             "varying highp vec2 textureCoordinate;\n" +
@@ -42,7 +42,7 @@ public class GPUImageNormalBlendFilter extends GPUImageTwoInputFilter {
             "     gl_FragColor = outputColor;\n" +
             " }";
 
-    public GPUImageNormalBlendFilter() {
+    public GPUImageSimpleOverlayBlendFilter() {
         super(NORMAL_BLEND_FRAGMENT_SHADER);
     }
 }

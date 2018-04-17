@@ -19,8 +19,8 @@ package cn.co.willow.android.ultimate.gpuimage.core_render_filter.filter_3x3_sam
 import android.opengl.GLES30;
 
 /**
- * 3x3卷积，高亮大色块变黑，加亮边缘、线条等
- * Runs a 3x3 convolution kernel against the image
+ * 3x3卷积，通过降低轮廓线上的像素点周边像素颜色，来实现轮廓线增亮
+ * Convolute pixels, enlight the pixel in center by taking down its surroundings, if they are at edge.
  */
 public class GPUImage3x3ConvolutionFilter extends GPUImage3x3TextureSamplingFilter {
     public static final String THREE_X_THREE_TEXTURE_SAMPLING_FRAGMENT_SHADER = "" +

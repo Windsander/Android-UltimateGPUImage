@@ -10,7 +10,7 @@
 The Elder said:
 >Goal is to have something as similar to GPUImage as possible. Vertex and fragment shaders are exactly the same. That way it makes it easier to port filters from GPUImage iOS to Android.
 
-相对来说，android-gpuimage 这个库已经好一段时间没有更新了。我觉老版本库中的一些特性，已经不能很好的满足当前的实际需求。因此，本项目的目的是为了在原有的 android-gpuimage 的出发点下，重新对框架进行扩展性设计和整合，解决已知bug并增加新的短视频相关功能。</p>
+相对来说，android-gpuimage 只提供了一些基础的滤镜操作，且已经好一段时间没有更新了。我觉老版本库已经不能很好的满足当前的实际需求。因此，本项目的目的是在保证原有的 android-gpuimage 为 Android开发者们提供简易、强大的图像操作功能 的出发点的前提下，重新对框架进行整体量级的设计和整合，解决已知bug，增强扩展性，并增加新的短视频相关功能。</p>
 新框架有以下几个优点：
 - 架构上进行了重新设计、重构
 - 新增加视频录制相关功能（功能占库 51%，请自行决定是否使用）
@@ -54,7 +54,7 @@ The Elder said:
 想要看一看本库提供的滤镜都有哪些？</p>
 你需要的是一份详细的滤镜列表:
 - [EN_Version](/Index_of_Filters.md) </p>
-- [CN_Version](/Index_of_Filters.md)  (还未准备好) </p>
+- [CN_Version](/Index_of_Filters_CN.md) </p>
 
 ## 环境要求
 * Android 4.3.1 or higher (OpenGL ES 3.0)
@@ -77,7 +77,7 @@ dependencies {
 
 如何快速的使用本库的录制模块，请看下面的例子。
 
-如果你想渲染一张图片的话：
+如果你想操作视频流的话:
 
 ```java
 @Override
@@ -109,8 +109,7 @@ public void onCreate(final Bundle savedInstanceState) {
 }
 ```
 
-
-如果你想操作视频流的话:
+如果你想渲染一张图片的话：
 
 ```java
 @Override

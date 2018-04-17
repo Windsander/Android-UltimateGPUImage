@@ -1,7 +1,7 @@
 package cn.co.willow.android.ultimate.gpuimage.core_render_filter.blend_mode_filter;
 
 /**
- * 屏幕包裹,通常用于创建亮点和镜头眩光
+ * 滤色混合，保留两个图层中较白的部分，较暗的部分被遮盖
  */
 public class GPUImageScreenBlendFilter extends GPUImageTwoInputFilter {
 
