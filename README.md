@@ -57,6 +57,13 @@ You should take a look at filter index with:
 
 ## Usage
 
+### Gradle
+Make sure that you run the clean target when using maven.
+
+```groovy
+gradle clean assemble
+```
+
 ### Gradle dependency
 
 ```groovy
@@ -126,14 +133,6 @@ public void onCreate(final Bundle savedInstanceState) {
                     .setFilter(contrastFilter)
                     .requestRender();
 }
-```
-
-
-### Gradle
-Make sure that you run the clean target when using maven.
-
-```groovy
-gradle clean assemble
 ```
 
 ## License
