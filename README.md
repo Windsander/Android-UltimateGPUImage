@@ -29,13 +29,13 @@ So, may the GPUImage be with us =p.
     <a href="#usage">Usage</a>
     <ul>
       <li>
+        <a href="#gradle">Gradle</a>
+      </li>
+      <li>
         <a href="#gradle-dependency">Gradle dependency</a>
       </li>
       <li>
         <a href="#sample-code">Sample Code</a>
-      </li>
-      <li>
-        <a href="#gradle">Gradle</a>
       </li>
     </ul>
   </li>
