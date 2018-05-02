@@ -17,7 +17,6 @@
         android:backgroundTint="@android:color/holo_blue_dark"
         android:text="@string/entry_to_video"
         android:textAllCaps="false"
-        android:transitionName="trans_video_enter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"

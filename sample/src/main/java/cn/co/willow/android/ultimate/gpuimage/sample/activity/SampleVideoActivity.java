@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Transition;
@@ -79,6 +80,8 @@ public class SampleVideoActivity extends AppCompatActivity {
 
     /*auxiliary method for this page================================================================*/
     private void initPageAnimator() {
+        String sharedViewName = getString(R.string.trans_control_pannel);
+        ViewCompat.setTransitionName(mFuncOperatePannel, sharedViewName);
         Transition enterTrans = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_enter);
         Transition exitTrans  = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_exit);
         getWindow().setEnterTransition(enterTrans);

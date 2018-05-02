@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -61,9 +62,11 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_video_recorder:
+                String sharedViewName = getString(R.string.trans_control_pannel);
+                //ViewCompat.setTransitionName(mBtnJump2Video, sharedViewName);
                 Intent intent = new Intent(this, SampleVideoActivity.class);
                 ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                        new Pair<View, String>(mBtnJump2Video, getString(R.string.trans_control_pannel)));
+                        new Pair<View, String>(mBtnJump2Video, sharedViewName));
                 startActivity(intent, optionsCompat.toBundle());
                 break;
         }
