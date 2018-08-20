@@ -85,26 +85,26 @@ public void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity);
 
-    // prepare camera preview, and bind to recorder manager.
+    // 准备预览界面，绑定管理器.
     mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
     mRecordManager = new VideoRecordManager(context, mRecorderViews);
 
-    // u can use this method to set ur own config rather than default one.(this is not necessary)
+    // 设置录制视频的音视频参数，不设置则为默认值.(并不必须)
     mRecordManager.setAVConfig(videoConfig, audioConfig);
 
-    // and now, we can start the camera
+    // 现在，我们就可以开始录制了
     mRecordManager.openCamera();
 
-    // if u want use filter, this method can be called in any place
+    // 如果你需要配置滤镜，可以调用这个方法（调用方法将替换之前设置，方法可以在任何位置调用）
     mRecordManager.setFilter(/*filter*/);
 
-    // when record start
+    // 开始视频录制
     mRecordManager.startRecord(/*videoSaveFile*/);
 
-    // when record finish
+    // 结束视频录制
     mRecordManager.stopRecord();
 
-    // if u don't want to use camera anymore.
+    // 如果不再使用，调用此方法，彻底释放资源
     mRecordManager.releaseCamera();
 }
 ```
@@ -117,14 +117,14 @@ public void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity);
 
-    // prepare surface.
+    // 准备预览层.
     mRecorderViews = (FilterRecoderView) findViewById(R.id.vp_video_recorder_gl);
 
-    // prepare the filter you want to use
+    // 配置打算使用的效果滤镜
     final GPUImageContrastFilter contrastFilter = new GPUImageContrastFilter(1.0f);
     contrastFilter.setContrast(contrastValue);
 
-    // bind to PureImageManager and render
+    // 开始纯图片处理
     PureImageManager.init(context)
                     .setGLSurfaceView(mRecorderViews)
                     .setScaleType(GPUImage.ScaleType.CENTER_INSIDE)
