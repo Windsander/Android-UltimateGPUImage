@@ -23,7 +23,9 @@ import static cn.co.willow.android.ultimate.gpuimage.core_config.FilterConfig.NO
 public class GPUImageFilter {
 
     /*着色器语言====================================================================================*/
-    /** 无渲染的顶点着色器 vertex shader without filter */
+    /**
+     * 无渲染的顶点着色器 vertex shader without filter
+     */
     protected static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 position;\n" +
             "attribute vec4 inputTextureCoordinate;\n" +
@@ -34,7 +36,9 @@ public class GPUImageFilter {
             "    textureCoordinate = inputTextureCoordinate.xy;\n" +
             "}";
 
-    /** 无渲染的片段着色器 fragment shader without filter */
+    /**
+     * 无渲染的片段着色器 fragment shader without filter
+     */
     protected static final String NO_FILTER_FRAGMENT_SHADER = "" +
             "varying highp vec2 textureCoordinate;\n" +
             "uniform sampler2D inputImageTexture;\n" +
@@ -46,15 +50,15 @@ public class GPUImageFilter {
 
     /*关键变量======================================================================================*/
     private final LinkedList<Runnable> mRunOnDraw;
-    private final String               mVertexShader;
-    private final String               mFragmentShader;
-    protected     int                  mGLProgId;                         // 着色程序片
-    protected     int                  mVertexPosition;                  // 顶点着色器顶点坐标数据索引
-    protected     int                  mVertexTexture;                   // 顶点着色器顶点纹理坐标索引
-    protected     int                  mFrag2DSampler;                   // 片段着色器2D采样器索引
-    protected     int                  mOutputWidth;
-    protected     int                  mOutputHeight;
-    private       boolean              mIsInitialized;
+    private final String mVertexShader;
+    private final String mFragmentShader;
+    protected int mGLProgId;                        // 着色程序片
+    protected int mVertexPosition;                  // 顶点着色器顶点坐标数据索引
+    protected int mVertexTexture;                   // 顶点着色器顶点纹理坐标索引
+    protected int mFrag2DSampler;                   // 片段着色器2D采样器索引
+    protected int mOutputWidth;
+    protected int mOutputHeight;
+    private boolean mIsInitialized;
 
     public GPUImageFilter() {
         this(NO_FILTER_VERTEX_SHADER, NO_FILTER_FRAGMENT_SHADER);
@@ -271,8 +275,8 @@ public class GPUImageFilter {
     public static String loadShader(String file, Context context) {
         try {
             AssetManager assetManager = context.getAssets();
-            InputStream  ims          = assetManager.open(file);
-            String       re           = convertStreamToString(ims);
+            InputStream ims = assetManager.open(file);
+            String re = convertStreamToString(ims);
             ims.close();
             return re;
         } catch (IOException e) {

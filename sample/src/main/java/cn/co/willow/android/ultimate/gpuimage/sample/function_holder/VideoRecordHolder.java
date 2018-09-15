@@ -40,13 +40,13 @@ public class VideoRecordHolder extends BaseHolder {
     private static final int REFRESH_TIME = 0x1;
 
     /*关键变量=======================================================================================*/
-    private FilterRecoderView  mRecorderViews;          // 显示视频的控件
-    private TextView           mRecorderTimer;          // 录制计时
-    private TextView           mCurFilterName;          // 当前滤镜名称
+    private FilterRecoderView mRecorderViews;       // 显示视频的控件
+    private TextView mRecorderTimer;                // 录制计时
+    private TextView mCurFilterName;                // 当前滤镜名称
     private VideoRecordManager mRecordManager;
-    private int     mCurFilter = 420;
-    private long    startTime  = 0;
-    private boolean isFinish   = true;
+    private int mCurFilter = 420;
+    private long startTime = 0;
+    private boolean isFinish = true;
 
     public VideoRecordHolder(Activity context) {
         super(context);
@@ -67,7 +67,9 @@ public class VideoRecordHolder extends BaseHolder {
         return view;
     }
 
-    /** 配置手势操作 set gesture operation */
+    /**
+     * 配置手势操作 set gesture operation
+     */
     private void initGesture() {
         mRecorderViews.setSwitchFilterListener(new FilterRecoderView.SwitchFilterListener() {
             @Override
@@ -94,7 +96,10 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*手势逻辑：滤镜================================================================================*/
-    /** 切换滤镜 switch camera filter */
+
+    /**
+     * 切换滤镜 switch camera filter
+     */
     public synchronized void doSwitchFilter(int orientation) {
         switch (orientation) {
             case ORIENTATION_LEFT:
@@ -111,7 +116,9 @@ public class VideoRecordHolder extends BaseHolder {
         mRecordManager.setFilter(filter);
     }
 
-    /** 显示滤镜名称 show filter name with animation */
+    /**
+     * 显示滤镜名称 show filter name with animation
+     */
     private void doShowFilterName(int position, int orientation) {
         mCurFilterName.setText(FilterType.Type.getFilter(position).getName());
         AnimatorSet set = new AnimatorSet();
@@ -146,20 +153,27 @@ public class VideoRecordHolder extends BaseHolder {
         });
         set.setDuration(200).start();
     }
-    
-    
+
+
     /*录制控制======================================================================================*/
-    /** 开启相机 */
+
+    /**
+     * 开启相机
+     */
     public void openCamera() {
         mRecordManager.openCamera();
     }
 
-    /** 释放相机 */
+    /**
+     * 释放相机
+     */
     public void releaseCamera() {
         mRecordManager.releaseCamera();
     }
 
-    /** 开始录制 */
+    /**
+     * 开始录制
+     */
     public void startRecord() {
         isFinish = false;
         String videoSavePath = FileUtil.getVideoSavePath();
@@ -168,14 +182,18 @@ public class VideoRecordHolder extends BaseHolder {
         mRecordManager.startRecord(FileUtil.computeMD5ForVideoFile(videoSavePath));
     }
 
-    /** 结束录制 */
+    /**
+     * 结束录制
+     */
     public void stopRecord() {
         isFinish = true;
         stopTimer();
         mRecordManager.stopRecord();
     }
 
-    /** 切换前后摄像头 */
+    /**
+     * 切换前后摄像头
+     */
     public void switchCamera() {
         mRecordManager.switchCamera();
     }
@@ -192,14 +210,18 @@ public class VideoRecordHolder extends BaseHolder {
     });
 
 
-    /** 设置开始时间 */
+    /**
+     * 设置开始时间
+     */
     public void startTimer() {
         if (startTime != 0) return;
         this.startTime = System.currentTimeMillis() / 1000;
         mTimerHandler.sendEmptyMessage(REFRESH_TIME);
     }
 
-    /** 停止Handler */
+    /**
+     * 停止Handler
+     */
     public void stopTimer() {
         startTime = 0;
         mTimerHandler.removeCallbacksAndMessages(null);
@@ -215,7 +237,10 @@ public class VideoRecordHolder extends BaseHolder {
 
 
     /*对外暴露监听==================================================================================*/
-    /** 播放器状态监听 */
+
+    /**
+     * 播放器状态监听
+     */
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mRecordManager.setOnRecordStateListener(mOnRecordStateListener);
     }

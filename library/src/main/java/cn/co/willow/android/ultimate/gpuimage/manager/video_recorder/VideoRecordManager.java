@@ -39,19 +39,19 @@ import static cn.co.willow.android.ultimate.gpuimage.core_config.OutputConfig.VI
  */
 public class VideoRecordManager implements VideoRecordConstrain, VideoRecordManagerCallback {
 
-    private static final String TAG               = VideoRecordManager.class.getSimpleName();
-    private static final int    PREVIEW_RULE_SIZE = VIDEO_RECORD_WIDTH * VIDEO_RECORD_HEIGH;
+    private static final String TAG = VideoRecordManager.class.getSimpleName();
+    private static final int PREVIEW_RULE_SIZE = VIDEO_RECORD_WIDTH * VIDEO_RECORD_HEIGH;
 
-    private final MessagesHandlerThread mRecordHandler      = new MessagesHandlerThread();
-    private       RecorderMessageState  mCurrentRecordState = RecorderMessageState.IDLE;
-    private FilterRecoderView              mRecorderView;                // 显示视频的控件
-    private Camera                         mCamera;                      // 相机对象
-    private Surface                        mRenderSurface;               // 渲染层对象（暂时没用上）
+    private final MessagesHandlerThread mRecordHandler = new MessagesHandlerThread();
+    private RecorderMessageState mCurrentRecordState = RecorderMessageState.IDLE;
+    private FilterRecoderView mRecorderView;        // 显示视频的控件
+    private Camera mCamera;                         // 相机对象
+    private Surface mRenderSurface;                 // 渲染层对象（暂时没用上）
+    private boolean isFrontCame = true;             // 是否使用前置摄像头
     private OutputConfig.VideoOutputConfig mVideoConfig;
     private OutputConfig.AudioOutputConfig mAudioConfig;
-    private boolean isFrontCame = true;                     // 是否使用前置摄像头
 
-    private VideoFilterManager mFilteManager;               // 视频渲染管理者
+    private VideoFilterManager mFilteManager;       // 视频渲染管理者
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoRecordManager(Context context, FilterRecoderView videoRecordView) {
@@ -62,7 +62,10 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
 
 
     /*相机控制======================================================================================*/
-    /** 初始化相机预览 */
+
+    /**
+     * 初始化相机预览
+     */
     @MainThread
     public void openCamera() {
         if (mCamera != null) return;
@@ -106,7 +109,9 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         });
     }
 
-    /** 释放照相机 */
+    /**
+     * 释放照相机
+     */
     public boolean releaseCamera() {
         if (mCamera != null) {
             mCamera.setPreviewCallback(null);
@@ -117,13 +122,17 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         return true;
     }
 
-    /** 切换滤镜 */
+    /**
+     * 切换滤镜
+     */
     public void setFilter(GPUImageFilter filter) {
         if (mFilteManager == null) return;
         mFilteManager.setFilter(filter);
     }
 
-    /** 设置录屏输出参数 */
+    /**
+     * 设置录屏输出参数
+     */
     public void setAVConfig(
             OutputConfig.VideoOutputConfig videoConfig,
             OutputConfig.AudioOutputConfig audioConfig) {
@@ -137,7 +146,10 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
 
 
     /*录制流程整体控制==============================================================================*/
-    /** 开始录像（注意：方法必须在{@link VideoRecordManager#openCamera()} 相机完成初始化设置后，才能执行） */
+
+    /**
+     * 开始录像（注意：方法必须在{@link VideoRecordManager#openCamera()} 相机完成初始化设置后，才能执行）
+     */
     @Override
     public void startRecord(File mOutputRecFile) {
 
@@ -173,7 +185,9 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mRenderSurface = null;
     }
 
-    /** 相机翻转 */
+    /**
+     * 相机翻转
+     */
     public void switchCamera() {
         releaseCamera();
         isFrontCame = !isFrontCame;
@@ -199,7 +213,10 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
 
 
     /*对外暴露监听==================================================================================*/
-    /** MediaRecorder关键步骤监听 */
+
+    /**
+     * MediaRecorder关键步骤监听
+     */
     public void setOnRecordStateListener(VideoRecorderRenderer.OnRecordStateListener mOnRecordStateListener) {
         mFilteManager.setOnRecordStateListener(mOnRecordStateListener);
     }

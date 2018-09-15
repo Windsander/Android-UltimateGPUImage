@@ -53,9 +53,9 @@ import static cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil.T
  */
 @TargetApi(11)
 public class BaseRenderer implements Renderer, PreviewCallback {
-    public static final int    DEFAULT_NO_IMAGE      = -1;
-    public final        byte[] mSurfaceChangedWaiter = new byte[0];       // 绘制锁
-    public static final float  CUBE[]                = {
+    public static final int DEFAULT_NO_IMAGE = -1;
+    public final byte[] mSurfaceChangedWaiter = new byte[0];       // 绘制锁
+    public static final float CUBE[] = {
             -1.0f, -1.0f,
             1.0f, -1.0f,
             -1.0f, 1.0f,
@@ -64,13 +64,13 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
     // 绘制处理流
     protected GPUImageFilter mFilter;
-    protected int            mGLTextureId    = DEFAULT_NO_IMAGE;
+    protected int mGLTextureId = DEFAULT_NO_IMAGE;
     protected SurfaceTexture mSurfaceTexture = null;
-    protected final FloatBuffer     mGLCubeBuffer;
-    protected final FloatBuffer     mGLTextureBuffer;
-    protected       IntBuffer       mGLRgbBuffer;
-    private final   Queue<Runnable> mRunOnDraw;
-    private final   Queue<Runnable> mEndOnDraw;
+    protected final FloatBuffer mGLCubeBuffer;
+    protected final FloatBuffer mGLTextureBuffer;
+    protected IntBuffer mGLRgbBuffer;
+    private final Queue<Runnable> mRunOnDraw;
+    private final Queue<Runnable> mEndOnDraw;
 
     // 预览参数
     protected int mOutputWidth;
@@ -81,8 +81,8 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
     // 适配参数（图形基本变换）
     private Rotation mRotation;
-    private boolean  mFlipHor;
-    private boolean  mFlipVer;
+    private boolean mFlipHor;
+    private boolean mFlipVer;
     private FilterConfig.ScaleType mScaleType = FilterConfig.ScaleType.CENTER_CROP;
 
     private float mBGR = 0;
@@ -95,13 +95,13 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         mEndOnDraw = new LinkedList<Runnable>();
 
         mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
-                                  .order(ByteOrder.nativeOrder())
-                                  .asFloatBuffer();
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
         mGLCubeBuffer.put(CUBE).position(0);
 
         mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
-                                     .order(ByteOrder.nativeOrder())
-                                     .asFloatBuffer();
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
         setRotation(Rotation.NORMAL, false, false);
     }
 
@@ -202,7 +202,10 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
 
     /*参数配置====================================================================================*/
-    /** 配置相机角度 */
+
+    /**
+     * 配置相机角度
+     */
     public void setRotation(Rotation rotation, boolean flipHorizontal, boolean flipVertical) {
         mFlipHor = flipHorizontal;
         mFlipVer = flipVertical;
@@ -210,14 +213,18 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         adjustImageScaling();
     }
 
-    /** 配置配置背景颜色 */
+    /**
+     * 配置配置背景颜色
+     */
     public void setBackgroundColor(float red, float green, float blue) {
         mBGR = red;
         mBGG = green;
         mBGB = blue;
     }
 
-    /** 设置相机 */
+    /**
+     * 设置相机
+     */
     public void setUpSurfaceTexture(final Camera camera) {
         runOnDraw(new Runnable() {
             @Override
@@ -239,7 +246,9 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         });
     }
 
-    /** 设置滤镜 */
+    /**
+     * 设置滤镜
+     */
     public void setFilter(final GPUImageFilter filter) {
         runOnDraw(new Runnable() {
             @Override
@@ -258,29 +267,32 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
 
     /*适配算法======================================================================================*/
-    /** 图像适配 */
+
+    /**
+     * 图像适配
+     */
     protected void adjustImageScaling() {
-        float outputWidth  = mOutputWidth;
+        float outputWidth = mOutputWidth;
         float outputHeight = mOutputHeight;
         if (mRotation == Rotation.ROTATION_270 || mRotation == Rotation.ROTATION_90) {
             outputWidth = mOutputHeight;
             outputHeight = mOutputWidth;
         }
 
-        float ratio1         = outputWidth / mImageWidth;
-        float ratio2         = outputHeight / mImageHeight;
-        float ratioMax       = Math.max(ratio1, ratio2);
-        int   imageWidthNew  = Math.round(mImageWidth * ratioMax);
-        int   imageHeightNew = Math.round(mImageHeight * ratioMax);
+        float ratio1 = outputWidth / mImageWidth;
+        float ratio2 = outputHeight / mImageHeight;
+        float ratioMax = Math.max(ratio1, ratio2);
+        int imageWidthNew = Math.round(mImageWidth * ratioMax);
+        int imageHeightNew = Math.round(mImageHeight * ratioMax);
 
-        float ratioWidth  = imageWidthNew / outputWidth;
+        float ratioWidth = imageWidthNew / outputWidth;
         float ratioHeight = imageHeightNew / outputHeight;
 
-        float[] cube         = CUBE;
+        float[] cube = CUBE;
         float[] textureCords = TextureRotationUtil.getRotation(mRotation, mFlipHor, mFlipVer);
         if (mScaleType == FilterConfig.ScaleType.CENTER_CROP) {
             float distHorizontal = (1 - 1 / ratioWidth) / 2;
-            float distVertical   = (1 - 1 / ratioHeight) / 2;
+            float distVertical = (1 - 1 / ratioHeight) / 2;
             textureCords = new float[]{
                     addDistance(textureCords[0], distHorizontal), addDistance(textureCords[1], distVertical),
                     addDistance(textureCords[2], distHorizontal), addDistance(textureCords[3], distVertical),
@@ -316,14 +328,18 @@ public class BaseRenderer implements Renderer, PreviewCallback {
         }
     }
 
-    /** 添加操作至：刷新队列 */
+    /**
+     * 添加操作至：刷新队列
+     */
     protected void runOnDraw(final Runnable runnable) {
         synchronized (mRunOnDraw) {
             mRunOnDraw.add(runnable);
         }
     }
 
-    /** 添加操作至：刷新结束队列 */
+    /**
+     * 添加操作至：刷新结束队列
+     */
     protected void runOnDrawEnd(final Runnable runnable) {
         synchronized (mEndOnDraw) {
             mEndOnDraw.add(runnable);
@@ -332,7 +348,9 @@ public class BaseRenderer implements Renderer, PreviewCallback {
 
 
     /*对外暴露监听==================================================================================*/
-    /** 播放器状态监听 */
+    /**
+     * 播放器状态监听
+     */
     private OnSurfaceSetListener mOnSurfaceSetListener;
 
     public interface OnSurfaceSetListener {

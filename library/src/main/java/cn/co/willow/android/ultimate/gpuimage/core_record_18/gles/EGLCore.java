@@ -1,6 +1,7 @@
 /*
  * Original work Copyright 2013 Google Inc.
- * Modified work Copyright 2016 Peter Lu
+ * Modified work Copyright 2016 Peter Li
+ * Modified work Copyright 2017 willow Li
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +42,10 @@ public final class EGLCore {
     private static final String TAG = GlUtil.TAG;
     public static final int FLAG_RECORDABLE = 0x01;                 // EGLConfig配置参数：保证数据EGL可处理
     public static final int FLAG_TRY_GLES3 = 0x02;                  // EGLConfig配置参数：判断GLES3是否可用，否则切回GLES2
-    private static final int EGL_RECORDABLE_ANDROID = 0x3142;      // android特有GLES扩展参数，必须设置
+    private static final int EGL_RECORDABLE_ANDROID = 0x3142;       // android特有GLES扩展参数，必须设置
 
-    private EGLDisplay mEGLDisplay = EGL14.EGL_NO_DISPLAY;           // 系统显示 ID 或句柄，可以理解为一个前端的显示窗口
-    private EGLContext mEGLContext = EGL14.EGL_NO_CONTEXT;           // OpenGL ES 图形上下文，它代表了OpenGL状态机
+    private EGLDisplay mEGLDisplay = EGL14.EGL_NO_DISPLAY;          // 系统显示 ID 或句柄，可以理解为一个前端的显示窗口
+    private EGLContext mEGLContext = EGL14.EGL_NO_CONTEXT;          // OpenGL ES 图形上下文，它代表了OpenGL状态机
     private EGLConfig mEGLConfig = null;                            // Surface的EGL配置，可以理解为绘制目标framebuffer的配置属性
     private int mGlVersion = -1;
 
@@ -70,7 +71,9 @@ public final class EGLCore {
 
     }
 
-    /** 1.初始化显示句柄 */
+    /**
+     * 1.初始化显示句柄
+     */
     private void initEGLDisplay() {
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("EGL already set up");
@@ -86,7 +89,9 @@ public final class EGLCore {
         }
     }
 
-    /** 2.初始化OpenGl状态机（自动/按flag 选择GLES核心库） */
+    /**
+     * 2.初始化OpenGl状态机（自动/按flag 选择GLES核心库）
+     */
     private void initEGLContext(EGLContext sharedContext, int flags) {
         if (sharedContext == null) {
             sharedContext = EGL14.EGL_NO_CONTEXT;
@@ -128,7 +133,9 @@ public final class EGLCore {
         }
     }
 
-    /** 3.查询OpenGL context与surface绑定情况（可以不调用） */
+    /**
+     * 3.查询OpenGL context与surface绑定情况（可以不调用）
+     */
     private void queryBandState() {
         int[] values = new int[1];
         EGL14.eglQueryContext(mEGLDisplay, mEGLContext, EGL14.EGL_CONTEXT_CLIENT_VERSION,
@@ -178,6 +185,7 @@ public final class EGLCore {
 
 
     /*资源释放方法====================================================================================*/
+
     /**
      * 释放所有占用资源
      * Discards all resources held by this class, notably the EGL context.  This must be
@@ -219,6 +227,7 @@ public final class EGLCore {
 
 
     /*流程控制方法====================================================================================*/
+
     /**
      * 销毁一个EGL surface对象
      * Destroys the specified surface.
@@ -318,6 +327,7 @@ public final class EGLCore {
 
 
     /*数据检测方法==================================================================================*/
+
     /**
      * 检测当前传入surface是否关联于当前EGLContext
      * Returns true if our context and the specified surface are current.

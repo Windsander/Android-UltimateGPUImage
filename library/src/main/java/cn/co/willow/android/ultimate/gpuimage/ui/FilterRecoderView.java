@@ -40,7 +40,10 @@ public class FilterRecoderView extends GLSurfaceView implements View.OnTouchList
 
 
     /*手势逻辑======================================================================================*/
-    /** 初始化缩放监听 */
+
+    /**
+     * 初始化缩放监听
+     */
     private void initScaleListener() {
         scaleGestureDetector = new ScaleGestureDetector(mContext,
                 new ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -51,6 +54,7 @@ public class FilterRecoderView extends GLSurfaceView implements View.OnTouchList
                         }
                         return true;
                     }
+
                     @Override
                     public boolean onScaleBegin(ScaleGestureDetector detector) {
                         return true;
@@ -58,7 +62,9 @@ public class FilterRecoderView extends GLSurfaceView implements View.OnTouchList
                 });
     }
 
-    /** 初始化手势监听 */
+    /**
+     * 初始化手势监听
+     */
     private void initTouchListener() {
         mainsGestureDetector = new GestureDetector(mContext,
                 new GestureDetector.OnGestureListener() {
@@ -131,26 +137,38 @@ public class FilterRecoderView extends GLSurfaceView implements View.OnTouchList
 
 
     /*对外暴露监听==================================================================================*/
-    /** 菜单状态监听 */
+    /**
+     * 菜单状态监听
+     */
     private FusionCallBack fusionCallBack;
 
     public interface FusionCallBack {
+
         boolean isMenuOpen();
+
         void closeFilterMenu();
+
     }
 
     public void setCallback(FusionCallBack fusionCallBack) {
         this.fusionCallBack = fusionCallBack;
     }
 
-    /** 手势操作监听 */
+    /**
+     * 手势操作监听
+     */
     private SwitchFilterListener mSwitchFilterListener;
 
     public interface SwitchFilterListener {
+
         void switchFilter(int orientation);                         //切换滤镜
+
         void handFocusTo(MotionEvent e);                            //手动对焦
-        void focusLength(int progress, float factor);              //调节焦距
+
+        void focusLength(int progress, float factor);               //调节焦距
+
         void releaseCamera();                                       //释放相机资源
+
     }
 
     public void setSwitchFilterListener(SwitchFilterListener switchFilterListener) {

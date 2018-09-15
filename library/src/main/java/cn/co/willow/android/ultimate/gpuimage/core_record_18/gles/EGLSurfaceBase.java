@@ -1,6 +1,7 @@
 /*
  * Original work Copyright 2013 Google Inc.
- * Modified work Copyright 2016 Peter Lu
+ * Modified work Copyright 2016 Peter Li
+ * Modified work Copyright 2017 willow Li
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +56,7 @@ public class EGLSurfaceBase {
 
 
     /*基本图层逻辑==================================================================================*/
+
     /**
      * 销毁一个EGL surface对象，用于清除之前配置的surface
      * Release the EGL surface.
@@ -131,6 +133,7 @@ public class EGLSurfaceBase {
 
 
     /*图层数据操作==================================================================================*/
+
     /**
      * 获取图层宽度
      * Returns the surface's width, in pixels.

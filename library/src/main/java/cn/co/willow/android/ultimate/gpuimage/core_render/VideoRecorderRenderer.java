@@ -41,8 +41,8 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
     private final AtomicReference<RecordCoderState> mCoderStatus = new AtomicReference<>();
     private TextureMovieEncoder mTMEncoder;                     // 音视频建简易编码器
-    private boolean                        mStartCoder  = false;                     // 编码器启用标志
-    private File                           mOutputFile  = null;
+    private boolean mStartCoder = false;                        // 编码器启用标志
+    private File mOutputFile = null;
     private OutputConfig.VideoOutputConfig mVideoConfig = new OutputConfig.VideoOutputConfig();
     private OutputConfig.AudioOutputConfig mAudioConfig = new OutputConfig.AudioOutputConfig();
 
@@ -54,7 +54,9 @@ public class VideoRecorderRenderer extends BaseRenderer {
         mCoderStatus.set(IDLE);
     }
 
-    /** 初始化编码器的控制器 */
+    /**
+     * 初始化编码器的控制器
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void initTMEncoder() {
         if (mTMEncoder == null) {
@@ -72,14 +74,19 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
 
     /*参数配置====================================================================================*/
-    /** 1.设置输出的滤镜视频文件位置 */
+
+    /**
+     * 1.设置输出的滤镜视频文件位置
+     */
     public void setOutputFile(File outputFile) {
         synchronized (lock) {
             mOutputFile = outputFile;
         }
     }
 
-    /** 2.录制开关，只能在{@link VideoRecorderRenderer#setOutputFile(File)}之后使用 */
+    /**
+     * 2.录制开关，只能在{@link VideoRecorderRenderer#setOutputFile(File)}之后使用
+     */
     public void changeCoderState(boolean startCodeing) {
         if (mOutputFile == null) return;
         mStartCoder = startCodeing;
@@ -91,14 +98,18 @@ public class VideoRecorderRenderer extends BaseRenderer {
         }
     }
 
-    /** 滤镜设置 */
+    /**
+     * 滤镜设置
+     */
     @Override
     public void setFilter(GPUImageFilter filter) {
         super.setFilter(filter);
         mTMEncoder.setFilter(filter);
     }
 
-    /** 获取当前编码器状态 */
+    /**
+     * 获取当前编码器状态
+     */
     public RecordCoderState getCurrentState() {
         return mCoderStatus.get();
     }
@@ -127,7 +138,10 @@ public class VideoRecorderRenderer extends BaseRenderer {
 
 
     /*编码器控制====================================================================================*/
-    /** 1.初始化视频编码器（每次适配时都需调用） */
+
+    /**
+     * 1.初始化视频编码器（每次适配时都需调用）
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void initVideoEncoder() {
         initTMEncoder();
@@ -135,7 +149,9 @@ public class VideoRecorderRenderer extends BaseRenderer {
         mTMEncoder.setGLTextureBuffer(mGLTextureBuffer);
     }
 
-    /** 2-1.编码器基本配置准备 */
+    /**
+     * 2-1.编码器基本配置准备
+     */
     public void prepareCoder(
             File outputFile,
             OutputConfig.VideoOutputConfig videoConfig,
@@ -161,7 +177,9 @@ public class VideoRecorderRenderer extends BaseRenderer {
         }
     }
 
-    /** 2-2.编码器开始录制 */
+    /**
+     * 2-2.编码器开始录制
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void startCoder() {
         synchronized (mCoderStatus) {
@@ -187,7 +205,9 @@ public class VideoRecorderRenderer extends BaseRenderer {
         }
     }
 
-    /** 2-3.编码器开始录制 */
+    /**
+     * 2-3.编码器开始录制
+     */
     private void stopCoder() {
         synchronized (mCoderStatus) {
             switch (mCoderStatus.get()) {
@@ -204,19 +224,21 @@ public class VideoRecorderRenderer extends BaseRenderer {
             mTMEncoder.stopRecording();
             // wait 1 seconds to deal with record, seriously important action.
             Executors.newScheduledThreadPool(1)
-                     .schedule(new Runnable() {
-                         @Override
-                         public void run() {
-                             if (mOnRecordStateListener != null) {
-                                 mOnRecordStateListener.onStartReady();
-                             }
-                         }
-                     }, 1, TimeUnit.SECONDS);
+                    .schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mOnRecordStateListener != null) {
+                                mOnRecordStateListener.onStartReady();
+                            }
+                        }
+                    }, 1, TimeUnit.SECONDS);
         }
         releaseCoder();
     }
 
-    /** 2-4.释放编码器上次录制资源 */
+    /**
+     * 2-4.释放编码器上次录制资源
+     */
     public void releaseCoder() {
         synchronized (mCoderStatus) {
             switch (mCoderStatus.get()) {
@@ -234,19 +256,25 @@ public class VideoRecorderRenderer extends BaseRenderer {
         }
     }
 
-    /** 当退出录制界面的时候{@link Activity#onDestroy()}，调用此方法 */
+    /**
+     * 当退出录制界面的时候{@link Activity#onDestroy()}，调用此方法
+     */
     public void clearAll() {
         mTMEncoder = null;
     }
 
 
     /*对外暴露监听==================================================================================*/
-    /** 播放器状态监听 */
+    /**
+     * 播放器状态监听
+     */
     private OnRecordStateListener mOnRecordStateListener;
 
     public interface OnRecordStateListener {
         void onStartReady();
+
         void onStopsReady();
+
         void onRecordFinish(File mOutputRecFile);
     }
 

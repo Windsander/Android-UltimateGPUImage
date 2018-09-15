@@ -27,8 +27,8 @@ import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
 public class VideoFilterManager {
 
     private VideoRecorderRenderer mRenderer;
-    private GLSurfaceView         mGlSurfaceView;
-    private GPUImageFilter        mFilter;
+    private GLSurfaceView mGlSurfaceView;
+    private GPUImageFilter mFilter;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoFilterManager(final Context context) {
@@ -38,16 +38,21 @@ public class VideoFilterManager {
     }
 
     /*关键设置======================================================================================*/
-    /** 检测是否支持OpenGl */
+
+    /**
+     * 检测是否支持OpenGl
+     */
     private void supportsOpenGLES3(final Context context) {
-        final ActivityManager   activityManager   = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         if (configurationInfo.reqGlEsVersion < 0x30000) {
             throw new IllegalStateException("OpenGL ES 3.0 is not supported on this phone.");
         }
     }
 
-    /** 初始化GLSurfaceView */
+    /**
+     * 初始化GLSurfaceView
+     */
     public void setGLSurfaceView(final GLSurfaceView view) {
         mGlSurfaceView = view;
         mGlSurfaceView.setEGLContextClientVersion(2);
@@ -58,19 +63,27 @@ public class VideoFilterManager {
         mGlSurfaceView.requestRender();
     }
 
-    /** 设置相机，并切换角度 */
+    /**
+     * 设置相机，并切换角度
+     */
     public void setUpCamera(final Camera camera, boolean isFrontCame) {
         mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
             mRenderer.setUpSurfaceTexture(camera);
-            mRenderer.setRotation(isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90, false, isFrontCame);
+            mRenderer.setRotation(
+                    isFrontCame ? Rotation.ROTATION_270 : Rotation.ROTATION_90,
+                    false,
+                    isFrontCame
+            );
         } else {
             camera.setPreviewCallback(mRenderer);
             camera.startPreview();
         }
     }
 
-    /** 设置滤镜 */
+    /**
+     * 设置滤镜
+     */
     public void setFilter(final GPUImageFilter filter) {
         mFilter = filter;
         mRenderer.setFilter(mFilter);
@@ -87,10 +100,12 @@ public class VideoFilterManager {
             File mOutputRecFile,
             OutputConfig.VideoOutputConfig mVideoConfig,
             OutputConfig.AudioOutputConfig mAudioConfig) {
+
         mRenderer.prepareCoder(
                 mOutputRecFile,
                 mVideoConfig,          // 系统旋转长宽相反
-                mAudioConfig);
+                mAudioConfig
+        );
     }
 
     public void start() {

@@ -1,6 +1,7 @@
 /*
  * Original work Copyright 2013 Google Inc.
- * Modified work Copyright 2016 Peter Lu
+ * Modified work Copyright 2016 Peter Li
+ * Modified work Copyright 2017 willow Li
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,24 +45,24 @@ import cn.co.willow.android.ultimate.gpuimage.utils.LogUtil;
  */
 public class TextureMovieEncoder implements Runnable {
 
-    private static final int MSG_START_RECORDING       = 0;
-    private static final int MSG_FRAME_AVAILABLE       = 1;
-    private static final int MSG_SET_TEXTURE_ID        = 2;
+    private static final int MSG_START_RECORDING = 0;
+    private static final int MSG_FRAME_AVAILABLE = 1;
+    private static final int MSG_SET_TEXTURE_ID = 2;
     private static final int MSG_UPDATE_SHARED_CONTEXT = 3;
-    private static final int MSG_STOP_RECORDING        = 4;
-    private static final int MSG_QUIT                  = 5;
+    private static final int MSG_STOP_RECORDING = 4;
+    private static final int MSG_QUIT = 5;
 
     // ----- accessed exclusively by encoder thread -----
-    private WindowSurface  mInputWindowSurface;
-    private EGLCore        mEGLCore;
+    private WindowSurface mInputWindowSurface;
+    private EGLCore mEGLCore;
     private GPUImageFilter mFilter;
-    private int            mTextureId;
-    private XMediaMuxer    mTMsCoreMuxer;
+    private int mTextureId;
+    private XMediaMuxer mTMsCoreMuxer;
 
     // ----- accessed by multiple threads -----
     private volatile EncoderHandler mHandler;
 
-    private Object  mReadyFence  = new Object();       // guards ready/running
+    private Object mReadyFence = new Object();      // guards ready/running
     private boolean mLooperReady = false;           // 循环器就绪标识
     private boolean mMuxersReady = false;           // 混合器就绪标识
     private boolean mRecrRunning = false;           // 录制器录制标识
@@ -75,10 +76,12 @@ public class TextureMovieEncoder implements Runnable {
         mFilter = filter;
     }
 
-    /** Encoder configuration. */
+    /**
+     * Encoder configuration.
+     */
     public static class EncoderConfig {
-        final EGLContext                     mEglContext;
-        final File                           mOutputFile;
+        final EGLContext mEglContext;
+        final File mOutputFile;
         final OutputConfig.VideoOutputConfig mVideoConfig;
         final OutputConfig.AudioOutputConfig mAudioConfig;
 
@@ -99,16 +102,21 @@ public class TextureMovieEncoder implements Runnable {
     public void setFilter(GPUImageFilter filter) {
         mFilter = filter;
     }
+
     public void setGLCubeBuffer(FloatBuffer buffer) {
         mGLCubeBuffer = buffer;
     }
+
     public void setGLTextureBuffer(FloatBuffer buffer) {
         mGLTextureBuffer = buffer;
     }
 
 
     /*录制流程控制====================================================================================*/
-    /** 1.开启录制 */
+
+    /**
+     * 1.开启录制
+     */
     public void startRecording(EncoderConfig config) {
         synchronized (mReadyFence) {
             if (mRecrRunning) {
@@ -127,7 +135,9 @@ public class TextureMovieEncoder implements Runnable {
         mHandler.sendMessage(mHandler.obtainMessage(MSG_START_RECORDING, config));
     }
 
-    /** 2.设置预览层TextureId，已经过基本纹理处理输出Texture的id（未加滤镜 not load filter） */
+    /**
+     * 2.设置预览层TextureId，已经过基本纹理处理输出Texture的id（未加滤镜 not load filter）
+     */
     public void setTextureId(int id) {
         synchronized (mReadyFence) {
             if (!mLooperReady) {
@@ -137,7 +147,9 @@ public class TextureMovieEncoder implements Runnable {
         mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TEXTURE_ID, id, 0, null));
     }
 
-    /** 3.通知新帧 */
+    /**
+     * 3.通知新帧
+     */
     public void frameAvailable(SurfaceTexture st) {
         synchronized (mReadyFence) {
             if (!mLooperReady) {
@@ -157,18 +169,24 @@ public class TextureMovieEncoder implements Runnable {
                 (int) (timestamp >> 32), (int) timestamp, transform));
     }
 
-    /** 4.EGL Surface 更新方法 */
+    /**
+     * 4.EGL Surface 更新方法
+     */
     public void updateSharedContext(EGLContext sharedContext) {
         mHandler.sendMessage(mHandler.obtainMessage(MSG_UPDATE_SHARED_CONTEXT, sharedContext));
     }
 
-    /** 5.停止录制 */
+    /**
+     * 5.停止录制
+     */
     public void stopRecording() {
         mHandler.sendMessage(mHandler.obtainMessage(MSG_STOP_RECORDING));
         mHandler.sendMessage(mHandler.obtainMessage(MSG_QUIT));
     }
 
-    /** 是否正在录制 */
+    /**
+     * 是否正在录制
+     */
     public boolean isRecording() {
         synchronized (mReadyFence) {
             return mRecrRunning;
@@ -177,7 +195,10 @@ public class TextureMovieEncoder implements Runnable {
 
 
     /*消息逻辑======================================================================================*/
-    /** 编码器流程消息控制线程入口，建立循环器，开启消息队列 */
+
+    /**
+     * 编码器流程消息控制线程入口，建立循环器，开启消息队列
+     */
     @Override
     public void run() {
         Looper.prepare();
@@ -196,7 +217,9 @@ public class TextureMovieEncoder implements Runnable {
     }
 
 
-    /** 处理编码请求的handler,应该在Handler Thread中调用 */
+    /**
+     * 处理编码请求的handler,应该在Handler Thread中调用
+     */
     private static class EncoderHandler extends Handler {
 
         private WeakReference<TextureMovieEncoder> mWeakEncoder;
@@ -208,13 +231,13 @@ public class TextureMovieEncoder implements Runnable {
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
         @Override  // runs on encoder thread
         public void handleMessage(Message inputMessage) {
-            int    what = inputMessage.what;
-            Object obj  = inputMessage.obj;
+            int what = inputMessage.what;
+            Object obj = inputMessage.obj;
 
             TextureMovieEncoder encoder = mWeakEncoder.get();
             if (encoder == null) return;
 
-            switch (what) {                               // 执行次数量级 frequency of execute
+            switch (what) {                             // 执行次数量级 frequency of execute
                 case MSG_START_RECORDING:               // x1
                     encoder.handleStartRecording((EncoderConfig) obj);
                     break;
@@ -224,10 +247,10 @@ public class TextureMovieEncoder implements Runnable {
                 case MSG_FRAME_AVAILABLE:               // xn
                     encoder.handleFrameAvailable();
                     break;
-                case MSG_UPDATE_SHARED_CONTEXT:        // x2
+                case MSG_UPDATE_SHARED_CONTEXT:         // x2
                     encoder.handleUpdateSharedContext((EGLContext) inputMessage.obj);
                     break;
-                case MSG_STOP_RECORDING:               // x1
+                case MSG_STOP_RECORDING:                // x1
                     encoder.handleStopRecording();
                     break;
                 case MSG_QUIT:                          // x1
@@ -241,7 +264,10 @@ public class TextureMovieEncoder implements Runnable {
 
 
     /*录制消息处理==================================================================================*/
-    /** 开启录制 */
+
+    /**
+     * 开启录制
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleStartRecording(EncoderConfig config) {
         prepareEncoder(
@@ -251,12 +277,16 @@ public class TextureMovieEncoder implements Runnable {
                 config.mAudioConfig);
     }
 
-    /** 设置视频帧来源SurfaceId */
+    /**
+     * 设置视频帧来源SurfaceId
+     */
     private void handleSetTexture(int id) {
         mTextureId = id;
     }
 
-    /** 通知视频帧更新 */
+    /**
+     * 通知视频帧更新
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleFrameAvailable() {
         if (!mMuxersReady) return;
@@ -268,7 +298,9 @@ public class TextureMovieEncoder implements Runnable {
         mInputWindowSurface.swapBuffers();
     }
 
-    /** 处理EGLSurface切换时，录屏监控对象的切换，以避免裂屏 */
+    /**
+     * 处理EGLSurface切换时，录屏监控对象的切换，以避免裂屏
+     */
     private void handleUpdateSharedContext(EGLContext newSharedContext) {
         mInputWindowSurface.releaseEglSurface();
         mEGLCore.release();
@@ -277,7 +309,9 @@ public class TextureMovieEncoder implements Runnable {
         mInputWindowSurface.makeCurrent();
     }
 
-    /** 停止录制 */
+    /**
+     * 停止录制
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleStopRecording() {
         mTMsCoreMuxer.stopMuxer();
@@ -286,7 +320,9 @@ public class TextureMovieEncoder implements Runnable {
         exitSafeLooper();
     }
 
-    /** 退出安全循环器 */
+    /**
+     * 退出安全循环器
+     */
     private void exitSafeLooper() {
         Looper myLooper = Looper.myLooper();
         if (myLooper != null) {
@@ -296,7 +332,10 @@ public class TextureMovieEncoder implements Runnable {
 
 
     /*混合器逻辑====================================================================================*/
-    /** 准备实时混合器 */
+
+    /**
+     * 准备实时混合器
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void prepareEncoder(
             final EGLContext sharedContext,
@@ -314,7 +353,9 @@ public class TextureMovieEncoder implements Runnable {
         }
     }
 
-    /** 释放资源 */
+    /**
+     * 释放资源
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void releaseEncoder() {
         if (mInputWindowSurface != null) {
@@ -329,7 +370,9 @@ public class TextureMovieEncoder implements Runnable {
 
 
     /*对外暴露监听==================================================================================*/
-    /** 最终结果返回监听 */
+    /**
+     * 最终结果返回监听
+     */
     private XMediaMuxer.OnFinishListener mOnFinishListener;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
