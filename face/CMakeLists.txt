@@ -2,7 +2,6 @@
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 cmake_minimum_required(VERSION 3.4.1)
 
-
 # 设置 native_lib 目录
 set(distribution_DIR ${CMAKE_SOURCE_DIR}/../distribution)
 set(dlib_path ${CMAKE_SOURCE_DIR}/src/main/dlib)
@@ -13,8 +12,9 @@ include(${dlib_path}/cmake)
 # 添加自定义库
 add_library(
         face_lib SHARED
-        src/main/cpp/native-test.cpp
         src/main/dlib/all/source.cpp
+        src/main/cpp/jstring_complier.cpp
+        src/main/cpp/face_detector.cpp
 )
 
 # 关联 log 库
