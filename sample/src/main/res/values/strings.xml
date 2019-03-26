@@ -2,6 +2,7 @@
     <string name="app_name">Android-UltimateGPUImage-Sample</string>
 
     <string name="entry_to_video">Test Video Recorder Function</string>
+    <string name="entry_to_face_detector">Test Face Detector Function</string>
     <string name="exit_unsafe_toast">Can\'t exit during recording.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

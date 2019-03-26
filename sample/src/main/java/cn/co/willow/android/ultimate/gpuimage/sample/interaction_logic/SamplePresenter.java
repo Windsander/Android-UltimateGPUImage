@@ -21,7 +21,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by willow.li on 2017/3/13.
  */
-
 public class SamplePresenter {
 
     private static SamplePresenter mInstance;
@@ -43,14 +42,16 @@ public class SamplePresenter {
 
 
     /*play video logic==============================================================================*/
-    /** play the lastest video */
+
+    /**
+     * play the lastest video
+     */
     public void doPlayerVideo(Context context) {
         if (mLastVideoFile == null) return;
         VideoPlayerDialog.getDefault(context)
-                         .setVideoUrl(Uri.fromFile(mLastVideoFile).toString())
-                         .show();
+                .setVideoUrl(Uri.fromFile(mLastVideoFile).toString())
+                .show();
     }
-
 
     /*record finish logic===========================================================================*/
     private File mLastVideoFile;
@@ -59,7 +60,9 @@ public class SamplePresenter {
         return mLastVideoFile;
     }
 
-    /** do update action */
+    /**
+     * do update action
+     */
     public void doUpdateVideoData(final File mOutputRecFile) {
         if (mOutputRecFile == null) return;
         mLastVideoFile = mOutputRecFile;
@@ -68,7 +71,7 @@ public class SamplePresenter {
                     @Override
                     public void call(final Subscriber<? super String> subscriber) {
                         String videoPath = mOutputRecFile.getAbsolutePath();
-                        File   imgFile   = createCoverImg(videoPath);
+                        File imgFile = createCoverImg(videoPath);
                         if (imgFile != null) {
                             subscriber.onNext(Uri.fromFile(imgFile).toString());
                         }
@@ -92,7 +95,9 @@ public class SamplePresenter {
                 });
     }
 
-    /** create last video image */
+    /**
+     * create last video image
+     */
     private File createCoverImg(String videoPath) {
         Bitmap bitmap = CameraUtil.getVideoThumbnailFF(videoPath);
         if (bitmap == null) return null;
@@ -101,15 +106,16 @@ public class SamplePresenter {
         return gifFile;
     }
 
-    /** create gif */
+    /**
+     * create gif
+     */
     private File createGifFile(String videoPath) {
         List<Bitmap> bitmaps = CameraUtil.getVideoThumbnailFF(videoPath, 8);
-        File         gifFile = FileUtil.computeMD5ForCoverFile(FileUtil.getCoverSavePath());
+        File gifFile = FileUtil.computeMD5ForCoverFile(FileUtil.getCoverSavePath());
         gifFile = CameraUtil.createGif(bitmaps, gifFile);
         bitmaps.clear();
         return gifFile;
     }
-
 
     /*listener======================================================================================*/
     private onCoverListener mOnCoverListener;
@@ -123,5 +129,4 @@ public class SamplePresenter {
             this.mOnCoverListener = mOnCoverListener;
         }
     }
-
 }

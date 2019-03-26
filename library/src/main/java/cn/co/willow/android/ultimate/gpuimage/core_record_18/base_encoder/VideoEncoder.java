@@ -23,17 +23,18 @@ import static cn.co.willow.android.ultimate.gpuimage.core_record_18.base_encoder
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 class VideoEncoder extends Thread {
 
-    private XMediaMuxer           mMediaMuxer;
-    private Surface               mInputSurface;
-    private MediaCodec            mVideoEncoder;
+    private XMediaMuxer mMediaMuxer;
+    private Surface mInputSurface;
+    private MediaCodec mVideoEncoder;
     private MediaCodec.BufferInfo mVideoBufferInfo;
 
-    private boolean isExit        = false;
-    private double  prevOutputPTS = 0;
+    private boolean isExit = false;
+    private double prevOutputPTS = 0;
 
     private OutputConfig.VideoOutputConfig mVideoConfig;
-    private String                         encoderState;
+    private String encoderState;
 
+    /*初始化流程======================================================================================*/
     VideoEncoder(OutputConfig.VideoOutputConfig videoConfig, XMediaMuxer mMediaMuxer) {
         try {
             this.mVideoConfig = videoConfig;
@@ -110,7 +111,10 @@ class VideoEncoder extends Thread {
 
 
     /*对外暴露控制==================================================================================*/
-    /** 返回当前设定的WindowSurface录制层 */
+
+    /**
+     * 返回当前设定的WindowSurface录制层
+     */
     Surface getInputSurface() {
         LogUtil.i("VideoEncoder", "mInputSurface isEmpty? " + (mInputSurface == null));
         return mInputSurface;
@@ -157,10 +161,14 @@ class VideoEncoder extends Thread {
     /*录屏编码逻辑====================================================================================*/
     private void autoEncodeFrame() {
         while (true) {
-            if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) return;
+            if (mVideoBufferInfo.presentationTimeUs < prevOutputPTS) {
+                return;
+            }
             prevOutputPTS = Math.max(mVideoBufferInfo.presentationTimeUs, prevOutputPTS);
             /*处理输出数据*/
-            if (mVideoEncoder == null) return;
+            if (mVideoEncoder == null) {
+                return;
+            }
             int outputBufferId = mVideoEncoder.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
             //LogUtil.i("VideoEncoder", "outputBufferId is " + outputBufferId + " " + getEncoderState(outputBufferId));
             switch (outputBufferId) {
@@ -203,6 +211,7 @@ class VideoEncoder extends Thread {
                             outputBuffer.clear();
                         }
                         mVideoEncoder.releaseOutputBuffer(outputBufferId, true);
+
                     } else {
                         LogUtil.i("VideoEncoder", "OutputBuffer's cur-index less than zero");
                     }

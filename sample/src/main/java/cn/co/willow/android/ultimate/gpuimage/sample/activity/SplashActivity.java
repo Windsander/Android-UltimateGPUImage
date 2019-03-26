@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
+import cn.co.willow.android.face.FaceDetectorDemoActivity;
 import cn.co.willow.android.ultimate.gpuimage.sample.R;
 
 /**
@@ -22,7 +23,8 @@ import cn.co.willow.android.ultimate.gpuimage.sample.R;
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ViewGroup mCPVirtualCont;
-    private Button    mBtnJump2Video;
+    private Button mBtnJump2Video;
+    private Button mBtnJump2Faces;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +50,11 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     /*init page UI & Logic==========================================================================*/
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void initView() {
-        mCPVirtualCont = (ViewGroup) findViewById(R.id.control_pannel);
-        mBtnJump2Video = (Button) findViewById(R.id.btn_video_recorder);
+        mCPVirtualCont = findViewById(R.id.control_pannel);
+        mBtnJump2Video = findViewById(R.id.btn_video_recorder);
+        mBtnJump2Faces = findViewById(R.id.btn_face_detector);
         mBtnJump2Video.setOnClickListener(this);
+        mBtnJump2Faces.setOnClickListener(this);
     }
 
     private void initPageAnimator() {
@@ -61,10 +65,16 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_video_recorder:
-                Intent intent = new Intent(this, SampleVideoActivity.class);
-                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                Intent intentRec = new Intent(this, SampleVideoActivity.class);
+                ActivityOptionsCompat optionsCompatRec = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
                         new Pair<View, String>(mBtnJump2Video, getString(R.string.trans_control_pannel)));
-                startActivity(intent, optionsCompat.toBundle());
+                startActivity(intentRec, optionsCompatRec.toBundle());
+                break;
+            case R.id.btn_face_detector:
+                Intent intentDec = new Intent(this, FaceDetectorDemoActivity.class);
+                ActivityOptionsCompat optionsCompatDec = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                        new Pair<View, String>(mBtnJump2Faces, getString(R.string.trans_control_pannel)));
+                startActivity(intentDec, optionsCompatDec.toBundle());
                 break;
         }
     }

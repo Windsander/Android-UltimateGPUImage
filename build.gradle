@@ -10,9 +10,9 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1' //用于打包Maven所需文件
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6' //用于上传Maven生成的文件到Bintray
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4' //用于上传Maven生成的文件到Bintray
     }
 }
 
@@ -23,6 +23,7 @@ allprojects {
             url 'https://maven.google.com/'
             name 'Google'
         }
+        google()
     }
 }
 

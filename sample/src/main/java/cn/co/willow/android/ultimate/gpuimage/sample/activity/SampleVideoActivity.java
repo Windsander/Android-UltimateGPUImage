@@ -76,11 +76,10 @@ public class SampleVideoActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-
     /*auxiliary method for this page================================================================*/
     private void initPageAnimator() {
         Transition enterTrans = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_enter);
-        Transition exitTrans  = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_exit);
+        Transition exitTrans = TransitionInflater.from(this).inflateTransition(R.transition.trans_video_exit);
         getWindow().setEnterTransition(enterTrans);
         getWindow().setSharedElementEnterTransition(initSharedElementEnterTransition());
         getWindow().setExitTransition(exitTrans);
@@ -134,11 +133,11 @@ public class SampleVideoActivity extends AppCompatActivity {
 
 
     /*how to use UltimateGPUImage with a holder module==============================================*/
-    private FrameLayout        mFunctionContainer;                  // use as a container for video preview
-    private FrameLayout        mFuncOperatePannel;                  // use to control video operate
-    private VideoRecordHolder  mVideoRecordHolder;                  // module: video recorder preview
+    private FrameLayout mFunctionContainer;                  // use as a container for video preview
+    private FrameLayout mFuncOperatePannel;                  // use to control video operate
+    private VideoRecordHolder mVideoRecordHolder;                  // module: video recorder preview
     private VideoControlHolder videoControlHolder;                  // module: video recorder controller
-    private SamplePresenter    mInteractionLogic;
+    private SamplePresenter mInteractionLogic;
 
     private void initInteractionLogics() {
         mInteractionLogic = SamplePresenter.init(new SamplePresenter.onCoverListener() {
@@ -158,7 +157,9 @@ public class SampleVideoActivity extends AppCompatActivity {
         mVideoRecordHolder.openCamera();
     }
 
-    /** 初始化历史视屏栏 */
+    /**
+     * 初始化历史视屏栏
+     */
     private void initFuncOperatePannel() {
         mFuncOperatePannel = (FrameLayout) findViewById(R.id.control_pannel);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mFuncOperatePannel.getLayoutParams();
@@ -174,10 +175,12 @@ public class SampleVideoActivity extends AppCompatActivity {
             public void onStartReady() {
                 videoControlHolder.switchRecordState(false);
             }
+
             @Override
             public void onStopsReady() {
                 videoControlHolder.switchRecordState(true);
             }
+
             @Override
             public void onRecordFinish(File mOutputRecFile) {
                 LogUtil.w("Video final Path::" + mOutputRecFile.getAbsolutePath());
@@ -189,14 +192,17 @@ public class SampleVideoActivity extends AppCompatActivity {
             public void playVideo() {
                 mInteractionLogic.doPlayerVideo(SampleVideoActivity.this);
             }
+
             @Override
             public void startRecord() {
                 mVideoRecordHolder.startRecord();
             }
+
             @Override
             public void stopRecord() {
                 mVideoRecordHolder.stopRecord();
             }
+
             @Override
             public void switchCamera() {
                 mVideoRecordHolder.switchCamera();
@@ -206,16 +212,21 @@ public class SampleVideoActivity extends AppCompatActivity {
 
 
     /*权限处理 Premission Handler===================================================================*/
-    /** 申请权限 request premission */
+
+    /**
+     * 申请权限 request premission
+     */
     public void requestPermission(String... permissions) {
         if (checkPremission(permissions)) return;
         ActivityCompat.requestPermissions(this, permissions, 114);
     }
 
-    /** 权限检测 check premission */
+    /**
+     * 权限检测 check premission
+     */
     public boolean checkPremission(String... permissions) {
-        boolean        allHave = true;
-        PackageManager pm      = getPackageManager();
+        boolean allHave = true;
+        PackageManager pm = getPackageManager();
         for (String permission : permissions) {
             switch (pm.checkPermission(permission, SampleApplication.getApplication().getPackageName())) {
                 case PERMISSION_GRANTED:
@@ -229,7 +240,9 @@ public class SampleVideoActivity extends AppCompatActivity {
         return allHave;
     }
 
-    /** 权限处理 premission result dealer */
+    /**
+     * 权限处理 premission result dealer
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -244,7 +257,9 @@ public class SampleVideoActivity extends AppCompatActivity {
         }
     }
 
-    /** 权限返回值处理 */
+    /**
+     * 权限返回值处理
+     */
     protected void grantedResultDeal(String permission, boolean isGranted) {
         switch (permission) {
             case CAMERA:

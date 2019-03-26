@@ -39,17 +39,17 @@ public class XMediaMuxer {
 
     private volatile boolean isVideoAdd;
     private volatile boolean isAudioAdd;
-    private volatile boolean isMuxerExit       = false;
-    private          boolean isMediaMuxerStart = false;
-    private          boolean isMediaDataFinish = false;
-    private volatile boolean isVideoFinish     = false;
-    private volatile boolean isAudioFinish     = false;
+    private volatile boolean isMuxerExit = false;
+    private boolean isMediaMuxerStart = false;
+    private boolean isMediaDataFinish = false;
+    private volatile boolean isVideoFinish = false;
+    private volatile boolean isAudioFinish = false;
 
     private AudioEncoder audioThread;
     private VideoEncoder videoThread;
-    private MediaFormat  videoMediaFormat;
-    private MediaFormat  audioMediaFormat;
-    private File         mOutputFile;
+    private MediaFormat videoMediaFormat;
+    private MediaFormat audioMediaFormat;
+    private File mOutputFile;
 
     public XMediaMuxer(
             OutputConfig.VideoOutputConfig mVideoConfig,
@@ -101,7 +101,10 @@ public class XMediaMuxer {
 
 
     /*混合器关键数据添加============================================================================*/
-    /** 返回当前设定的WindowSurface录制层 */
+
+    /**
+     * 返回当前设定的WindowSurface录制层
+     */
     public Surface getInputSurface() {
         return videoThread.getInputSurface();
     }
@@ -162,8 +165,8 @@ public class XMediaMuxer {
     private void stopMediaMuxer() {
         if (mMediaMuxer != null) {
             try {
-                Class<?> name   = Class.forName("android.media.MediaMuxer");
-                Field    mState = name.getDeclaredField("mState");
+                Class<?> name = Class.forName("android.media.MediaMuxer");
+                Field mState = name.getDeclaredField("mState");
                 mState.setAccessible(true);
                 int state = (int) mState.get(mMediaMuxer);
                 LogUtil.w("Muxer", "Muxer state is :: " + state);
@@ -195,10 +198,12 @@ public class XMediaMuxer {
     public @interface TrackIndex {
     }
 
-    /** 封装需要传输的数据类型 */
+    /**
+     * 封装需要传输的数据类型
+     */
     public static class MuxerData {
-        int                   trackIndex;
-        ByteBuffer            byteBuf;
+        int trackIndex;
+        ByteBuffer byteBuf;
         MediaCodec.BufferInfo bufferInfo;
 
         public MuxerData(@TrackIndex int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
@@ -210,7 +215,9 @@ public class XMediaMuxer {
 
 
     /*对外暴露监听==================================================================================*/
-    /** 最终结果返回监听 */
+    /**
+     * 最终结果返回监听
+     */
     private OnFinishListener mOnFinishListener;
 
     public interface OnFinishListener {
