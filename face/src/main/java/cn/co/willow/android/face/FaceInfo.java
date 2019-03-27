@@ -27,10 +27,9 @@ public class FaceInfo implements Serializable {
     public final static String FACE_KEY_TOP_LIP = "top_lip";
     public final static String FACE_KEY_BOTTOM_LIP = "bottom_lip";
 
-    private List<Point> mKeyPoints;        // 脸部特征点数据集
+    public List<Point> mKeyPoints;        // 脸部特征点数据集
 
-    public FaceInfo(List<Point> mKeyPoints) {
-        this.mKeyPoints = mKeyPoints;
+    public FaceInfo() {
     }
 
     /*关键参数获取=====================================================================================*/
@@ -110,4 +109,13 @@ public class FaceInfo implements Serializable {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return (null == mKeyPoints) ?
+                "null" :
+                "FaceInfo{" +
+                        "mKeyPoints_size=" + mKeyPoints.size() +
+                        "mKeyPoints=" + mKeyPoints.toArray() +
+                        '}';
+    }
 }

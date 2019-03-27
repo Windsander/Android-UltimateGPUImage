@@ -28,12 +28,20 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            jniDebuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                moduleName "face_lib"
+                stl "stlport_static"
+                ldLibs "log"
+            }
+        }
     }
 
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            //path "src/main/dlib/CMakeLists.txt"
         }
     }
 }

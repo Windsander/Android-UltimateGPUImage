@@ -46,7 +46,6 @@ public class VideoRecorderRenderer extends BaseRenderer {
     private OutputConfig.VideoOutputConfig mVideoConfig = new OutputConfig.VideoOutputConfig();
     private OutputConfig.AudioOutputConfig mAudioConfig = new OutputConfig.AudioOutputConfig();
 
-
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public VideoRecorderRenderer(GPUImageFilter filter) {
         super(filter);

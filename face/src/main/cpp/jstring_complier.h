@@ -4,7 +4,6 @@
 #ifndef ANDROID_ULTIMATEGPUIMAGE_JSTRING_COMPLIER_H
 #define ANDROID_ULTIMATEGPUIMAGE_JSTRING_COMPLIER_H
 
-#include <config.h>
 #include <jni.h>
 #include <cstring>
 #include <cstdlib>

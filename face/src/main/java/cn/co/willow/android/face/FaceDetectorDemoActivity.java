@@ -14,7 +14,6 @@ public class FaceDetectorDemoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FaceDetectorManager mFaceDetectorManager = new FaceDetectorManager(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -29,9 +28,4 @@ public class FaceDetectorDemoActivity extends AppCompatActivity {
             }
         });
     }
-
-    public static native void HelloWorld();
-
-    public static native void HelloWorld2();
-
 }

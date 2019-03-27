@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include "config.h"
 #include "jstring_complier.h"
 
 using namespace std;
@@ -19,7 +20,7 @@ string jstring_complier::jstring_to_string(JNIEnv *env, jstring jstr) {
 }
 
 jstring jstring_complier::char_to_jstring(JNIEnv *env, const char *pat) {
-    jclass strClass = (env)->FindClass("Ljava/lang/String;");
+    jclass strClass = (env)->FindClass("java/lang/String");
     jmethodID ctorID = (env)->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
     auto strLength = jsize(strlen(pat));
     jbyteArray bytes = (env)->NewByteArray(strLength);
@@ -30,11 +31,11 @@ jstring jstring_complier::char_to_jstring(JNIEnv *env, const char *pat) {
 
 char *jstring_complier::jstring_to_char(JNIEnv *env, jstring jstr) {
     char *rtn = nullptr;
-    jclass clsstring = env->FindClass("Ljava/lang/String");
+    jclass clsstring = env->FindClass("java/lang/String");
     jstring strencode = env->NewStringUTF("GB2312");
     jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
     auto barr = (jbyteArray) env->CallObjectMethod(jstr, mid, strencode);
-    auto alen = size_t(env->GetArrayLength(barr));
+    auto alen = (size_t)(env->GetArrayLength(barr));
     jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
     if (alen > 0) {
         rtn = (char *) malloc(alen + 1);

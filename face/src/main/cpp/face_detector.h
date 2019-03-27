@@ -5,7 +5,6 @@
 #ifndef ANDROID_ULTIMATEGPUIMAGE_FACE_DETECTOR_H
 #define ANDROID_ULTIMATEGPUIMAGE_FACE_DETECTOR_H
 
-#include <config.h>
 #include <jni.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing.h>
@@ -34,7 +33,7 @@ public:
     // 实现人脸检测算法
     jobjectArray do_face_detect_action(
             JNIEnv *env,
-            jbyteArray image_data,
+            jintArray image_data,
             jint image_height,
             jint image_widht
     );
@@ -42,10 +41,13 @@ public:
 
 namespace out_cast_detector {
 
-    static void do_init(JNIEnv *env, jstring predictor_path);
+    static void do_init(JNIEnv *env,
+                        jobject obj,
+                        jstring predictor_path);
 
     static jobjectArray do_detect(JNIEnv *env,
-                                  jbyteArray image_data,
+                                  jobject obj,
+                                  jintArray image_data,
                                   jint image_height,
                                   jint image_widht
     );

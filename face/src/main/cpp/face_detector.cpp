@@ -11,33 +11,38 @@ using namespace out_cast_detector;
 face_detector::face_detector() = default;
 
 void face_detector::init_face_detector(JNIEnv *env, jstring predictor_path) {
+    LOGE("init_face_detector start");
     string path = jstring_complier::jstring_to_string(env, predictor_path);
     frontal_face_detector detector = get_frontal_face_detector();
     shape_predictor predictor = shape_predictor();
     deserialize(path) >> predictor;
+    // deserialize(predictor, path);
 
     jclass pointFClazz = env->FindClass("android/graphics/Point");
     jclass faceInfoClass = env->FindClass("cn/co/willow/android/face/FaceInfo");
     mPointClass = (jclass) env->NewGlobalRef(pointFClazz);
     mFaceInfoClass = (jclass) env->NewGlobalRef(faceInfoClass);
-
+    LOGE("init_face_detector start");
 }
 
 jobjectArray face_detector::do_face_detect_action(JNIEnv *env,
-                                                  jbyteArray image_data,
+                                                  jintArray image_data,
                                                   jint image_height,
                                                   jint image_widht) {
 
     // 数据转换
+    LOGE("数据转换 start");
     auto size = (unsigned long) (image_height * image_widht);
     std::vector<int> image_datacpp(size);
     jsize len = env->GetArrayLength(image_data);
-    jbyte *body = env->GetByteArrayElements(image_data, nullptr);
+    jint *body = env->GetIntArrayElements(image_data, nullptr);
     for (jsize i = 0; i < len; i++) {
         image_datacpp[i] = (int) body[i];
     }
+    LOGE("数据转换 finish");
 
     // 灰度取值
+    LOGE("灰度取值 start");
     array2d<rgb_pixel> frame;
     frame.set_size(image_height, image_widht);
     for (int i = 0; i < image_height; i++) {
@@ -53,8 +58,10 @@ jobjectArray face_detector::do_face_detect_action(JNIEnv *env,
             );
         }
     }
+    LOGE("灰度取值 finish");
 
     // 人脸检测
+    LOGE("人脸检测 start");
     jmethodID pointConstructID = (env)->GetMethodID(mPointClass, "<init>", "()V");
     jmethodID faceConstructID = (env)->GetMethodID(mFaceInfoClass, "<init>", "()V");
 
@@ -84,6 +91,7 @@ jobjectArray face_detector::do_face_detect_action(JNIEnv *env,
         (env)->SetObjectArrayElement(final_result, i, tempFaceInfo);
         (env)->DeleteLocalRef(tempFaceInfo);
     }
+    LOGE("人脸检测 finish");
 
     return final_result;
 }
@@ -91,20 +99,27 @@ jobjectArray face_detector::do_face_detect_action(JNIEnv *env,
 /*暴露方法=======================================================================================*/
 face_detector *current_detector = nullptr;
 
-static void out_cast_detector::do_init(JNIEnv *env, jstring predictor_path) {
+static void out_cast_detector::do_init(JNIEnv *env,
+                                       jobject job,
+                                       jstring predictor_path) {
+    LOGE("init_face_detector proxy start");
     if (current_detector != nullptr) {
         current_detector->init_face_detector(env, predictor_path);
     }
+    LOGE("init_face_detector proxy finish");
 }
 
 
 static jobjectArray out_cast_detector::do_detect(JNIEnv *env,
-                                                 jbyteArray image_data,
+                                                 jobject obj,
+                                                 jintArray image_data,
                                                  jint image_height,
                                                  jint image_widht) {
+    LOGE("do_detect proxy start");
     if (current_detector != nullptr) {
         return current_detector->do_face_detect_action(env, image_data, image_height, image_widht);
     }
+    LOGE("do_detect proxy finish");
     return nullptr;
 }
 
@@ -114,7 +129,7 @@ static jobjectArray out_cast_detector::do_detect(JNIEnv *env,
 static const char *jniClassName = "cn/co/willow/android/face/FaceDetectorManager";
 static const JNINativeMethod provide_methods[] = {
         {"initFaceDetector",   "(Ljava/lang/String;)V",                       (void *) out_cast_detector::do_init},
-        {"doFaceDetectAction", "([BII)[Lcn/co/willow/android/face/FaceInfo;", (jobjectArray *) out_cast_detector::do_detect},
+        {"doFaceDetectAction", "([III)[Lcn/co/willow/android/face/FaceInfo;", (jobjectArray *) out_cast_detector::do_detect},
 };
 
 // 此函数通过调用RegisterNatives方法来注册我们的函数
@@ -130,7 +145,7 @@ static int registerNativeMethods(JNIEnv *env,
     if ((env)->RegisterNatives(clazz, getMethods, methodsNum) < 0) {
         return JNI_FALSE;
     }
-    if (current_detector != nullptr) {
+    if (current_detector == nullptr) {
         current_detector = new face_detector();
     }
     return JNI_TRUE;

@@ -37,9 +37,11 @@ target_link_libraries(
 set(CMAKE_BUILE_TYPE "RELEASE")
 set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} -s -O3 -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -s -O3 -Wall")
+
 #[[
-SET(CMAKE_BUILE_TYPE "DEBUG")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
+set(CMAKE_BUILE_TYPE "DEBUG")
+set(CMAKE_C_FLAGS_DEBUG "-g -Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 ]]
 
 

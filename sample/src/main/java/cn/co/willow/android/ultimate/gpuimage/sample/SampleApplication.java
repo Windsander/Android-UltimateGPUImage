@@ -5,34 +5,44 @@ import android.os.Handler;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
+import cn.co.willow.android.face.FaceDetectorManager;
+
 /**
  * App实际对象类
  */
 public class SampleApplication extends MultiDexApplication {
 
     private static SampleApplication mApplicationContext;               // 主线程的上下文
-    private static Handler           mMainThreadsHandler;               // 主线程的Handler
-    private static Thread            mMainThread;                       // 主线程
-    private static int               mMainThreadId;                     // 主线程id
+    private static Handler mMainThreadsHandler;               // 主线程的Handler
+    private static Thread mMainThread;                       // 主线程
+    private static int mMainThreadId;                     // 主线程id
 
     /*变量获取======================================================================================*/
 
-    /** 获得应用上下文 */
+    /**
+     * 获得应用上下文
+     */
     public static SampleApplication getApplication() {
         return mApplicationContext;
     }
 
-    /** 获得主线程Handler */
+    /**
+     * 获得主线程Handler
+     */
     public static Handler getMainThreadHandler() {
         return mMainThreadsHandler;
     }
 
-    /** 获得主线程 */
+    /**
+     * 获得主线程
+     */
     public static Thread getMainThread() {
         return mMainThread;
     }
 
-    /** 获得主线程id */
+    /**
+     * 获得主线程id
+     */
     public static int getMainThreadId() {
         return mMainThreadId;
     }
@@ -58,6 +68,7 @@ public class SampleApplication extends MultiDexApplication {
         super.onCreate();
         // 网络请求提供者
 
+        FaceDetectorManager.register(this);
     }
 
 }

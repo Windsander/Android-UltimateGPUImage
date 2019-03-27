@@ -23,6 +23,7 @@ import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView.Renderer;
+import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -35,6 +36,8 @@ import java.util.Queue;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import cn.co.willow.android.face.FaceDetectorManager;
+import cn.co.willow.android.face.FaceInfo;
 import cn.co.willow.android.ultimate.gpuimage.core_config.FilterConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
@@ -167,6 +170,15 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                     }
                 }
             });
+        }
+        FaceDetectorManager faceDetector = FaceDetectorManager.getInstance();
+        if (null != faceDetector) {
+            FaceInfo[] faceInfos = faceDetector.doFaceDetect(
+                    mGLRgbBuffer.array(),
+                    previewSize.height,
+                    previewSize.width
+            );
+            Log.e("!!!!!!!!!!!!!!!", "faceInfos = " + faceInfos);
         }
     }
 
