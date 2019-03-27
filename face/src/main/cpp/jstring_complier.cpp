@@ -30,7 +30,7 @@ jstring jstring_complier::char_to_jstring(JNIEnv *env, const char *pat) {
 
 char *jstring_complier::jstring_to_char(JNIEnv *env, jstring jstr) {
     char *rtn = nullptr;
-    jclass clsstring = env->FindClass("java/lang/String");
+    jclass clsstring = env->FindClass("Ljava/lang/String");
     jstring strencode = env->NewStringUTF("GB2312");
     jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
     auto barr = (jbyteArray) env->CallObjectMethod(jstr, mid, strencode);

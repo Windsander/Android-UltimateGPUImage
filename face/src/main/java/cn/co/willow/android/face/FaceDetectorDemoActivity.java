@@ -11,13 +11,11 @@ import com.example.face.R;
 
 public class FaceDetectorDemoActivity extends AppCompatActivity {
 
-    static {
-        System.loadLibrary("face_lib");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FaceDetectorManager mFaceDetectorManager = new FaceDetectorManager(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -28,8 +26,6 @@ public class FaceDetectorDemoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                HelloWorld();
-                HelloWorld2();
             }
         });
     }
