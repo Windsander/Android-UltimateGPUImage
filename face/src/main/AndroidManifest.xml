@@ -3,10 +3,7 @@
     package="com.example.face">
 
     <application>
-        <activity
-            android:name="cn.co.willow.android.face.FaceDetectorDemoActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>

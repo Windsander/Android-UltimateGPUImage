@@ -13,7 +13,7 @@ include(${dlib_path}/cmake)
 add_library(
         face_lib SHARED
         src/main/dlib/all/source.cpp
-        src/main/cpp/jstring_complier.cpp
+        src/main/cpp/jdata_complier.cpp
         src/main/cpp/face_detector.cpp
 )
 

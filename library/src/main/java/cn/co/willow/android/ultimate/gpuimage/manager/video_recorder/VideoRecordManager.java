@@ -60,7 +60,6 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mFilteManager.setGLSurfaceView(videoRecordView);
     }
 
-
     /*相机控制======================================================================================*/
 
     /**
@@ -103,8 +102,8 @@ public class VideoRecordManager implements VideoRecordConstrain, VideoRecordMana
         mFilteManager.setUpCamera(mCamera, isFrontCame);
         mFilteManager.setOnSurfaceSetListener(new BaseRenderer.OnSurfaceSetListener() {
             @Override
-            public void onSurfaceSet(SurfaceTexture mSurfaceTexture) {
-                mRenderSurface = new Surface(mSurfaceTexture);
+            public void onSurfaceSet(SurfaceTexture surfaceTexture) {
+                mRenderSurface = new Surface(surfaceTexture);
             }
         });
     }

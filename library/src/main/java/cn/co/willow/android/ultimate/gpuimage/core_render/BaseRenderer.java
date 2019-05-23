@@ -21,6 +21,8 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView.Renderer;
 import android.util.Log;
@@ -30,6 +32,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -41,6 +44,7 @@ import cn.co.willow.android.face.FaceInfo;
 import cn.co.willow.android.ultimate.gpuimage.core_config.FilterConfig;
 import cn.co.willow.android.ultimate.gpuimage.core_config.Rotation;
 import cn.co.willow.android.ultimate.gpuimage.core_render_filter.GPUImageFilter;
+import cn.co.willow.android.ultimate.gpuimage.ui.FilterRecoderView;
 import cn.co.willow.android.ultimate.gpuimage.utils.GPUImageNativeLibrary;
 import cn.co.willow.android.ultimate.gpuimage.utils.GlUtil;
 import cn.co.willow.android.ultimate.gpuimage.utils.TextureRotationUtil;
@@ -145,7 +149,7 @@ public class BaseRenderer implements Renderer, PreviewCallback {
     public void onPreviewFrame(final byte[] data, final Camera camera) {
         final Size previewSize = camera.getParameters().getPreviewSize();
         if (mGLRgbBuffer == null) {
-            mGLRgbBuffer = IntBuffer.allocate(previewSize.width * previewSize.height);
+            mGLRgbBuffer = IntBuffer.allocate((previewSize.width * previewSize.height));
         }
         if (mRunOnDraw.isEmpty()) {
             runOnDraw(new Runnable() {
@@ -178,7 +182,8 @@ public class BaseRenderer implements Renderer, PreviewCallback {
                     previewSize.height,
                     previewSize.width
             );
-            Log.e("!!!!!!!!!!!!!!!", "faceInfos = " + faceInfos);
+            Log.e("!!!", "mGLRgbBuffer = " + Arrays.toString(mGLRgbBuffer.array()));
+            Log.e("!!!!!!!!!!!!!!!", "faceInfos = " + Arrays.toString(faceInfos));
         }
     }
 
@@ -366,12 +371,12 @@ public class BaseRenderer implements Renderer, PreviewCallback {
     private OnSurfaceSetListener mOnSurfaceSetListener;
 
     public interface OnSurfaceSetListener {
-        void onSurfaceSet(SurfaceTexture mSurfaceTexture);
+        void onSurfaceSet(SurfaceTexture surfaceTexture);
     }
 
-    public void setOnSurfaceSetListener(OnSurfaceSetListener mOnSurfaceSetListener) {
-        if (mOnSurfaceSetListener != null) {
-            this.mOnSurfaceSetListener = mOnSurfaceSetListener;
+    public void setOnSurfaceSetListener(OnSurfaceSetListener onSurfaceSetListener) {
+        if (onSurfaceSetListener != null) {
+            this.mOnSurfaceSetListener = onSurfaceSetListener;
         }
     }
 }

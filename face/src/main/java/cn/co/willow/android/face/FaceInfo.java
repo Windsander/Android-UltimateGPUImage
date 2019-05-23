@@ -5,9 +5,11 @@ import android.graphics.PointF;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,17 +19,29 @@ import java.util.List;
  */
 public class FaceInfo implements Serializable {
 
-    public final static String FACE_KEY_CHIN = "chin";
-    public final static String FACE_KEY_LEFT_EYEBROW = "left_eyebrow";
-    public final static String FACE_KEY_RIGHT_EYEBROW = "right_eyebrow";
-    public final static String FACE_KEY_NOSE_BRIDGE = "nose_bridge";
-    public final static String FACE_KEY_NOSE_TIP = "nose_tip";
-    public final static String FACE_KEY_LEFT_EYE = "left_eye";
-    public final static String FACE_KEY_RIGHT_EYE = "right_eye";
-    public final static String FACE_KEY_TOP_LIP = "top_lip";
-    public final static String FACE_KEY_BOTTOM_LIP = "bottom_lip";
+    private final static String FACE_KEY_CHIN = "chin";
+    private final static String FACE_KEY_LEFT_EYEBROW = "left_eyebrow";
+    private final static String FACE_KEY_RIGHT_EYEBROW = "right_eyebrow";
+    private final static String FACE_KEY_NOSE_BRIDGE = "nose_bridge";
+    private final static String FACE_KEY_NOSE_TIP = "nose_tip";
+    private final static String FACE_KEY_LEFT_EYE = "left_eye";
+    private final static String FACE_KEY_RIGHT_EYE = "right_eye";
+    private final static String FACE_KEY_TOP_LIP = "top_lip";
+    private final static String FACE_KEY_BOTTOM_LIP = "bottom_lip";
 
-    public List<Point> mKeyPoints;        // 脸部特征点数据集
+    public final static String[] FACE_MARK_LIST_68 = {
+            FACE_KEY_CHIN,
+            FACE_KEY_LEFT_EYEBROW,
+            FACE_KEY_RIGHT_EYEBROW,
+            FACE_KEY_NOSE_BRIDGE,
+            FACE_KEY_NOSE_TIP,
+            FACE_KEY_LEFT_EYE,
+            FACE_KEY_RIGHT_EYE,
+            FACE_KEY_TOP_LIP,
+            FACE_KEY_BOTTOM_LIP
+    };
+
+    public PointF[] mKeyPoints;        // 脸部特征点数据集
 
     public FaceInfo() {
     }
@@ -39,7 +53,7 @@ public class FaceInfo implements Serializable {
      *
      * @return 特征点集合
      */
-    public List<Point> getKeyPoints() {
+    public PointF[] getKeyPoints() {
         return mKeyPoints;
     }
 
@@ -49,64 +63,65 @@ public class FaceInfo implements Serializable {
      * @param facemark 检索脸部位置
      * @return 对应位置特征点数据集
      */
-    public List<Point> getCertainFacemark68(String facemark) {
+    public PointF[] getCertainFacemark68(String facemark) {
         if (null == mKeyPoints || TextUtils.isEmpty(facemark)) {
             return mKeyPoints;
         }
-        List<Point> result = new ArrayList<>();
+        List<PointF> result = new ArrayList<>();
+        final List<PointF> pointArray = Arrays.asList(mKeyPoints);
         switch (facemark) {
             case FACE_KEY_CHIN:
-                result = mKeyPoints.subList(0, 17);
+                result = pointArray.subList(0, 17);
                 break;
             case FACE_KEY_LEFT_EYEBROW:
-                result = mKeyPoints.subList(17, 22);
+                result = pointArray.subList(17, 22);
                 break;
             case FACE_KEY_RIGHT_EYEBROW:
-                result = mKeyPoints.subList(22, 27);
+                result = pointArray.subList(22, 27);
                 break;
             case FACE_KEY_NOSE_BRIDGE:
-                result = mKeyPoints.subList(27, 31);
+                result = pointArray.subList(27, 31);
                 break;
             case FACE_KEY_NOSE_TIP:
-                result = mKeyPoints.subList(31, 36);
+                result = pointArray.subList(31, 36);
                 break;
             case FACE_KEY_LEFT_EYE:
-                result = mKeyPoints.subList(36, 42);
+                result = pointArray.subList(36, 42);
                 break;
             case FACE_KEY_RIGHT_EYE:
-                result = mKeyPoints.subList(42, 48);
+                result = pointArray.subList(42, 48);
                 break;
             case FACE_KEY_TOP_LIP:
-                List<Point> posTopPoint = mKeyPoints.subList(48, 55);
-                List<Point> negTopPoint = new ArrayList<Point>() {
+                List<PointF> posTopPoint = pointArray.subList(48, 55);
+                List<PointF> negTopPoint = new ArrayList<PointF>() {
                     {
-                        this.add(mKeyPoints.get(64));
-                        this.add(mKeyPoints.get(63));
-                        this.add(mKeyPoints.get(62));
-                        this.add(mKeyPoints.get(61));
-                        this.add(mKeyPoints.get(60));
+                        this.add(pointArray.get(64));
+                        this.add(pointArray.get(63));
+                        this.add(pointArray.get(62));
+                        this.add(pointArray.get(61));
+                        this.add(pointArray.get(60));
                     }
                 };
                 result.addAll(posTopPoint);
                 result.addAll(negTopPoint);
                 break;
             case FACE_KEY_BOTTOM_LIP:
-                List<Point> posBottomPoint = mKeyPoints.subList(54, 60);
-                List<Point> negBottomPoint = new ArrayList<Point>() {
+                List<PointF> posBottomPoint = pointArray.subList(54, 60);
+                List<PointF> negBottomPoint = new ArrayList<PointF>() {
                     {
-                        this.add(mKeyPoints.get(48));
-                        this.add(mKeyPoints.get(60));
-                        this.add(mKeyPoints.get(67));
-                        this.add(mKeyPoints.get(66));
-                        this.add(mKeyPoints.get(65));
-                        this.add(mKeyPoints.get(64));
+                        this.add(pointArray.get(48));
+                        this.add(pointArray.get(60));
+                        this.add(pointArray.get(67));
+                        this.add(pointArray.get(66));
+                        this.add(pointArray.get(65));
+                        this.add(pointArray.get(64));
                     }
                 };
                 result.addAll(posBottomPoint);
                 result.addAll(negBottomPoint);
                 break;
         }
-        return result;
+        return (PointF[]) result.toArray();
     }
 
     @Override
@@ -114,8 +129,8 @@ public class FaceInfo implements Serializable {
         return (null == mKeyPoints) ?
                 "null" :
                 "FaceInfo{" +
-                        "mKeyPoints_size=" + mKeyPoints.size() +
-                        "mKeyPoints=" + mKeyPoints.toArray() +
+                        "mKeyPoints_size=" + mKeyPoints.length +
+                        "mKeyPoints=" + Arrays.toString(mKeyPoints) +
                         '}';
     }
 }

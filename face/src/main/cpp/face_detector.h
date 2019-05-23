@@ -8,7 +8,7 @@
 #include <jni.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing.h>
-#include "jstring_complier.h"
+#include "jdata_complier.h"
 
 using namespace std;
 using namespace dlib;
@@ -33,6 +33,14 @@ public:
     // 实现人脸检测算法
     jobjectArray do_face_detect_action(
             JNIEnv *env,
+            jbyteArray image_data,
+            jint image_height,
+            jint image_widht
+    );
+
+    // 实现人脸检测算法
+    jobjectArray do_face_detect_action_int(
+            JNIEnv *env,
             jintArray image_data,
             jint image_height,
             jint image_widht
@@ -47,9 +55,16 @@ namespace out_cast_detector {
 
     static jobjectArray do_detect(JNIEnv *env,
                                   jobject obj,
-                                  jintArray image_data,
+                                  jbyteArray image_data,
                                   jint image_height,
                                   jint image_widht
+    );
+
+    static jobjectArray do_detect_int(JNIEnv *env,
+                                      jobject obj,
+                                      jintArray image_data,
+                                      jint image_height,
+                                      jint image_widht
     );
 }
 #endif //ANDROID_ULTIMATEGPUIMAGE_FACE_DETECTOR_H

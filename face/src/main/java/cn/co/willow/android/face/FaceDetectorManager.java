@@ -56,15 +56,25 @@ public class FaceDetectorManager {
         }
     }
 
-    public FaceInfo[] doFaceDetect(int[] image_data,
+    public FaceInfo[] doFaceDetect(byte[] image_data,
                                    int image_height,
                                    int image_widht) {
         return doFaceDetectAction(image_data, image_height, image_widht);
     }
 
+    public FaceInfo[] doFaceDetect(int[] image_data,
+                                   int image_height,
+                                   int image_widht) {
+        return doFaceDetectActionInt(image_data, image_height, image_widht);
+    }
+
     private static native void initFaceDetector(String predictor_path);
 
-    private static native FaceInfo[] doFaceDetectAction(int[] image_data,
+    private static native FaceInfo[] doFaceDetectAction(byte[] image_data,
+                                                        int image_height,
+                                                        int image_widht);
+
+    private static native FaceInfo[] doFaceDetectActionInt(int[] image_data,
                                                         int image_height,
                                                         int image_widht);
 }

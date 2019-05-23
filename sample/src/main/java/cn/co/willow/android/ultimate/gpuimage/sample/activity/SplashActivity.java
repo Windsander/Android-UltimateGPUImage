@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
-import cn.co.willow.android.face.FaceDetectorDemoActivity;
 import cn.co.willow.android.ultimate.gpuimage.sample.R;
 
 /**

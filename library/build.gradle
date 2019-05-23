@@ -41,6 +41,5 @@ dependencies {
     api project(path: ':face')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.14'
-    implementation 'com.googlecode.mp4parser:isoparser:1.1.21'
 }
 apply from: "bintrayUpload.gradle"

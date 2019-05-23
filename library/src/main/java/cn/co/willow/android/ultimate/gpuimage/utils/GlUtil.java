@@ -138,34 +138,36 @@ public class GlUtil {
      * @param data   Image data, in a "direct" ByteBuffer.
      * @param width  Texture width, in pixels (not bytes).
      * @param height Texture height, in pixels.
-     * @param format Image data format (use constant appropriate for glTexImage2D(), e.g. GL_RGBA).
      * @return Handle to texture.
      */
-    public static int createTexture(final ByteBuffer data, final int width, final int height, final int format) {
+    public static int createTexture(final ByteBuffer data, final int width, final int height, final int usedTexId) {
         int textures[] = new int[1];
-        GLES30.glGenTextures(1, textures, 0);
-        GlUtil.checkGlError("glGenTextures");
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
-        GlUtil.checkGlError("glBindTexture");
-        GLES30.glTexParameteri(
-                /*texture-type*/ GLES30.GL_TEXTURE_2D,
-                /*filter-type*/  GLES30.GL_TEXTURE_MIN_FILTER,
-                /*algorithm*/    GLES30.GL_LINEAR);
-        GLES30.glTexParameteri(
-                /*texture-type*/ GLES30.GL_TEXTURE_2D,
-                /*filter-type*/  GLES30.GL_TEXTURE_MAG_FILTER,
-                /*algorithm*/    GLES30.GL_LINEAR);
-        GlUtil.checkGlError("glTexParameteri");
-        GLES30.glTexImage2D(
-                /*aim*/          GLES30.GL_TEXTURE_2D,
-                /*level*/        0,
-                /*detail*/       format, width, height,
-                /*border*/       0,
-                /*pixel-format*/ format,
-                /*pixel-type*/   GLES30.GL_UNSIGNED_BYTE,
-                /*pixel-data*/   data);
-        GlUtil.checkGlError("glTexImage2D");
-
+        if (usedTexId == NO_TEXTURE) {
+            GLES30.glGenTextures(1, textures, 0);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexImage2D(
+                    GLES30.GL_TEXTURE_2D,
+                    0,
+                    GLES30.GL_RGBA, width, height,
+                    0,
+                    GLES30.GL_RGBA,
+                    GLES30.GL_UNSIGNED_BYTE,
+                    data);
+        } else {
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, usedTexId);
+            GLES30.glTexSubImage2D(
+                    GLES30.GL_TEXTURE_2D,
+                    0,
+                    0, 0, width, height,
+                    GLES30.GL_RGBA,
+                    GLES30.GL_UNSIGNED_BYTE,
+                    data);
+            textures[0] = usedTexId;
+        }
         return textures[0];
     }
 
@@ -182,33 +184,15 @@ public class GlUtil {
         int textures[] = new int[1];
         if (usedTexId == NO_TEXTURE) {
             GLES30.glGenTextures(1, textures, 0);
-            GlUtil.checkGlError("glGenTextures");
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
-            GlUtil.checkGlError("glBindTexture");
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_MIN_FILTER,
-                    GLES30.GL_LINEAR);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_MAG_FILTER,
-                    GLES30.GL_LINEAR);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_WRAP_S,
-                    GLES30.GL_CLAMP_TO_EDGE);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_WRAP_T,
-                    GLES30.GL_CLAMP_TO_EDGE);
-            GlUtil.checkGlError("glTexParameteri");
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, img, 0);
-            GlUtil.checkGlError("glTexImage2D");
         } else {
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, usedTexId);
-            GlUtil.checkGlError("glBindTexture");
             GLUtils.texSubImage2D(GLES30.GL_TEXTURE_2D, 0, 0, 0, img);
-            GlUtil.checkGlError("glTexImage2D");
             textures[0] = usedTexId;
         }
         if (recycle) {
@@ -234,22 +218,10 @@ public class GlUtil {
             GlUtil.checkGlError("glGenTextures");
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textures[0]);
             GlUtil.checkGlError("glBindTexture");
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_MAG_FILTER,
-                    GLES30.GL_LINEAR);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_MIN_FILTER,
-                    GLES30.GL_LINEAR);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_WRAP_S,
-                    GLES30.GL_CLAMP_TO_EDGE);
-            GLES30.glTexParameterf(
-                    GLES30.GL_TEXTURE_2D,
-                    GLES30.GL_TEXTURE_WRAP_T,
-                    GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
             GlUtil.checkGlError("glTexParameterf");
             GLES30.glTexImage2D(
                     GLES30.GL_TEXTURE_2D,
